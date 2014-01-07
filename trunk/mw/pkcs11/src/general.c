@@ -21,15 +21,19 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "beid_p11.h"
+//#include "beid_p11.h"
+#include "asep11.h"
 #include "util.h"
 #include "log.h"
-#include "p11.h"
-#include "cal.h"
+//#include "p11.h"
+//#include "cal.h"
 
 #define LOG_MAX_REC  10
 
 extern CK_FUNCTION_LIST pkcs11_function_list;
+
+static void* g_aseP11Handle;
+
 //extern void *logmutex;
 
 //static int g_final = 0; /* Belpic */
@@ -50,6 +54,7 @@ extern CK_FUNCTION_LIST pkcs11_function_list;
 CK_RV C_Initialize(CK_VOID_PTR pReserved)
 {
 	int ret = CKR_OK;
+	CK_RV retVal = CKR_OK;
 	CK_C_INITIALIZE_ARGS_PTR p_args;
 
 #if _DEBUG
@@ -92,10 +97,37 @@ CK_RV C_Initialize(CK_VOID_PTR pReserved)
 			log_trace(WHERE, "S: p11_init_lock");
 			p11_init_lock(p_args);
 		}
-		cal_init();
-		p11_set_init(BEIDP11_INITIALIZED);
-		log_trace(WHERE, "S: Initialize this PKCS11 Module");
-		log_trace(WHERE, "S: =============================");
+		//cal_init();
+		g_aseP11Handle = dlopen(ASEP11_LIB, RTLD_LAZY); // RTLD_NOW is slower
+		log_trace(WHERE, "S: dlopen(ASEP11_LIB");
+		if (g_aseP11Handle != NULL)
+		{
+		    // get function pointer to C_GetFunctionList
+            pC_GetFunctionList = (CK_C_GetFunctionList)dlsym(g_aseP11Handle, "C_GetFunctionList");
+            if (pC_GetFunctionList != NULL)
+            {
+                // invoke C_GetFunctionList to get the list of pkcs11 function pointers
+                retVal = (*pC_GetFunctionList) (&pFunctions);
+                if (retVal == CKR_OK)
+                {
+                    // initialize Cryptoki
+                    retVal = (pFunctions->C_Initialize) (NULL);
+                }
+            }
+		}
+		if (retVal == CKR_OK)
+        {
+            p11_set_init(BEIDP11_INITIALIZED);
+            log_trace(WHERE, "S: Initialize this PKCS11 Module");
+            log_trace(WHERE, "S: =============================");
+        }
+		else
+		{
+			log_trace(WHERE, "E: Not Initialized this PKCS11 Module");
+            ret = CKR_ARGUMENTS_BAD;
+            goto cleanup;
+		}
+
 	}
 
 cleanup:
@@ -134,7 +166,21 @@ CK_RV C_Finalize(CK_VOID_PTR pReserved)
 	//g_final = 0; /* Belpic */
 	p11_set_init(BEIDP11_DEINITIALIZING);
 
-	ret = cal_close();
+	//ret = cal_close();
+    if (g_aseP11Handle == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - g_aseP11Handle is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+    }
+    else
+    {
+        ret = (pFunctions->C_Finalize) (&pReserved);
+        if (g_aseP11Handle != NULL)
+		{
+			dlclose(g_aseP11Handle);
+		}
+
+    }
 
 	/* Release and destroy the mutex */
 	// mutex might still be in use by C_waitforslotlist
@@ -166,7 +212,7 @@ CK_RV C_GetInfo(CK_INFO_PTR pInfo)
 
 	log_trace(WHERE, "S: C_GetInfo()");
 
-	memset(pInfo, 0, sizeof(CK_INFO));
+	/*memset(pInfo, 0, sizeof(CK_INFO));
 	pInfo->cryptokiVersion.major = 2;
 #ifdef PKCS11_V2_20
 	pInfo->cryptokiVersion.minor = 20;
@@ -176,7 +222,14 @@ CK_RV C_GetInfo(CK_INFO_PTR pInfo)
 	strcpy_n(pInfo->manufacturerID,  "Belgium Government",  sizeof(pInfo->manufacturerID), ' ');
 	strcpy_n(pInfo->libraryDescription, "Belgium eID PKCS#11 interface v2", sizeof(pInfo->libraryDescription), ' ');
 	pInfo->libraryVersion.major = 2;
-	pInfo->libraryVersion.minor = 0;
+	pInfo->libraryVersion.minor = 0;*/
+    if (g_aseP11Handle == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - g_aseP11Handle is NULL");
+        ret = CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    ret = (pFunctions->C_GetInfo) (pInfo);
 
 cleanup:
 	log_trace(WHERE, "I: leave, ret = %i",ret);
@@ -199,6 +252,12 @@ CK_RV C_GetFunctionList(CK_FUNCTION_LIST_PTR_PTR ppFunctionList)
 	}
 
 	*ppFunctionList = &pkcs11_function_list;
+    /*if (g_aseP11Handle == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - g_aseP11Handle is NULL");
+        return CKR_ARGUMENTS_BAD;
+    }
+	*ppFunctionList = pFunctions;*/
 
 	log_trace(WHERE, "I: leave, CKR_OK");
 	return CKR_OK;
@@ -213,7 +272,7 @@ CK_RV C_GetSlotList(CK_BBOOL       tokenPresent,  /* only slots with token prese
 	CK_ULONG_PTR   pulCount)      /* receives the number of slots */
 {
 
-	P11_SLOT *pSlot;
+	//P11_SLOT *pSlot;
 	CK_RV ret = CKR_OK;
 	int h;
 	CK_ULONG c = 0; 
@@ -246,7 +305,7 @@ CK_RV C_GetSlotList(CK_BBOOL       tokenPresent,  /* only slots with token prese
 
 #ifdef PKCS11_V2_20
 	if(pSlotList == NULL){
-		ret = cal_refresh_readers();
+		//ret = cal_refresh_readers();
 	}
 #endif
 	//init slots allready done
@@ -259,7 +318,7 @@ CK_RV C_GetSlotList(CK_BBOOL       tokenPresent,  /* only slots with token prese
 	log_trace(WHERE, "I: h=0");
 	//Do not show the virtual reader (used to capture the reader connect events)
 	//for (h=0; h < (p11_get_nreaders()-1); h++)
-	for (h=0; h < p11_get_nreaders(); h++)
+	/*for (h=0; h < p11_get_nreaders(); h++)
 	{
 		log_trace(WHERE, "I: h=%i",h);
 		pSlot = p11_get_slot(h);
@@ -318,7 +377,16 @@ CK_RV C_GetSlotList(CK_BBOOL       tokenPresent,  /* only slots with token prese
 		ret = CKR_BUFFER_TOO_SMALL;
 
 	//number of slots should always be returned.
-	*pulCount = c;
+	*pulCount = c;*/
+
+    if (g_aseP11Handle == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - g_aseP11Handle is NULL");
+        ret = CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+
+    ret = (pFunctions->C_GetSlotList) (tokenPresent, pSlotList, pulCount);
 
 cleanup:   
 	log_trace(WHERE, "I: p11_unlock()");
@@ -333,7 +401,7 @@ cleanup:
 CK_RV C_GetSlotInfo(CK_SLOT_ID slotID, CK_SLOT_INFO_PTR pInfo)
 {         
 	CK_RV ret;
-	P11_SLOT *slot;
+	//P11_SLOT *slot;
 	static int l=0;
 	log_trace(WHERE, "I: enter");
 
@@ -359,7 +427,7 @@ CK_RV C_GetSlotInfo(CK_SLOT_ID slotID, CK_SLOT_INFO_PTR pInfo)
 		CLEANUP(CKR_ARGUMENTS_BAD);
 	}
 
-	slot = p11_get_slot(slotID);
+	/*slot = p11_get_slot(slotID);
 	if (slot == NULL)
 	{
 		log_trace(WHERE, "E: p11_get_slot(%d) returns null", slotID);
@@ -379,6 +447,14 @@ CK_RV C_GetSlotInfo(CK_SLOT_ID slotID, CK_SLOT_INFO_PTR pInfo)
 	if (cal_token_present(slotID))
 		//VSC:don't remove other flags
 		pInfo->flags |= CKF_TOKEN_PRESENT;
+	*/
+    if (g_aseP11Handle == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - g_aseP11Handle is NULL");
+        CLEANUP(CKR_ARGUMENTS_BAD);
+    }
+
+    ret = (pFunctions->C_GetSlotInfo) ( slotID,  pInfo);
 
 cleanup:
 	p11_unlock();
@@ -415,12 +491,20 @@ CK_RV C_GetTokenInfo(CK_SLOT_ID slotID, CK_TOKEN_INFO_PTR pInfo)
 		CLEANUP(CKR_ARGUMENTS_BAD);
 	}
 
-	ret = cal_get_token_info(slotID, pInfo);
+	/*ret = cal_get_token_info(slotID, pInfo);
 	if (ret != CKR_OK)
 	{
 		log_trace(WHERE, "E: p11_get_token_info returns %d", ret);
 		goto cleanup;
-	}
+	}*/
+    if (g_aseP11Handle == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - g_aseP11Handle is NULL");
+        CLEANUP(CKR_ARGUMENTS_BAD);
+    }
+
+    ret = (pFunctions->C_GetTokenInfo) ( slotID,  pInfo);
+
 
 cleanup:        
 	p11_unlock();
@@ -454,12 +538,20 @@ CK_RV C_GetMechanismList(CK_SLOT_ID slotID,
 
 	log_trace(WHERE, "S: C_GetMechanismList(slot %d)", slotID);
 
-	ret = cal_get_mechanism_list(slotID, pMechanismList,pulCount);
+	/*ret = cal_get_mechanism_list(slotID, pMechanismList,pulCount);
 	if (ret != CKR_OK)
 	{
 		log_trace(WHERE, "E: cal_get_mechanism_list(slotid=%d) returns %s", slotID, log_map_error(ret));
 		goto cleanup;
-	}
+	}*/
+    if (g_aseP11Handle == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - g_aseP11Handle is NULL");
+        CLEANUP(CKR_ARGUMENTS_BAD);
+    }
+
+    ret = (pFunctions->C_GetMechanismList) ( slotID,  pMechanismList, pulCount);
+
 
 cleanup:
 
@@ -498,12 +590,20 @@ CK_RV C_GetMechanismInfo(CK_SLOT_ID slotID,
 		CLEANUP(CKR_ARGUMENTS_BAD);
 	}
 
-	ret = cal_get_mechanism_info(slotID, type, pInfo);
+	/*ret = cal_get_mechanism_info(slotID, type, pInfo);
 	if (ret != CKR_OK)
 	{
 		log_trace(WHERE, "E: p11_get_mechanism_info(slotid=%d) returns %d", slotID, ret);
 		goto cleanup;
-	}
+	}*/
+    if (g_aseP11Handle == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - g_aseP11Handle is NULL");
+        CLEANUP(CKR_ARGUMENTS_BAD);
+    }
+
+    ret = (pFunctions->C_GetMechanismInfo) ( slotID,  type, pInfo);
+
 
 cleanup:        
 	p11_unlock();
@@ -537,7 +637,7 @@ CK_RV C_WaitForSlotEvent(CK_FLAGS flags,   /* blocking/nonblocking flag */
 {
 	CK_RV ret = CKR_OK;
 	int h;
-	P11_SLOT *p11Slot = NULL;
+	//P11_SLOT *p11Slot = NULL;
 	int i = 0;
 	CK_BBOOL locked = CK_FALSE;
 
@@ -578,7 +678,7 @@ CK_RV C_WaitForSlotEvent(CK_FLAGS flags,   /* blocking/nonblocking flag */
 
 	//first check if no events are set for slots in previous run
 	//this could happen if more cards are inserted/removed at the same time
-	for (i=0; i < p11_get_nreaders(); i++)
+	/*for (i=0; i < p11_get_nreaders(); i++)
 	{
 		p11Slot = p11_get_slot(i);
 		if(p11Slot == NULL)
@@ -631,7 +731,14 @@ CK_RV C_WaitForSlotEvent(CK_FLAGS flags,   /* blocking/nonblocking flag */
 	ret = cal_get_slot_changes(&h);
 
 	if (ret == CKR_OK)
-		*pSlot = h;
+		*pSlot = h;*/
+    if (g_aseP11Handle == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - g_aseP11Handle is NULL");
+        CLEANUP(CKR_ARGUMENTS_BAD);
+    }
+
+    ret = (pFunctions->C_WaitForSlotEvent) ( flags,  pSlot, pReserved);
 
 	//else CKR_NO_EVENT
 

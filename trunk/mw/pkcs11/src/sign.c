@@ -19,7 +19,8 @@
 **************************************************************************** */
 #include <stdlib.h>
 #include <string.h>
-#include "beid_p11.h"
+//#include "beid_p11.h"
+#include "asep11.h"
 #include "util.h"
 #include "log.h"
 #include "p11.h"
@@ -346,10 +347,10 @@ CK_RV C_SignInit(CK_SESSION_HANDLE hSession,    /* the session's handle */
                  CK_OBJECT_HANDLE  hKey)        /* handle of the signature key */
 {
    int ret;
-   P11_SESSION *pSession = NULL;
+   /*P11_SESSION *pSession = NULL;
    P11_SLOT    *pSlot = NULL;
    P11_SIGN_DATA *pSignData = NULL;
-   P11_OBJECT  *pObject = NULL;
+   P11_OBJECT  *pObject = NULL;*/
 
    CK_BBOOL       *pcan_sign = NULL;
    CK_KEY_TYPE    *pkeytype = NULL;
@@ -374,7 +375,7 @@ CK_RV C_SignInit(CK_SESSION_HANDLE hSession,    /* the session's handle */
 
 	 log_trace(WHERE, "I: enter");
 
-   ret = p11_get_session(hSession, &pSession);
+   /*ret = p11_get_session(hSession, &pSession);
    if (ret)
       {
       log_trace(WHERE, "E: Invalid session handle (%d)", hSession);
@@ -466,7 +467,7 @@ CK_RV C_SignInit(CK_SESSION_HANDLE hSession,    /* the session's handle */
 
    //check class, keytype and sign attribute CKO_PRIV_KEY
    /* CKR_KEY_TYPE_INCONSISTENT has higher rank than CKR_KEY_FUNCTION_NOT_PERMITTED */
-   ret = p11_get_attribute_value(pObject->pAttr, pObject->count, CKA_KEY_TYPE, (CK_VOID_PTR*) &pkeytype, &len);
+   /*ret = p11_get_attribute_value(pObject->pAttr, pObject->count, CKA_KEY_TYPE, (CK_VOID_PTR*) &pkeytype, &len);
    if (ret || (len != sizeof(CK_KEY_TYPE)) || (*pkeytype != CKK_RSA))
       {
       log_trace(WHERE, "E: Wrong keytype");
@@ -500,7 +501,7 @@ CK_RV C_SignInit(CK_SESSION_HANDLE hSession,    /* the session's handle */
 
    /* get ID to identify signature key */
    /* at this time, id should be available, otherwise, device is not connected and objects are not initialized */
-   ret = p11_get_attribute_value(pObject->pAttr, pObject->count, CKA_ID, (CK_VOID_PTR*) &pid, &len);
+   /*ret = p11_get_attribute_value(pObject->pAttr, pObject->count, CKA_ID, (CK_VOID_PTR*) &pid, &len);
    if (ret || (len != sizeof(CK_ULONG)))
       {
       log_trace(WHERE, "E: ID missing for key");
@@ -509,7 +510,7 @@ CK_RV C_SignInit(CK_SESSION_HANDLE hSession,    /* the session's handle */
       }
 
    /* init sign operation */
-   if((pSignData = pSession->Operation[P11_OPERATION_SIGN].pData) == NULL)
+   /*if((pSignData = pSession->Operation[P11_OPERATION_SIGN].pData) == NULL)
       {
       pSignData = pSession->Operation[P11_OPERATION_SIGN].pData = (P11_SIGN_DATA *) malloc (sizeof(P11_SIGN_DATA));
       if (pSignData == NULL)
@@ -538,7 +539,18 @@ CK_RV C_SignInit(CK_SESSION_HANDLE hSession,    /* the session's handle */
          }
       }
    pSession->Operation[P11_OPERATION_SIGN].active = 1;
-
+   */
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_SignInit");
+        ret = (pFunctions->C_SignInit) (hSession, pMechanism, hKey);
+    }
 cleanup:       
    p11_unlock();
 	 log_trace(WHERE, "I: leave, ret = 0x%08x",ret);
@@ -557,8 +569,8 @@ CK_RV C_Sign(CK_SESSION_HANDLE hSession,        /* the session's handle */
              CK_ULONG_PTR      pulSignatureLen) /* receives byte count of signature */
 {
    int 		  ret         = CKR_OK;
-   P11_SESSION*   pSession    = NULL;
-   P11_SIGN_DATA* pSignData   = NULL;
+   //P11_SESSION*   pSession    = NULL;
+   //P11_SIGN_DATA* pSignData   = NULL;
    unsigned char* pDigest     = NULL;
    unsigned long  ulDigestLen = 0;
 // unsigned int ulSignatureLen = *pulSignatureLen;
@@ -575,7 +587,7 @@ CK_RV C_Sign(CK_SESSION_HANDLE hSession,        /* the session's handle */
 
 	 log_trace(WHERE, "I: enter");
 
-   ret = p11_get_session(hSession, &pSession);
+   /*ret = p11_get_session(hSession, &pSession);
    if (ret)
       {
       log_trace(WHERE, "E: Invalid session handle (%d)", hSession);
@@ -591,7 +603,7 @@ CK_RV C_Sign(CK_SESSION_HANDLE hSession,        /* the session's handle */
       }
 
    /* get sign operation */
-   if((pSignData = pSession->Operation[P11_OPERATION_SIGN].pData) == NULL)
+   /*if((pSignData = pSession->Operation[P11_OPERATION_SIGN].pData) == NULL)
       {
       log_trace( WHERE, "E: no sign operation initialized");
       ret = CKR_OPERATION_NOT_INITIALIZED;
@@ -607,7 +619,7 @@ CK_RV C_Sign(CK_SESSION_HANDLE hSession,        /* the session's handle */
 
    if (pSignature == NULL)
       {
-      /* just return the signature size */
+      /* just return the signature size */ /*
       *pulSignatureLen = pSignData->l_sign;
       ret = CKR_OK;
       goto cleanup;
@@ -621,10 +633,10 @@ CK_RV C_Sign(CK_SESSION_HANDLE hSession,        /* the session's handle */
       }
 
    /* do we have to hash first? */
-   if (pSignData->phash)
+   /*if (pSignData->phash)
       {
       /* reserve space for data to sign */
-      pDigest = (unsigned char*) malloc(pSignData->l_hash);
+      /*pDigest = (unsigned char*) malloc(pSignData->l_hash);
       if (pDigest == NULL)
          {
          ret = CKR_HOST_MEMORY;
@@ -643,7 +655,7 @@ CK_RV C_Sign(CK_SESSION_HANDLE hSession,        /* the session's handle */
    else
       {
       /* reserve space for data to sign */
-      pDigest = (unsigned char*) malloc(ulDataLen);
+      /*pDigest = (unsigned char*) malloc(ulDataLen);
       if (pDigest == NULL)
          {
          ret = CKR_HOST_MEMORY;
@@ -654,7 +666,7 @@ CK_RV C_Sign(CK_SESSION_HANDLE hSession,        /* the session's handle */
       }
 
    /* do the signing (and add pkcs headers first if needed) */
-   ret = cal_sign(pSession->hslot, pSignData, pDigest, ulDigestLen, pSignature, pulSignatureLen);
+   /*ret = cal_sign(pSession->hslot, pSignData, pDigest, ulDigestLen, pSignature, pulSignatureLen);
    if (ret != CKR_OK)
       log_trace(WHERE, "E: cal_sign() returned %s", log_map_error(ret));
 
@@ -663,6 +675,18 @@ terminate:
    free(pSignData);
    pSession->Operation[P11_OPERATION_SIGN].pData = NULL;
    pSession->Operation[P11_OPERATION_SIGN].active = 0;
+   */
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_Sign");
+        ret = (pFunctions->C_Sign) (hSession, pData, ulDataLen, pSignature, pulSignatureLen);
+    }
 
 cleanup:        
    if (pDigest)
