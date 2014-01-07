@@ -1,7 +1,7 @@
 /* ****************************************************************************
 
 * eID Middleware Project.
-* Copyright (C) 2008-2013 FedICT.
+* Copyright (C) 2008-2012 FedICT.
 *
 * This is free software; you can redistribute it and/or modify it
 * under the terms of the GNU Lesser General Public License version
@@ -19,15 +19,13 @@
 **************************************************************************** */
 #include <stdlib.h>
 #include <string.h>
-#include "beid_p11.h"
+//#include "beid_p11.h"
+#include "asep11.h"
 #include "log.h"
 #include "util.h"
 #include "p11.h"
 #include "cal.h"
 #include "display.h"
-
-//global variable 
-int eidmw_readpermission = 0;
 
 //function declarations
 void SetParseFlagByLabel(CK_BYTE* pFilesToParseFlag,CK_UTF8CHAR_PTR pLabel,CK_ULONG len);
@@ -99,9 +97,9 @@ CK_RV C_GetAttributeValue(CK_SESSION_HANDLE hSession,   /* the session's handle 
 	*/
 
 	int status, ret = 0;
-	P11_SESSION *pSession = NULL;
-	P11_SLOT    *pSlot    = NULL;
-	P11_OBJECT  *pObject  = NULL;
+	//P11_SESSION *pSession = NULL;
+	//P11_SLOT    *pSlot    = NULL;
+	//P11_OBJECT  *pObject  = NULL;
 	unsigned int j = 0;
 	void  *pValue    = NULL;
 	CK_ULONG len = 0;
@@ -119,7 +117,7 @@ CK_RV C_GetAttributeValue(CK_SESSION_HANDLE hSession,   /* the session's handle 
 
 	log_trace(WHERE, "S: C_GetAttributeValue(hObject=%d)",hObject);
 
-	ret = p11_get_session(hSession, &pSession);
+	/*ret = p11_get_session(hSession, &pSession);
 	if (ret)
 	{
 		log_trace(WHERE, "E: Invalid session handle (%d)", hSession);
@@ -171,7 +169,7 @@ CK_RV C_GetAttributeValue(CK_SESSION_HANDLE hSession,   /* the session's handle 
 	//retrieve all objects as listed in template and fill the template
 	//action is done for all attributes, even if some attributes give errors or buffer is too small
 	//there is however only one return code to return so we have to keep the most important return code.
-	for (j = 0; j < ulCount; j++)
+	/*for (j = 0; j < ulCount; j++)
 	{
 		status = p11_get_attribute_value(pObject->pAttr, pObject->count, pTemplate[j].type, (CK_VOID_PTR *) &pValue, &len);
 		if (status != CKR_OK)
@@ -186,7 +184,7 @@ CK_RV C_GetAttributeValue(CK_SESSION_HANDLE hSession,   /* the session's handle 
 		if (pTemplate[j].pValue == NULL)
 		{
 			/* in this case we return the real length of the value */
-			pTemplate[j].ulValueLen = len;
+			/*pTemplate[j].ulValueLen = len;
 			continue;
 		}
 
@@ -203,6 +201,18 @@ CK_RV C_GetAttributeValue(CK_SESSION_HANDLE hSession,   /* the session's handle 
 
 	if (ulCount != 0)
 		log_template("I: Template out:", pTemplate, ulCount);
+	*/
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_GetAttributeValue");
+        ret = (pFunctions->C_GetAttributeValue) (hSession, hObject, pTemplate, ulCount);
+    }
 
 cleanup:
 	p11_unlock();
@@ -230,8 +240,8 @@ CK_RV C_FindObjectsInit(CK_SESSION_HANDLE hSession,   /* the session's handle */
 												CK_ATTRIBUTE_PTR  pTemplate,  /* attribute values to match */
 												CK_ULONG          ulCount)    /* attributes in search template */
 {
-	P11_SESSION *pSession = NULL;
-	P11_FIND_DATA *pData = NULL;
+	//P11_SESSION *pSession = NULL;
+	//P11_FIND_DATA *pData = NULL;
 	int ret;
 	CK_ULONG      *pclass = NULL;
 	CK_ULONG       len = 0;
@@ -262,7 +272,7 @@ CK_RV C_FindObjectsInit(CK_SESSION_HANDLE hSession,   /* the session's handle */
 	/* CKA_CLASS_TYPE we support is only CKO_CERTIFICATE, CKO_PRIVATE_KEY and CKO_PUBLIC_KEY */
 	/* Sun-PKCS11 cannot handle  CKR_ATTRIBUTE_VALUE_INVALID properly so => initialize search and findObjects will just return 0 matching objects
 	in case of CKO_DATA */
-	if (ulCount)
+	/*if (ulCount)
 	{
 		ret = p11_get_attribute_value(pTemplate, ulCount, CKA_CLASS, (CK_VOID_PTR *) &pclass, &len);
 		if ( (ret == 0) && (len == sizeof(CK_ULONG) ) )
@@ -294,7 +304,7 @@ CK_RV C_FindObjectsInit(CK_SESSION_HANDLE hSession,   /* the session's handle */
 	//	addIdObjects = CK_TRUE;
 	//}
 
-	ret = p11_get_session(hSession, &pSession);
+	/*ret = p11_get_session(hSession, &pSession);
 	// if (pSession == NULL)
 	if (ret)
 	{
@@ -333,36 +343,29 @@ CK_RV C_FindObjectsInit(CK_SESSION_HANDLE hSession,   /* the session's handle */
 		}
 		if((filesToCacheFlag != CACHED_DATA_TYPE_CARDDATA) && (filesToCacheFlag != CACHED_DATA_TYPE_RNCERT))
 		{
-			if ((pSession->bReadDataAllowed == P11_READDATA_ASK) & (eidmw_readpermission != P11_READDATA_ALWAYS))
+			if (pSession->bReadDataAllowed == P11_READDATA_ASK)
 			{
 				allowCardRead = AllowCardReading();
-				switch(allowCardRead)
+				if (allowCardRead == P11_DISPLAY_YES)
 				{
-				case P11_DISPLAY_YES:
 					pSession->bReadDataAllowed = P11_READDATA_ALLOWED;
-					break;
-				case P11_DISPLAY_ALWAYS:
-					pSession->bReadDataAllowed = P11_READDATA_ALLOWED;
-					eidmw_readpermission = P11_READDATA_ALWAYS;
-					//allowed for as long as this pkcs11 instance exists, put it in some variable
-					log_trace(WHERE, "I: Al reading from the card");
-					break;
-				case P11_DISPLAY_NO:
-					pSession->bReadDataAllowed = P11_READDATA_REFUSED;	
-				default:							
+				}
+				else
+				{
+					if(allowCardRead == P11_DISPLAY_NO)
+					{
+						pSession->bReadDataAllowed = P11_READDATA_REFUSED;
+					}				
 					log_trace(WHERE, "I: User does not allow reading from the card");
 					ret = CKR_FUNCTION_FAILED;
 					goto cleanup;
-					break;
-
-			}
-
+				}
 			}
 		}
 	}
 
 	/* init search operation */
-	if((pData = pSession->Operation[P11_OPERATION_FIND].pData) == NULL)
+	/*if((pData = pSession->Operation[P11_OPERATION_FIND].pData) == NULL)
 	{
 		pData = pSession->Operation[P11_OPERATION_FIND].pData = (P11_FIND_DATA *) malloc (sizeof(P11_FIND_DATA));
 		if (pData == NULL)
@@ -456,7 +459,19 @@ CK_RV C_FindObjectsInit(CK_SESSION_HANDLE hSession,   /* the session's handle */
 		}
 	}
 
-	ret = CKR_OK;
+	ret = CKR_OK;*/
+
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_FindObjectsInit");
+        ret = (pFunctions->C_FindObjectsInit) (hSession, pTemplate, ulCount);
+    }
 
 cleanup:
 	p11_unlock();
@@ -480,10 +495,10 @@ CK_RV C_FindObjects(CK_SESSION_HANDLE    hSession,          /* the session's han
 	*/
 
 	int ret = 0;
-	P11_SESSION   *pSession = NULL;
-	P11_SLOT      *pSlot = NULL;
-	P11_FIND_DATA *pData = NULL;
-	P11_OBJECT    *pObject = NULL;
+	//P11_SESSION   *pSession = NULL;
+	//P11_SLOT      *pSlot = NULL;
+	//P11_FIND_DATA *pData = NULL;
+	//P11_OBJECT    *pObject = NULL;
 	CK_BBOOL      *pbToken = NULL;
 	void          *p = NULL;
 	CK_ULONG      *pclass = NULL;
@@ -506,7 +521,7 @@ CK_RV C_FindObjects(CK_SESSION_HANDLE    hSession,          /* the session's han
 
 	log_trace(WHERE, "S: C_FindObjects(session %d)", hSession);
 
-	ret = p11_get_session(hSession, &pSession);
+	/*ret = p11_get_session(hSession, &pSession);
 	if (pSession == NULL)
 		// if (ret)
 	{
@@ -532,7 +547,7 @@ CK_RV C_FindObjects(CK_SESSION_HANDLE    hSession,          /* the session's han
 
 	/* VSC this code was moved to here since Sun-PKCS11 cannot handle CKR_Attribute_value_invalid in C_FindObjectsInit() properly!!! */
 	/* here we just return 0 objects in case of class type that is not supported */
-	ret = p11_get_attribute_value(pData->pSearch, pData->size, CKA_CLASS, (CK_VOID_PTR *) &pclass, &len);
+	/*ret = p11_get_attribute_value(pData->pSearch, pData->size, CKA_CLASS, (CK_VOID_PTR *) &pclass, &len);
 	if ( (ret == 0) && (len == sizeof(CK_ULONG) ) )
 	{
 		if ( (*pclass != CKO_CERTIFICATE) && (*pclass != CKO_PRIVATE_KEY) && (*pclass != CKO_PUBLIC_KEY) && (*pclass != CKO_DATA) )
@@ -639,7 +654,18 @@ CK_RV C_FindObjects(CK_SESSION_HANDLE    hSession,          /* the session's han
 			log_trace(WHERE, "I: Slot %d: Object %d no match with search template", pSession->hslot, h);
 	}
 
-	ret = CKR_OK;
+	ret = CKR_OK;*/
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_FindObjectsFinal");
+        ret = (pFunctions->C_FindObjects) (hSession, phObject, ulMaxObjectCount, pulObjectCount);
+    }
 
 cleanup: 
 	p11_unlock();
@@ -654,8 +680,8 @@ cleanup:
 #define WHERE "C_FindObjectsFinal()"
 CK_RV C_FindObjectsFinal(CK_SESSION_HANDLE hSession) /* the session's handle */
 {
-	P11_SESSION *pSession = NULL;
-	P11_FIND_DATA *pData = NULL;
+	//P11_SESSION *pSession = NULL;
+	//P11_FIND_DATA *pData = NULL;
 	int ret;
 	log_trace(WHERE, "I: enter");
 
@@ -671,7 +697,7 @@ CK_RV C_FindObjectsFinal(CK_SESSION_HANDLE hSession) /* the session's handle */
 
 	log_trace(WHERE, "S: C_FindObjectsFinal(session %d)", hSession);
 
-	ret = p11_get_session(hSession, &pSession);
+	/*ret = p11_get_session(hSession, &pSession);
 	if (pSession == NULL)
 		//omit error card removed here since FireFox has a problem with it.
 		// if (ret)
@@ -706,7 +732,18 @@ CK_RV C_FindObjectsFinal(CK_SESSION_HANDLE hSession) /* the session's handle */
 
 	pSession->Operation[P11_OPERATION_FIND].active = 0;
 
-	ret = CKR_OK;
+	ret = CKR_OK;*/
+	if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_FindObjectsFinal");
+        ret = (pFunctions->C_FindObjectsFinal) (hSession);
+    }
 
 cleanup:
 	p11_unlock();

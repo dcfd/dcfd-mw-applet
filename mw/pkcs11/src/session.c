@@ -21,11 +21,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "beid_p11.h"
-#include "p11.h"
+//#include "beid_p11.h"
+#include "asep11.h"
+//#include "p11.h"
 #include "log.h"
 #include "util.h"
-#include "cal.h"
+//#include "cal.h"
 
 #define WHERE "C_OpenSession()"
 CK_RV C_OpenSession(CK_SLOT_ID            slotID,        /* the slot's ID */
@@ -35,8 +36,8 @@ CK_RV C_OpenSession(CK_SLOT_ID            slotID,        /* the slot's ID */
 	CK_SESSION_HANDLE_PTR phSession)     /* receives new session handle */
 {
 	int ret;
-	P11_SLOT* pSlot = NULL;
-	P11_SESSION *pSession = NULL;
+	//P11_SLOT* pSlot = NULL;
+	//P11_SESSION *pSession = NULL;
 
 	//   CAutoMutex(&g_oSlotMutex);
 	log_trace(WHERE, "I: enter");
@@ -70,7 +71,7 @@ CK_RV C_OpenSession(CK_SLOT_ID            slotID,        /* the slot's ID */
 	goto cleanup;
 	}*/
 
-	pSlot = p11_get_slot(slotID);
+	/*pSlot = p11_get_slot(slotID);
 	if (pSlot == NULL)
 	{
 		log_trace(WHERE, "E: p11_get_slot(%d) returns null", slotID);
@@ -80,7 +81,7 @@ CK_RV C_OpenSession(CK_SLOT_ID            slotID,        /* the slot's ID */
 
 	/* Check that no conflictions sessions exist */
 	/* RO session when SO session exists is not allowed */
-	if ( !(flags & CKF_RW_SESSION) && (pSlot->login_type == CKU_SO)) 
+	/*if ( !(flags & CKF_RW_SESSION) && (pSlot->login_type == CKU_SO))
 	{
 		log_trace(WHERE, "E: R/W Session exists", slotID);
 		ret = CKR_SESSION_READ_WRITE_SO_EXISTS;
@@ -115,7 +116,18 @@ CK_RV C_OpenSession(CK_SLOT_ID            slotID,        /* the slot's ID */
 	pSession->bCardDataCashed = FALSE;
 
 	/* keep the nr of sessions for this slot */
-	pSlot->nsessions++;
+	/*pSlot->nsessions++;*/
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_OpenSession");
+        ret = (pFunctions->C_OpenSession) (slotID, flags, pApplication, Notify, phSession );
+    }
 
 	log_trace(WHERE, "S: Open session (slot %d: hsession = %d )", slotID, *phSession);
 
@@ -131,8 +143,8 @@ cleanup:
 #define WHERE "C_CloseSession()"
 CK_RV C_CloseSession(CK_SESSION_HANDLE hSession)
 {
-	P11_SESSION *pSession = NULL;
-	P11_SLOT *pSlot = NULL;
+	//P11_SESSION *pSession = NULL;
+	//P11_SLOT *pSlot = NULL;
 	CK_RV ret;
 	log_trace(WHERE, "I: enter");
 
@@ -152,7 +164,7 @@ CK_RV C_CloseSession(CK_SESSION_HANDLE hSession)
 	log_trace(WHERE, "S: C_CloseSession (session %d)", hSession);
 
 	//get session, of pSession is found, regardless the ret value, we can clean it up
-	ret = p11_get_session(hSession, &pSession);
+	/*ret = p11_get_session(hSession, &pSession);
 	if (pSession == NULL)
 	{
 		ret = CKR_SESSION_HANDLE_INVALID;
@@ -190,7 +202,19 @@ CK_RV C_CloseSession(CK_SESSION_HANDLE hSession)
 	pSession->flags = 0;
 	pSession->hslot = 0;
 	pSession->pdNotify = NULL;
-	pSession->pfNotify = NULL;
+	pSession->pfNotify = NULL;*/
+
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_CloseSession");
+        ret = (pFunctions->C_CloseSession) (hSession);
+    }
 
 cleanup:
 	p11_unlock();
@@ -223,7 +247,17 @@ CK_RV C_CloseAllSessions(CK_SLOT_ID slotID) /* the token's slot */
 
 	log_trace(WHERE, "S: C_CloseAllSessions(slot %d)", slotID);
 
-	ret = p11_close_all_sessions(slotID);
+	//ret = p11_close_all_sessions(slotID);
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_CloseAllSessions");
+        ret = (pFunctions->C_CloseAllSessions) (slotID);
+    }
 
 	p11_unlock();
 	log_trace(WHERE, "I: leave, ret = %i",ret);
@@ -238,9 +272,9 @@ CK_RV C_GetSessionInfo(CK_SESSION_HANDLE hSession,  /* the session's handle */
 	CK_SESSION_INFO_PTR pInfo)   /* receives session information */
 {
 	int ret;
-	P11_SESSION *pSession = NULL;
-	P11_SLOT *pSlot = NULL;
-	CK_TOKEN_INFO tokeninfo;
+	//P11_SESSION *pSession = NULL;
+	//P11_SLOT *pSlot = NULL;
+	//CK_TOKEN_INFO tokeninfo;
 	log_trace(WHERE, "I: enter");
 
 	if (p11_get_init() != BEIDP11_INITIALIZED)
@@ -264,7 +298,7 @@ CK_RV C_GetSessionInfo(CK_SESSION_HANDLE hSession,  /* the session's handle */
 		goto cleanup;
 	}
 
-	ret = p11_get_session(hSession, &pSession);
+	/*ret = p11_get_session(hSession, &pSession);
 	if (ret)
 	{
 		log_trace(WHERE, "E: Invalid session handle (%d) (%s)", hSession, log_map_error(ret));
@@ -301,7 +335,19 @@ CK_RV C_GetSessionInfo(CK_SESSION_HANDLE hSession,  /* the session's handle */
 			pInfo->state = (pSession->flags & CKF_RW_SESSION)? CKS_RW_USER_FUNCTIONS : CKS_RO_USER_FUNCTIONS;
 		else
 			pInfo->state = (pSession->flags & CKF_RW_SESSION) ? CKS_RW_PUBLIC_SESSION : CKS_RO_PUBLIC_SESSION;
-	}
+	}*/
+	
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_CloseSession");
+        ret = (pFunctions->C_CloseSession) (hSession);
+    }
 
 cleanup:
 	p11_unlock();
@@ -343,8 +389,8 @@ CK_RV C_Login(CK_SESSION_HANDLE hSession,  /* the session's handle */
 	CK_ULONG          ulPinLen)  /* the length of the PIN */
 {
 	int ret;
-	P11_SESSION *pSession = NULL;
-	P11_SLOT *pSlot = NULL;
+	//P11_SESSION *pSession = NULL;
+	//P11_SLOT *pSlot = NULL;
 	CK_TOKEN_INFO tokeninfo;
 
 	//return(CKR_OK);
@@ -373,7 +419,7 @@ CK_RV C_Login(CK_SESSION_HANDLE hSession,  /* the session's handle */
 		goto cleanup;
 	}
 
-	ret = p11_get_session(hSession, &pSession);
+	/*ret = p11_get_session(hSession, &pSession);
 	if (ret)
 	{
 		log_trace(WHERE, "E: Invalid session handle (%d)", hSession);
@@ -408,9 +454,20 @@ CK_RV C_Login(CK_SESSION_HANDLE hSession,  /* the session's handle */
 	goto cleanup;
 	}*/
 
-	ret = cal_logon(pSession->hslot, ulPinLen, pPin, 0);
+	/*ret = cal_logon(pSession->hslot, ulPinLen, pPin, 0);
 	if (ret == CKR_OK)
-		pSlot->login_type = userType;
+		pSlot->login_type = userType;*/
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_Login");
+        ret = (pFunctions->C_Login) (hSession, userType, pPin, ulPinLen);
+    }
 
 cleanup:
 	p11_unlock();
@@ -425,8 +482,8 @@ cleanup:
 CK_RV C_Logout(CK_SESSION_HANDLE hSession) /* the session's handle */
 {
 	int ret = CKR_OK;
-	P11_SESSION *pSession = NULL;
-	P11_SLOT *pSlot = NULL;
+	//P11_SESSION *pSession = NULL;
+	//P11_SLOT *pSlot = NULL;
 	log_trace(WHERE, "I: enter");
 
 	if (p11_get_init() != BEIDP11_INITIALIZED)
@@ -444,7 +501,7 @@ CK_RV C_Logout(CK_SESSION_HANDLE hSession) /* the session's handle */
 
 	log_trace(WHERE, "S: Logout (session %d)", hSession);
 
-	ret = p11_get_session(hSession, &pSession);
+	/*ret = p11_get_session(hSession, &pSession);
 	if (ret)
 	{
 		log_trace(WHERE, "E: Invalid session handle (%d)", hSession);
@@ -466,10 +523,23 @@ CK_RV C_Logout(CK_SESSION_HANDLE hSession) /* the session's handle */
 	}
 	else
 		ret = CKR_USER_NOT_LOGGED_IN;
-
+	*/
 	/* TODO  cleanup all active operations (see standard) */
 	/* TODO: invalidate all private objects */
 	/* TODO: destroy all private session objects (we only have private token objects and they are unreadable anyway) */
+
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_Logout");
+        ret = (pFunctions->C_Logout) (hSession);
+    }
+
 
 cleanup:
 	p11_unlock();
@@ -500,7 +570,7 @@ CK_RV C_SetPIN(CK_SESSION_HANDLE hSession,
 	CK_ULONG ulNewLen)
 {
 	int ret;
-	P11_SESSION *pSession = NULL;
+	//P11_SESSION *pSession = NULL;
 	log_trace(WHERE, "I: enter");
 
 	if (p11_get_init() != BEIDP11_INITIALIZED)
@@ -518,7 +588,7 @@ CK_RV C_SetPIN(CK_SESSION_HANDLE hSession,
 
 	log_trace(WHERE, "S: C_SetPIN(session %d)", hSession);
 
-	ret = p11_get_session(hSession, &pSession);
+	/*ret = p11_get_session(hSession, &pSession);
 	if (ret)
 	{
 		log_trace(WHERE, "E: Invalid session handle (%d)", hSession);
@@ -526,6 +596,19 @@ CK_RV C_SetPIN(CK_SESSION_HANDLE hSession,
 	}
 
 	ret = cal_change_pin(pSession->hslot, ulOldLen, pOldPin, ulNewLen, pNewPin);
+	*/
+    if (pFunctions == NULL)
+    {
+        log_trace(WHERE, "E: leave, CKR_CRYPTOKI_NOT_INITIALIZED - pFunctions is NULL");
+        ret =  CKR_ARGUMENTS_BAD;
+        goto cleanup;
+    }
+    else
+    {
+		log_trace(WHERE, "I: leave, ASE C_SetPIN");
+        ret = (pFunctions->C_SetPIN) (hSession, pOldPin, ulOldLen, pNewPin, ulNewLen);
+    }
+
 cleanup:
 	p11_unlock();
 	log_trace(WHERE, "I: leave, ret = %i",ret);
