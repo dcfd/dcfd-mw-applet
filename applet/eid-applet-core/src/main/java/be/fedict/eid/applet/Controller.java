@@ -39,6 +39,8 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Enumeration;
@@ -54,14 +56,17 @@ import javax.security.auth.login.LoginException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import sun.security.pkcs11.wrapper.PKCS11Exception;
 import be.fedict.eid.applet.Messages.MESSAGE_ID;
 import be.fedict.eid.applet.io.AppletSSLSocketFactory;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpReceiver;
 import be.fedict.eid.applet.io.HttpURLConnectionHttpTransmitter;
 import be.fedict.eid.applet.io.LocalAppletProtocolContext;
 import be.fedict.eid.applet.sc.DiagnosticCallbackHandler;
+import be.fedict.eid.applet.sc.PKCS11NotFoundException;
 import be.fedict.eid.applet.sc.PcscEid;
 import be.fedict.eid.applet.sc.PcscEidSpi;
+import be.fedict.eid.applet.sc.Pkcs11Eid;
 import be.fedict.eid.applet.sc.Task;
 import be.fedict.eid.applet.sc.TaskRunner;
 import be.fedict.eid.applet.shared.AdministrationMessage;
@@ -113,6 +118,8 @@ public class Controller {
 	 */
 	private final PcscEidSpi pcscEidSpi;
 
+	private final Pkcs11Eid pkcs11Eid;
+
 	private final ProtocolStateMachine protocolStateMachine;
 
 	@SuppressWarnings("unchecked")
@@ -120,21 +127,50 @@ public class Controller {
 		this.view = view;
 		this.runtime = runtime;
 		this.messages = messages;
-
+		if (false == System.getProperty("java.version").startsWith("1.5")) {
+			/*
+			 * Java 1.6 and later. Loading the PcscEid class via reflection
+			 * avoids a hard reference to Java 1.6 specific code. This is
+			 * required in order to be able to let a Java 1.5 runtime load this
+			 * Controller class without exploding on unsupported 1.6 types.
+			 */
+			try {
+				Class<? extends PcscEidSpi> pcscEidClass = (Class<? extends PcscEidSpi>) Class
+						.forName("be.fedict.eid.applet.sc.PcscEid");
+				Constructor<? extends PcscEidSpi> pcscEidConstructor = pcscEidClass
+						.getConstructor(View.class, Messages.class);
+				this.pcscEidSpi = pcscEidConstructor.newInstance(this.view,
+						this.messages);
+			} catch (Exception e) {
+				String msg = "error loading PC/SC eID component: "
+						+ e.getMessage();
+				this.view.addDetailMessage(msg);
+				throw new RuntimeException(msg);
+			}
+			this.pcscEidSpi.addObserver(new PcscEidObserver());
+		} else {
+			/*
+			 * No PC/SC Java 6 available.
+			 */
+			this.pcscEidSpi = null;
+		}
+		Pkcs11Eid pkcs11Eid;
 		try {
-			Class<? extends PcscEidSpi> pcscEidClass = (Class<? extends PcscEidSpi>) Class
-					.forName("be.fedict.eid.applet.sc.PcscEid");
-			Constructor<? extends PcscEidSpi> pcscEidConstructor = pcscEidClass
-					.getConstructor(View.class, Messages.class);
-			this.pcscEidSpi = pcscEidConstructor.newInstance(this.view,
-					this.messages);
-		} catch (Exception e) {
-			String msg = "error loading PC/SC eID component: " + e.getMessage();
+			pkcs11Eid = new Pkcs11Eid(this.view, this.messages);
+		} catch (NoClassDefFoundError e) {
+			/*
+			 * sun/security/pkcs11/SunPKCS11 is not available on Windows 64 bit
+			 * JRE 1.6.0_20.
+			 */
+			this.view.addDetailMessage("class not found: " + e.getMessage());
+			pkcs11Eid = null;
+		}
+		this.pkcs11Eid = pkcs11Eid;
+		if (null == this.pkcs11Eid && null == this.pcscEidSpi) {
+			String msg = "no PKCS11 nor PCSC interface available";
 			this.view.addDetailMessage(msg);
 			throw new RuntimeException(msg);
 		}
-		this.pcscEidSpi.addObserver(new PcscEidObserver());
-
 		ProtocolContext protocolContext = new LocalAppletProtocolContext(
 				this.view);
 		this.protocolStateMachine = new ProtocolStateMachine(protocolContext);
@@ -392,6 +428,10 @@ public class Controller {
 					return null;
 				}
 			}
+		} catch (PKCS11NotFoundException e) {
+			setStatusMessage(Status.ERROR, MESSAGE_ID.NO_MIDDLEWARE_ERROR);
+			addDetailMessage("error: no eID Middleware PKCS#11 library found");
+			return null;
 		} catch (SecurityException e) {
 			setStatusMessage(Status.ERROR, MESSAGE_ID.SECURITY_ERROR);
 			addDetailMessage("error: " + e.getMessage());
@@ -499,6 +539,15 @@ public class Controller {
 		X509Certificate authnCertificate = this.pcscEidSpi
 				.diagnosticTests(callbackHandler);
 		this.pcscEidSpi.close();
+
+		if (null != pkcs11Eid) {
+			this.pkcs11Eid.diagnosticTests(callbackHandler);
+			try {
+				this.pkcs11Eid.close();
+			} catch (Exception e) {
+				addDetailMessage("error closing PKCS#11: " + e.getMessage());
+			}
+		}
 
 		mscapiDiagnosticTest(authnCertificate);
 
@@ -617,7 +666,41 @@ public class Controller {
 			SignCertificatesRequestMessage signCertificatesRequestMessage)
 			throws Exception {
 		addDetailMessage("performing sign certificates retrieval operation...");
+		boolean includeIdentity = signCertificatesRequestMessage.includeIdentity;
+		boolean includeAddress = signCertificatesRequestMessage.includeAddress;
+		boolean includePhoto = signCertificatesRequestMessage.includePhoto;
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
+		if (null == this.pkcs11Eid || includeIdentity || includeAddress
+				|| includePhoto) {
+			return performPcscSignCertificatesOperation(signCertificatesRequestMessage);
+		}
+		try {
+			if (false == this.pkcs11Eid.isEidPresent()) {
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
+				this.pkcs11Eid.waitForEidPresent();
+			}
+		} catch (PKCS11NotFoundException e) {
+			addDetailMessage("eID Middleware PKCS#11 library not found.");
+			if (null != this.pcscEidSpi) {
+				addDetailMessage("fallback to PC/SC signing...");
+				return performPcscSignCertificatesOperation(signCertificatesRequestMessage);
+			}
+			throw new PKCS11NotFoundException();
+		}
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
+		PrivateKeyEntry privateKeyEntry = this.pkcs11Eid
+				.getPrivateKeyEntry("Signature");
+		X509Certificate[] certificateChain = (X509Certificate[]) privateKeyEntry
+				.getCertificateChain();
+		this.pkcs11Eid.close();
+		SignCertificatesDataMessage signCertificatesDataMessage = new SignCertificatesDataMessage(
+				certificateChain);
+		return signCertificatesDataMessage;
+	}
 
+	private SignCertificatesDataMessage performPcscSignCertificatesOperation(
+			SignCertificatesRequestMessage signCertificatesRequestMessage)
+			throws Exception {
 		boolean includeIdentity = signCertificatesRequestMessage.includeIdentity;
 		boolean includeAddress = signCertificatesRequestMessage.includeAddress;
 		boolean includePhoto = signCertificatesRequestMessage.includePhoto;
@@ -704,15 +787,33 @@ public class Controller {
 	}
 
 	private void kioskMode() throws IllegalArgumentException,
-			SecurityException, IOException, InterruptedException,
-			NoSuchFieldException, IllegalAccessException,
+			SecurityException, IOException, PKCS11Exception,
+			InterruptedException, NoSuchFieldException, IllegalAccessException,
 			InvocationTargetException, NoSuchMethodException, Exception {
 		addDetailMessage("entering Kiosk Mode...");
 		this.view.setStatusMessage(Status.NORMAL,
 				Messages.MESSAGE_ID.KIOSK_MODE);
 		while (true) {
-			if (false == this.pcscEidSpi.isEidPresent()) {
-				this.pcscEidSpi.waitForEidPresent();
+			try {
+				if (null == this.pkcs11Eid) {
+					throw new PKCS11NotFoundException();
+				}
+				if (false == this.pkcs11Eid.isEidPresent()) {
+					this.pkcs11Eid.waitForEidPresent();
+				}
+				addDetailMessage("waiting for card removal...");
+				this.pkcs11Eid.removeCard();
+			} catch (PKCS11NotFoundException e) {
+				addDetailMessage("fallback to PC/SC interface...");
+				if (null == this.pcscEidSpi) {
+					addDetailMessage("no PC/SC interface fallback possible.");
+					throw e;
+				}
+				if (false == this.pcscEidSpi.isEidPresent()) {
+					this.pcscEidSpi.waitForEidPresent();
+				}
+				addDetailMessage("waiting for card removal...");
+				this.pcscEidSpi.removeCard();
 			}
 			addDetailMessage("waiting for card removal...");
 			this.pcscEidSpi.removeCard();
@@ -853,12 +954,108 @@ public class Controller {
 		boolean logoff = signRequestMessage.logoff;
 		boolean removeCard = signRequestMessage.removeCard;
 		boolean requireSecureReader = signRequestMessage.requireSecureReader;
+		boolean noPkcs11 = signRequestMessage.noPkcs11;
 		addDetailMessage("logoff: " + logoff);
 		addDetailMessage("remove card: " + removeCard);
 		addDetailMessage("require secure smart card reader: "
 				+ requireSecureReader);
+		addDetailMessage("no PKCS11: " + noPkcs11);
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
+		if (requireSecureReader || noPkcs11 || null == this.pkcs11Eid) {
+			if (null != this.pcscEidSpi) {
+				return performEidPcscSignOperation(signRequestMessage,
+						requireSecureReader);
+			}
+		}
+		try {
+			if (false == this.pkcs11Eid.isEidPresent()) {
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
+				this.pkcs11Eid.waitForEidPresent();
+			}
+		} catch (PKCS11NotFoundException e) {
+			addDetailMessage("eID Middleware PKCS#11 library not found.");
+			if (null != this.pcscEidSpi) {
+				addDetailMessage("fallback to PC/SC signing...");
+				return performEidPcscSignOperation(signRequestMessage,
+						requireSecureReader);
+			}
+			throw new PKCS11NotFoundException();
+		}
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.SIGNING);
 
+		String logoffReaderName;
+		if (logoff) {
+			if (null == this.pcscEidSpi) {
+				/*
+				 * We cannot logoff via PC/SC so we remove the card via PKCS#11.
+				 */
+				removeCard = true;
+				logoffReaderName = null;
+			} else {
+				if (removeCard) {
+					/*
+					 * No need to logoff a removed card.
+					 */
+					logoffReaderName = null;
+				} else {
+					logoffReaderName = this.pkcs11Eid.getSlotDescription();
+				}
+			}
+		} else {
+			logoffReaderName = null;
+		}
+
+		byte[] signatureValue;
+		List<X509Certificate> signCertChain;
+		try {
+			/*
+			 * Via next dialog we try to implement WYSIWYS using the digest
+			 * description. Also showing the digest value is pointless.
+			 */
+			// TODO DRY refactoring
+			int response = JOptionPane.showConfirmDialog(
+					this.getParentComponent(), "OK to sign \""
+							+ signRequestMessage.description + "\"?\n"
+							+ "Signature algorithm: "
+							+ signRequestMessage.digestAlgo + " with RSA",
+					"Signature creation", JOptionPane.YES_NO_OPTION);
+			// TODO i18n
+			if (JOptionPane.OK_OPTION != response) {
+				throw new SecurityException("sign operation aborted");
+			}
+			addDetailMessage("signing with algorithm: "
+					+ signRequestMessage.digestAlgo + " with RSA");
+			signatureValue = this.pkcs11Eid.sign(
+					signRequestMessage.digestValue,
+					signRequestMessage.digestAlgo);
+			signCertChain = this.pkcs11Eid.getSignCertificateChain();
+			if (removeCard) {
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);
+				this.pkcs11Eid.removeCard();
+			}
+		} finally {
+			/*
+			 * We really need to remove the SunPKCS11 security provider, else a
+			 * following eID signature will fail.
+			 */
+			this.pkcs11Eid.close();
+			if (null != logoffReaderName) {
+				this.pcscEidSpi.logoff(logoffReaderName);
+			}
+		}
+		SignatureDataMessage signatureDataMessage = new SignatureDataMessage(
+				signatureValue, signCertChain);
+		Object responseMessage = sendMessage(signatureDataMessage);
+		if (false == (responseMessage instanceof FinishedMessage)) {
+			throw new RuntimeException("finish expected");
+		}
+		FinishedMessage finishedMessage = (FinishedMessage) responseMessage;
+		return finishedMessage;
+	}
+
+	private FinishedMessage performEidPcscSignOperation(
+			SignRequestMessage signRequestMessage, boolean requireSecureReader)
+			throws Exception {
 		waitForEIdCardPcsc();
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.SIGNING);
@@ -966,6 +1163,7 @@ public class Controller {
 		boolean includePhoto = authnRequest.includePhoto;
 		boolean includeIntegrityData = authnRequest.includeIntegrityData;
 		boolean requireSecureReader = authnRequest.requireSecureReader;
+		boolean noPkcs11 = authnRequest.noPkcs11;
 		String transactionMessage = authnRequest.transactionMessage;
 		if (challenge.length < 20) {
 			throw new SecurityException(
@@ -989,6 +1187,12 @@ public class Controller {
 		addDetailMessage("require secure smart card reader: "
 				+ requireSecureReader);
 		addDetailMessage("transaction message: " + transactionMessage);
+		addDetailMessage("no PKCS11: " + noPkcs11);
+
+		SecureRandom secureRandom = new SecureRandom();
+		byte[] salt = new byte[20];
+		secureRandom.nextBytes(salt);
+
 
 		String hostname;
 		if (includeHostname) {
@@ -1027,17 +1231,120 @@ public class Controller {
 			encodedServerCertificate = null;
 		}
 
-		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
-		waitForEIdCardPcsc();
-
-		setStatusMessage(Status.NORMAL, MESSAGE_ID.AUTHENTICATING);
-
-		byte[] salt = this.pcscEidSpi.getChallenge(20);
-
 		AuthenticationContract authenticationContract = new AuthenticationContract(
 				salt, hostname, inetAddress, sessionId,
 				encodedServerCertificate, challenge);
 		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
+
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
+		if (includeIdentity || includeAddress || includePhoto
+				|| includeCertificates || requireSecureReader || noPkcs11
+				|| null == this.pkcs11Eid) {
+			if (null != this.pcscEidSpi) {
+				FinishedMessage finishedMessage = performEidPcscAuthnOperation(
+						salt, sessionId, toBeSigned, logoff, preLogoff,
+						removeCard, includeIdentity, includeCertificates,
+						includeAddress, includePhoto, includeIntegrityData,
+						encodedServerCertificate, requireSecureReader);
+				return finishedMessage;
+			}
+		}
+		try {
+			if (false == this.pkcs11Eid.isEidPresent()) {
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
+				this.pkcs11Eid.waitForEidPresent();
+			}
+		} catch (PKCS11NotFoundException e) {
+			addDetailMessage("eID Middleware PKCS#11 library not found.");
+			if (null != this.pcscEidSpi) {
+				addDetailMessage("fallback to PC/SC interface for authentication...");
+				FinishedMessage finishedMessage = performEidPcscAuthnOperation(
+						salt, sessionId, toBeSigned, logoff, preLogoff,
+						removeCard, includeIdentity, includeCertificates,
+						includeAddress, includePhoto, includeIntegrityData,
+						encodedServerCertificate, requireSecureReader);
+				return finishedMessage;
+			}
+			throw new PKCS11NotFoundException();
+		}
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.AUTHENTICATING);
+
+		String logoffReaderName;
+		if (logoff) {
+			if (null == this.pcscEidSpi) {
+				/*
+				 * We cannot logoff via PC/SC so we remove the card via PKCS#11.
+				 */
+				removeCard = true;
+				logoffReaderName = null;
+			} else {
+				if (removeCard) {
+					/*
+					 * No need to logoff a removed card.
+					 */
+					logoffReaderName = null;
+				} else {
+					logoffReaderName = this.pkcs11Eid.getSlotDescription();
+				}
+			}
+		} else {
+			logoffReaderName = null;
+		}
+
+		if (preLogoff) {
+			if (null != this.pcscEidSpi) {
+				this.view.addDetailMessage("performing a pre-logoff");
+				String readerName = logoffReaderName;
+				if (null == readerName) {
+					readerName = this.pkcs11Eid.getSlotDescription();
+				}
+				this.pcscEidSpi.logoff(readerName);
+			} else {
+				this.view.addDetailMessage("cannot perform a pre-logoff");
+			}
+		}
+
+		byte[] signatureValue;
+		List<X509Certificate> authnCertChain;
+		try {
+			signatureValue = this.pkcs11Eid.signAuthn(toBeSigned);
+			authnCertChain = this.pkcs11Eid.getAuthnCertificateChain();
+			if (removeCard) {
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);
+				this.pkcs11Eid.removeCard();
+			}
+		} finally {
+			/*
+			 * We really need to remove the SunPKCS11 security provider, else a
+			 * following eID authentication will fail.
+			 */
+			this.pkcs11Eid.close();
+			if (null != logoffReaderName) {
+				this.pcscEidSpi.logoff(logoffReaderName);
+			}
+		}
+
+		AuthenticationDataMessage authenticationDataMessage = new AuthenticationDataMessage(
+				salt, sessionId, signatureValue, authnCertChain, null, null,
+				null, null, null, null, null, encodedServerCertificate, null );
+		Object responseMessage = sendMessage(authenticationDataMessage);
+		if (false == (responseMessage instanceof FinishedMessage)) {
+			throw new RuntimeException("finish expected");
+		}
+		FinishedMessage finishedMessage = (FinishedMessage) responseMessage;
+		return finishedMessage;
+	}
+
+	private FinishedMessage performEidPcscAuthnOperation(byte[] salt,
+			byte[] sessionId, byte[] toBeSigned, boolean logoff,
+			boolean preLogoff, boolean removeCard, boolean includeIdentity,
+			boolean includeCertificates, boolean includeAddress,
+			boolean includePhoto, boolean includeIntegrityData,
+			byte[] encodedServerCertificate, boolean requireSecureReader)
+			throws Exception {
+		waitForEIdCardPcsc();
+
+		setStatusMessage(Status.NORMAL, MESSAGE_ID.AUTHENTICATING);
 
 		if (includeIdentity || includeAddress || includePhoto) {
 			boolean response = this.view.privacyQuestion(includeAddress,
@@ -1073,11 +1380,6 @@ public class Controller {
 			signatureValue = this.pcscEidSpi.signAuthn(toBeSigned,
 					requireSecureReader);
 
-			if (null != transactionMessage) {
-				signedTransactionMessage = this.pcscEidSpi
-						.signTransactionMessage(transactionMessage,
-								requireSecureReader);
-			}
 
 			int maxProgress = 0;
 			maxProgress += (1050 / 255) + 1; // authn cert file
@@ -1210,7 +1512,11 @@ public class Controller {
 				photoData, identitySignatureData, addressSignatureData,
 				rrnCertData, encodedServerCertificate, signedTransactionMessage);
 		Object responseMessage = sendMessage(authenticationDataMessage);
-		return responseMessage;
+		if (false == (responseMessage instanceof FinishedMessage)) {
+			throw new RuntimeException("finish expected");
+		}
+		FinishedMessage finishedMessage = (FinishedMessage) responseMessage;
+		return finishedMessage;
 	}
 
 	private void printEnvironment() {
@@ -1450,6 +1756,10 @@ public class Controller {
 
 	private void waitForEIdCardPcsc() throws Exception {
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.DETECTING_CARD);
+		if (null == this.pcscEidSpi) {
+			addDetailMessage("no PC/SC interface available");
+			throw new RuntimeException("no PC/SC interface available");
+		}
 		if (false == this.pcscEidSpi.hasCardReader()) {
 			setStatusMessage(Status.NORMAL, MESSAGE_ID.CONNECT_READER);
 			this.pcscEidSpi.waitForCardReader();
