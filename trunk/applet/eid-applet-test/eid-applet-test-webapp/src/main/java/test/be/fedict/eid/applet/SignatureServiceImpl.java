@@ -149,4 +149,7 @@ public class SignatureServiceImpl implements SignatureService {
 		 */
 		return null;
 	}
+        public void setHttpSessionObject(Object session){
+
+        }
 }

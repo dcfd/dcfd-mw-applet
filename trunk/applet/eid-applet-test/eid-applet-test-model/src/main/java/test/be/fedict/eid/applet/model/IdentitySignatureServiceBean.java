@@ -108,4 +108,7 @@ public class IdentitySignatureServiceBean implements SignatureServiceEx {
 		throw new UnsupportedOperationException(
 				"this is a SignatureServiceEx implementation");
 	}
+        public void setHttpSessionObject(Object session){
+
+        }
 }

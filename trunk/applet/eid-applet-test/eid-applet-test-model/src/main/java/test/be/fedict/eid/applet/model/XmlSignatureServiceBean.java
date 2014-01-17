@@ -320,4 +320,7 @@ public class XmlSignatureServiceBean implements SignatureService {
 
 		return filesDigestAlgo;
 	}
+        public void setHttpSessionObject(Object session){
+
+        }
 }

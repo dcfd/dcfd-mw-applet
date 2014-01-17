@@ -160,6 +160,9 @@ public class AbstractODFSignatureServiceTest {
 		protected OutputStream getSignedOpenDocumentOutputStream() {
 			return this.signedODFOutputStream;
 		}
+                public void setHttpSessionObject(Object sessionObject){
+
+                }
 	}
 
 	@Test

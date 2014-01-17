@@ -93,6 +93,10 @@ public class AbstractCMSSignatureServiceTest {
 		public byte[] getCMSSignature() {
 			return this.cmsSignature;
 		}
+
+                public void setHttpSessionObject(Object sessionObject){
+
+                }
 	}
 
 	@Test

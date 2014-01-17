@@ -111,6 +111,9 @@ public class AbstractOOXMLSignatureServiceTest {
 		protected TemporaryDataStorage getTemporaryDataStorage() {
 			return this.temporaryDataStorage;
 		}
+                public void setHttpSessionObject(Object sessionObject){
+
+                }
 	}
 
 	@Test

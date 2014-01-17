@@ -122,4 +122,7 @@ public class FilesSignatureServiceBean implements SignatureService {
 
 		return filesDigestAlgo;
 	}
+        public void setHttpSessionObject(Object session){
+
+        }
 }

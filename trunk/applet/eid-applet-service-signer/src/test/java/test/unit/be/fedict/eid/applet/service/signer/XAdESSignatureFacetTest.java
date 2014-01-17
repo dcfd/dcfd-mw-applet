@@ -129,6 +129,9 @@ public class XAdESSignatureFacetTest {
 		public String getFilesDigestAlgorithm() {
 			return null;
 		}
+                public void setHttpSessionObject(Object sessionObject){
+
+                }
 	}
 
 	@BeforeClass

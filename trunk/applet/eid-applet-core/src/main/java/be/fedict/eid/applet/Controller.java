@@ -35,12 +35,16 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.DigestInputStream;
+import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.SignatureException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Enumeration;
@@ -50,6 +54,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
@@ -127,7 +133,8 @@ public class Controller {
 		this.view = view;
 		this.runtime = runtime;
 		this.messages = messages;
-		if (false == System.getProperty("java.version").startsWith("1.5")) {
+                
+		if (false){// == System.getProperty("java.version").startsWith("1.5")) {
 			/*
 			 * Java 1.6 and later. Loading the PcscEid class via reflection
 			 * avoids a hard reference to Java 1.6 specific code. This is
@@ -148,34 +155,43 @@ public class Controller {
 				throw new RuntimeException(msg);
 			}
 			this.pcscEidSpi.addObserver(new PcscEidObserver());
+                        
 		} else {
 			/*
 			 * No PC/SC Java 6 available.
 			 */
 			this.pcscEidSpi = null;
 		}
-		Pkcs11Eid pkcs11Eid;
+               
+		Pkcs11Eid pkcs11Eid_local;
 		try {
-			pkcs11Eid = new Pkcs11Eid(this.view, this.messages);
+			pkcs11Eid_local = new Pkcs11Eid(this.view, this.messages);
 		} catch (NoClassDefFoundError e) {
 			/*
 			 * sun/security/pkcs11/SunPKCS11 is not available on Windows 64 bit
 			 * JRE 1.6.0_20.
 			 */
 			this.view.addDetailMessage("class not found: " + e.getMessage());
-			pkcs11Eid = null;
+			pkcs11Eid_local = null;
 		}
-		this.pkcs11Eid = pkcs11Eid;
+		this.pkcs11Eid = pkcs11Eid_local;
 		if (null == this.pkcs11Eid && null == this.pcscEidSpi) {
 			String msg = "no PKCS11 nor PCSC interface available";
 			this.view.addDetailMessage(msg);
 			throw new RuntimeException(msg);
 		}
+                
 		ProtocolContext protocolContext = new LocalAppletProtocolContext(
 				this.view);
 		this.protocolStateMachine = new ProtocolStateMachine(protocolContext);
 	}
 
+        public List<String> getReaderList()
+                throws Exception
+        {
+            this.view.addDetailMessage("getReaderList()");
+            return this.pkcs11Eid.getReaderList();
+        }
 	private <T> T sendMessage(Object message, Class<T> responseClass)
 			throws MalformedURLException, IOException {
 		Object responseObject = sendMessage(message);
@@ -377,7 +393,7 @@ public class Controller {
 				resultMessage = performAuthnSignOperation(authSignRequestMessage);
 			}
 			if (resultMessage instanceof IdentificationRequestMessage) {
-				IdentificationRequestMessage identificationRequestMessage = (IdentificationRequestMessage) resultMessage;
+				/*IdentificationRequestMessage identificationRequestMessage = (IdentificationRequestMessage) resultMessage;
 				addDetailMessage("include address: "
 						+ identificationRequestMessage.includeAddress);
 				addDetailMessage("include photo: "
@@ -397,7 +413,11 @@ public class Controller {
 						identificationRequestMessage.includeIntegrityData,
 						identificationRequestMessage.includeCertificates,
 						identificationRequestMessage.removeCard,
-						identificationRequestMessage.identityDataUsage);
+						identificationRequestMessage.identityDataUsage);*/
+                            //No disponemos de soporte PC/SC para la tarjeta del Banco Central
+                            //TODO: Cambia Applet Service para entender IdentificationRequestMessage con solo los 2 certificados que contiene la tarjeta
+                            //Por el momento saltamos este paso
+                            resultMessage = performPkcs11IdentificationOperation();
 			}
 			if (resultMessage instanceof FinishedMessage) {
 				FinishedMessage finishedMessage = (FinishedMessage) resultMessage;
@@ -688,10 +708,9 @@ public class Controller {
 			throw new PKCS11NotFoundException();
 		}
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
-		PrivateKeyEntry privateKeyEntry = this.pkcs11Eid
-				.getPrivateKeyEntry("Signature");
-		X509Certificate[] certificateChain = (X509Certificate[]) privateKeyEntry
-				.getCertificateChain();
+
+                addDetailMessage("Obtaining SignatureChain through PKCS#11");
+                X509Certificate[] certificateChain =  this.pkcs11Eid.getSignatureCertificateChain();
 		this.pkcs11Eid.close();
 		SignCertificatesDataMessage signCertificatesDataMessage = new SignCertificatesDataMessage(
 				certificateChain);
@@ -1014,7 +1033,7 @@ public class Controller {
 			 */
 			// TODO DRY refactoring
 			int response = JOptionPane.showConfirmDialog(
-					this.getParentComponent(), "OK to sign \""
+					this.getParentComponent(), "OK para firmar \""
 							+ signRequestMessage.description + "\"?\n"
 							+ "Signature algorithm: "
 							+ signRequestMessage.digestAlgo + " with RSA",
@@ -1147,6 +1166,123 @@ public class Controller {
 		}
 	}
 
+        public void cleanUp()
+        {
+            try {
+                //this.pkcs11Eid.removeCard();
+                this.pkcs11Eid.close();
+            }
+            catch(Exception e)
+            {
+                System.out.println(e);
+            }
+            
+        }
+        public void TestAuthnOperation()
+                throws Exception
+        {
+                SecureRandom secureRandom = new SecureRandom();
+		byte[] salt = new byte[20];
+		secureRandom.nextBytes(salt);
+
+                AuthenticationContract authenticationContract = new AuthenticationContract(
+                salt, null, null, null, null, null);
+		byte[] toBeSigned = authenticationContract.calculateToBeSigned();
+
+                byte[] signatureValue;
+		List<X509Certificate> authnCertChain;
+                signatureValue = this.pkcs11Eid.signAuthentication(toBeSigned);
+                authnCertChain = this.pkcs11Eid.getAuthnCertificateChain();
+
+
+                byte[] toBeSigned1;
+                try {
+                     toBeSigned1 = authenticationContract.calculateToBeSigned();
+                    java.security.PublicKey signingKey = authnCertChain.get(0).getPublicKey();
+                    java.security.Signature signature = java.security.Signature.getInstance("SHA1withRSA");
+                    signature.initVerify(signingKey);
+                    signature.update(toBeSigned1);
+                    if ( signature.verify(signatureValue) )
+                    {
+                        this.view.addDetailMessage("Verified!!!");
+                    }
+                     else {
+                        this.view.addDetailMessage("NOT Verified!!!");
+                     }
+
+                } catch (NoSuchAlgorithmException e) {
+                        throw new SecurityException("algo error");
+                } catch (java.security.InvalidKeyException e) {
+                        throw new SecurityException("authn key error");
+                } catch (java.security.SignatureException e) {
+                        throw new SecurityException("signature error");
+                }
+        }
+
+        public void TestSignPkcs11() {
+            this.view.addDetailMessage("TestSignPkcs11");
+        try {
+            X509Certificate[] signCertChain = this.pkcs11Eid.getSignatureCertificateChain() ;
+            this.pkcs11Eid.close();
+            byte[] signatureValue = this.pkcs11Eid.sign(("A test text").getBytes(), "SHA-1");
+            byte[] toBeSigned = ("A test text").getBytes();
+           
+            this.view.addDetailMessage("Signed!!!!!" + new String(signatureValue));
+
+                try {
+
+                    addDetailMessage(signCertChain[0].toString());
+                    java.security.PublicKey signingKey = signCertChain[0].getPublicKey();
+                    java.security.Signature signature = java.security.Signature.getInstance("SHA1withRSA");
+                    signature.initVerify(signingKey);
+                    signature.update(toBeSigned);
+                    if ( signature.verify(signatureValue) )
+                    {
+                        this.view.addDetailMessage("Verified!!!");
+                    }
+                     else {
+                        this.view.addDetailMessage("NOT Verified!!!");
+                     }
+
+                } catch (NoSuchAlgorithmException e) {
+                        throw new SecurityException("algo error");
+                } catch (java.security.InvalidKeyException e) {
+                        throw new SecurityException("authn key error");
+                } catch (java.security.SignatureException e) {
+                        throw new SecurityException("signature error");
+                }
+
+
+
+        } catch (Exception ex) {
+            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        }
+        public void TestSignOperation() {
+             this.view.addDetailMessage("TestSignOperation");
+            try {
+                X509Certificate[] certificateChain = this.pkcs11Eid.getSignatureCertificateChain();
+                for(X509Certificate cert : certificateChain)  {
+                    this.view.addDetailMessage(cert.toString());
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (KeyStoreException ex) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CertificateException ex) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnrecoverableEntryException ex) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (PKCS11Exception ex) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SignatureException ex) {
+                Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 	private Object performEidAuthnOperation(
 			AuthenticationRequestMessage authnRequest) throws Exception {
 		byte[] challenge = authnRequest.challenge;
@@ -1307,7 +1443,8 @@ public class Controller {
 		byte[] signatureValue;
 		List<X509Certificate> authnCertChain;
 		try {
-			signatureValue = this.pkcs11Eid.signAuthn(toBeSigned);
+
+                        signatureValue = this.pkcs11Eid.signAuthentication(toBeSigned);
 			authnCertChain = this.pkcs11Eid.getAuthnCertificateChain();
 			if (removeCard) {
 				setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);
@@ -1566,7 +1703,23 @@ public class Controller {
 			Controller.this.view.increaseProgress();
 		}
 	}
-
+        private FinishedMessage performPkcs11IdentificationOperation( ) throws Exception {
+            try {
+                        if (false == this.pkcs11Eid.hasCardReader()) {
+                                setStatusMessage(Status.NORMAL, MESSAGE_ID.CONNECT_READER);
+                                this.pkcs11Eid.waitForCardReader();
+                        }
+			if (false == this.pkcs11Eid.isEidPresent()) {
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
+				this.pkcs11Eid.waitForEidPresent();
+			}
+			return new FinishedMessage(null);
+		} catch (PKCS11NotFoundException e) {
+			addDetailMessage("eID Middleware PKCS#11 library not found.");
+			throw new PKCS11NotFoundException();
+		}
+        }
+        
 	private FinishedMessage performEidIdentificationOperation(
 			boolean includeAddress, boolean includePhoto,
 			boolean includeIntegrityData, boolean includeCertificates,
