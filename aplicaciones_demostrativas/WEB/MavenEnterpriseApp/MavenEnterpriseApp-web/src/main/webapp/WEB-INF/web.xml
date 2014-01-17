@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+    <servlet>
+        <servlet-name>AppletAuthnServiceServlet</servlet-name>
+        <servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+        <init-param>
+            <param-name>AuthenticationService</param-name>
+            <param-value>java:global/com.mycompany_MavenEnterpriseApp-ear_ear_1.0-SNAPSHOT/MavenEnterpriseApp-web-1.0-SNAPSHOT/AuthenticationServiceOCSPBean</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AppletAuthnServiceServlet</servlet-name>
+        <url-pattern>/applet-service-authn</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AppletSignServiceServlet</servlet-name>
+        <servlet-class>be.fedict.eid.applet.service.AppletServiceServlet</servlet-class>
+        <init-param>
+            <param-name>SignatureServiceClass</param-name>
+            <param-value>web.SignatureServiceImplementation</param-value>
+        </init-param>
+        <init-param>
+            <param-name>IncludeCertificates</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AppletSignServiceServlet</servlet-name>
+        <url-pattern>/applet-service-sign</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+</web-app>
