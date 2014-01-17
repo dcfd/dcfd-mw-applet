@@ -156,4 +156,6 @@ public class AbstractASiCSignatureService extends AbstractXmlSignatureService
 		Document document = ASiCUtil.createNewSignatureDocument();
 		return document;
 	}
+        public void setHttpSessionObject(Object sessionObject){
+        }
 }

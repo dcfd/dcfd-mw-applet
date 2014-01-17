@@ -1,50 +1,26 @@
-/*
- * eID Applet Project.
- * Copyright (C) 2008-2009 FedICT.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License version
- * 3.0 as published by the Free Software Foundation.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see 
- * http://www.gnu.org/licenses/.
- */
-
 package be.fedict.eid.applet.sc;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.InvalidKeyException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableEntryException;
-import java.security.KeyStore.LoadStoreParameter;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import sun.security.pkcs11.SunPKCS11;
+
 import sun.security.pkcs11.wrapper.CK_ATTRIBUTE;
 import sun.security.pkcs11.wrapper.CK_C_INITIALIZE_ARGS;
 import sun.security.pkcs11.wrapper.CK_INFO;
@@ -54,16 +30,14 @@ import sun.security.pkcs11.wrapper.CK_TOKEN_INFO;
 import sun.security.pkcs11.wrapper.PKCS11;
 import sun.security.pkcs11.wrapper.PKCS11Constants;
 import sun.security.pkcs11.wrapper.PKCS11Exception;
+
 import be.fedict.eid.applet.DiagnosticTests;
+import be.fedict.eid.applet.Dialogs;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.View;
+import java.io.FileInputStream;
+import sun.security.x509.X509CertImpl;
 
-/**
- * Class holding all PKCS#11 eID card access logic.
- * 
- * @author Frank Cornelis
- * 
- */
 public class Pkcs11Eid {
 
 	private final View view;
@@ -90,115 +64,80 @@ public class Pkcs11Eid {
 		return this.pkcs11;
 	}
 
-	private String getPkcs11Path() throws PKCS11NotFoundException {
+	private X509Certificate getIssuerCert(boolean is_RootCA) {
+                String osName = System.getProperty("os.name");
+		File certificate = null;
+		if (osName.startsWith("Linux") || osName.startsWith("Mac")) {
+			/*
+			 * Covers 4.0 eID Middleware.
+			 */
+                        if(!is_RootCA) {
+                            certificate = new File("/usr/lib/dcfd/certificados/CA SINPE - PERSONA FISICA.cer");
+                        }
+                        else {
+                            certificate = new File("/usr/lib/dcfd/certificados/CA RAIZ NACIONAL COSTA RICA.cer");
+                        }
+                } else { //Windows
+                        if(!is_RootCA) {
+                            certificate = new File("C:\\Firma Digital\\certificados\\CA SINPE - PERSONA FISICA.cer");
+                        }
+                        else {
+                            certificate = new File("C:\\Firma Digital\\certificados\\CA RAIZ NACIONAL COSTA RICA.cer");
+                        }
+                }
+                if(certificate != null) {
+
+			if (certificate.exists()) {
+                            FileInputStream stream = null;
+                            try {
+                                stream = new FileInputStream(certificate);
+                                int lenght = (int) ( certificate.length());
+                                byte[] buf1 = new byte[lenght];
+                                stream.read(buf1);
+                                return new  X509CertImpl(buf1);
+                            } catch (FileNotFoundException ex) {
+                                Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                            }   catch (IOException ex) {
+                                Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (java.security.cert.CertificateException ex) {
+                                Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            finally {
+                                try {
+                                    stream.close();
+                                } catch (IOException ex) {
+                                    Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+			}
+                }
+		return null;
+        }
+
+        private String getPkcs11Path() throws PKCS11NotFoundException {
 		String osName = System.getProperty("os.name");
 		File pkcs11File;
 		if (osName.startsWith("Linux")) {
 			/*
-			 * Covers 3.5 eID Middleware.
+			 * Covers 4.0 eID Middleware.
 			 */
 			pkcs11File = new File("/usr/local/lib/libbeidpkcs11.so");
 			if (pkcs11File.exists()) {
 				return pkcs11File.getAbsolutePath();
 			}
-			/*
-			 * Some 2.6 eID MW installations.
-			 */
-			pkcs11File = new File("/usr/lib/libbeidpkcs11.so");
-			if (pkcs11File.exists()) {
-				return pkcs11File.getAbsolutePath();
-			}
-			/*
-			 * Some 2.6 and 2.5.9 installations.
-			 */
-			pkcs11File = new File("/usr/local/lib/pkcs11/Belgium-EID-pkcs11.so");
-			if (pkcs11File.exists()) {
-				return pkcs11File.getAbsolutePath();
-			}
-			/*
-			 * Final fallback is OpenSC. Note that OpenSC PKCS#11 cannot create
-			 * non-rep signatures. One might need to configure the OpenSC layer
-			 * as follows:
-			 * 
-			 * /etc/opensc.conf:
-			 * 
-			 * card_drivers = belpic, ...
-			 * 
-			 * reader_drivers = pcsc;
-			 * 
-			 * reader_driver pcsc {}
-			 */
-			pkcs11File = new File("/usr/lib/opensc-pkcs11.so");
-			if (pkcs11File.exists()) {
-				return pkcs11File.getAbsolutePath();
-			}
 		} else if (osName.startsWith("Mac")) {
 			/*
-			 * eID MW 3.5.1
-			 */
-			pkcs11File = new File("/usr/local/lib/libbeidpkcs11.3.5.1.dylib");
-			if (pkcs11File.exists()) {
-				return pkcs11File.getAbsolutePath();
-			}
-			/*
-			 * eID MW 3.5
-			 */
-			pkcs11File = new File("/usr/local/lib/libbeidpkcs11.3.5.0.dylib");
-			if (pkcs11File.exists()) {
-				return pkcs11File.getAbsolutePath();
-			}
-			/*
-			 * eID MW 2.6
-			 */
-			pkcs11File = new File(
-					"/usr/local/lib/beid-pkcs11.bundle/Contents/MacOS/libbeidpkcs11.2.1.0.dylib");
-			if (pkcs11File.exists()) {
-				return pkcs11File.getAbsolutePath();
-			}
-			/*
-			 * We try the symbolic links only at the end since there were some
-			 * negative reports on the symbolic links on Mac installations.
-			 */
-			/*
-			 * eID MW 3.x series
+			 * eID MW 4.0
 			 */
 			pkcs11File = new File("/usr/local/lib/libbeidpkcs11.dylib");
 			if (pkcs11File.exists()) {
 				return pkcs11File.getAbsolutePath();
 			}
-			/*
-			 * eID MW 2.x series
-			 */
-			pkcs11File = new File(
-					"/usr/local/lib/beid-pkcs11.bundle/Contents/MacOS/libbeidpkcs11.dylib");
-			if (pkcs11File.exists()) {
-				return pkcs11File.getAbsolutePath();
-			}
 		} else {
 			/*
-			 * eID Middleware 3.5 - XP
+			 * eID Middleware 4.0 - XP
 			 */
 			pkcs11File = new File("C:\\WINDOWS\\system32\\beidpkcs11.dll");
-			if (pkcs11File.exists()) {
-				return pkcs11File.getAbsolutePath();
-			}
-			/*
-			 * eID Middleware 2.6 and 2.5.9
-			 */
-			pkcs11File = new File(
-					"C:\\WINDOWS\\system32\\Belgium Identity Card PKCS11.dll");
-			if (pkcs11File.exists()) {
-				return pkcs11File.getAbsolutePath();
-			}
-			/*
-			 * Windows 2000.
-			 */
-			pkcs11File = new File(
-					"C:\\WINNT\\system32\\Belgium Identity Card PKCS11.dll");
-			if (pkcs11File.exists()) {
-				return pkcs11File.getAbsolutePath();
-			}
-			pkcs11File = new File("C:\\WINNT\\system32\\beidpkcs11.dll");
 			if (pkcs11File.exists()) {
 				return pkcs11File.getAbsolutePath();
 			}
@@ -208,18 +147,6 @@ public class Pkcs11Eid {
 			pkcs11File = new File("C:\\Windows\\SysWOW64\\beidpkcs11.dll");
 			if (pkcs11File.exists()) {
 				return pkcs11File.getAbsolutePath();
-			}
-			/*
-			 * And finally we try out some generic solution.
-			 */
-			String javaLibraryPath = System.getProperty("java.library.path");
-			String pathSeparator = System.getProperty("path.separator");
-			String[] libraryDirectories = javaLibraryPath.split(pathSeparator);
-			for (String libraryDirectory : libraryDirectories) {
-				pkcs11File = new File(libraryDirectory + "\\beidpkcs11.dll");
-				if (pkcs11File.exists()) {
-					return pkcs11File.getAbsolutePath();
-				}
 			}
 		}
 		throw new PKCS11NotFoundException();
@@ -268,6 +195,44 @@ public class Pkcs11Eid {
 		cFinalize();
 		return readerList;
 	}
+        
+	public boolean hasCardReader() throws IOException, PKCS11Exception,
+			InterruptedException, NoSuchFieldException, IllegalAccessException,
+			IllegalArgumentException, SecurityException,
+			InvocationTargetException, NoSuchMethodException {
+		String pkcs11Path = getPkcs11Path();
+                this.view.addDetailMessage("PKCS#11 path: " + pkcs11Path);
+                this.pkcs11 = loadPkcs11(pkcs11Path);
+                CK_INFO ck_info = this.pkcs11.C_GetInfo();
+                this.view.addDetailMessage("library description: "
+                                + new String(ck_info.libraryDescription).trim());
+                this.view.addDetailMessage("manufacturer ID: "
+                                + new String(ck_info.manufacturerID).trim());
+                this.view.addDetailMessage("library version: "
+                                + Integer.toString(ck_info.libraryVersion.major, 16) + "."
+                                + Integer.toString(ck_info.libraryVersion.minor, 16));
+                this.view.addDetailMessage("cryptoki version: "
+                                + Integer.toString(ck_info.cryptokiVersion.major, 16) + "."
+                                + Integer.toString(ck_info.cryptokiVersion.minor, 16));
+                long[] slotIdxs = this.pkcs11.C_GetSlotList(false);
+                if (0 == slotIdxs.length) {
+                    this.view.addDetailMessage("no card readers connected?");
+                    return false;
+                }
+                return true;
+	}
+
+	public void waitForCardReader() throws IOException, PKCS11Exception,
+			InterruptedException, NoSuchFieldException, IllegalAccessException,
+			IllegalArgumentException, SecurityException,
+			InvocationTargetException, NoSuchMethodException {
+		while (true) {
+			if (true == hasCardReader()) {
+				return;
+			}
+			Thread.sleep(1000);
+		}
+	}
 
 	public boolean isEidPresent() throws IOException, PKCS11Exception,
 			InterruptedException, NoSuchFieldException, IllegalAccessException,
@@ -306,13 +271,14 @@ public class Pkcs11Eid {
 					 */
 					continue;
 				}
-				if (new String(tokenInfo.label).startsWith("BELPIC")) {
-					this.view.addDetailMessage("Belgium eID card in slot: "
+                                String tokenInfoLabel =  new String(tokenInfo.label);
+				if (tokenInfoLabel.startsWith("IDProtect")) {
+					this.view.addDetailMessage("DCFD card labeled: "+tokenInfoLabel+" is in slot: "
 							+ slotIdx);
 					this.slotIdx = slotIdx;
 					this.slotDescription = new String(slotInfo.slotDescription)
 							.trim();
-					return true;
+                                        return GetAvailableLabels();
 				}
 			}
 		}
@@ -359,87 +325,318 @@ public class Pkcs11Eid {
 		}
 	}
 
-	private SunPKCS11 pkcs11Provider;
+        private boolean GetAvailableLabels() {
+            boolean result = false;
+             if(this.pkcs11 != null) {
+                long session;
+                try {
 
-	public PrivateKeyEntry getPrivateKeyEntry(String alias) throws IOException,
+                       session = this.pkcs11.C_OpenSession(this.slotIdx, PKCS11Constants.CKF_SERIAL_SESSION, null, null);
+
+                        CK_ATTRIBUTE[] attributes = new CK_ATTRIBUTE[2];
+                        attributes[0] = new CK_ATTRIBUTE();
+                        attributes[0].type = PKCS11Constants.CKA_CLASS;
+                        attributes[0].pValue = PKCS11Constants.CKO_CERTIFICATE;
+                        attributes[1] = new CK_ATTRIBUTE();
+                        attributes[1].type = PKCS11Constants.CKA_CERTIFICATE_TYPE;
+                        attributes[1].pValue = PKCS11Constants.CKC_X_509;
+                        this.pkcs11.C_FindObjectsInit(session, attributes);
+
+
+                        try {
+                                long[] certHandles = this.pkcs11.C_FindObjects(session, 4);
+                                if (0 == certHandles.length) {
+                                        /*
+                                         * In case of OpenSC PKCS#11.
+                                         */
+                                        throw new RuntimeException("cannot find objects via PKCS#11");
+                                }
+                                if(certHandles.length == 2 ) {
+
+                                    char[] certLabel = null;
+                                    CK_ATTRIBUTE[] template = new CK_ATTRIBUTE[1];
+                                    template[0] = new CK_ATTRIBUTE();
+                                    template[0].type = PKCS11Constants.CKA_LABEL;
+                                    this.pkcs11.C_GetAttributeValue(session, certHandles[0], template);
+                                    if(template[0].pValue != null) {
+                                            certLabel = (char[]) template[0].pValue;
+                                            this.setAuthenticationLabel(new String(certLabel));
+                                    }
+                                    else { result =  false;}
+                                    this.pkcs11.C_GetAttributeValue(session, certHandles[1], template);
+                                    if(template[0].pValue != null) {
+                                            certLabel = (char[]) template[0].pValue;
+                                            this.setSignatureLabel(new String(certLabel));
+                                    }
+                                    else { result =  false;}
+                                }
+                        }
+                        finally {
+                                this.pkcs11.C_FindObjectsFinal(session);
+                        }
+                        result = true;
+
+                } catch (PKCS11Exception ex) {
+                    System.out.println("PKCS11Exception");
+                    Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                catch(RuntimeException rex) {
+                    System.out.println("RuntimeException");
+                    Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, rex);
+                }
+            }
+            return result;
+        }
+        private  List<X509Certificate> signCertificateChain;
+        
+        public  X509Certificate[]  getSignatureCertificateChain()  throws IOException,
 			KeyStoreException, NoSuchAlgorithmException, CertificateException,
-			UnrecoverableEntryException {
-		// setup configuration file
-		File tmpConfigFile = File.createTempFile("pkcs11-", "conf");
-		tmpConfigFile.deleteOnExit();
-		PrintWriter configWriter = new PrintWriter(new FileOutputStream(
-				tmpConfigFile), true);
-		configWriter.println("name=SmartCard");
-		configWriter.println("library=" + getPkcs11Path());
-		configWriter.println("slotListIndex= " + this.slotIdx);
-
-		// load security provider
-		this.pkcs11Provider = new SunPKCS11(tmpConfigFile.getAbsolutePath());
-		if (-1 == Security.addProvider(this.pkcs11Provider)) {
-			throw new RuntimeException("could not add security provider");
-		}
-
-		// load key material
-		KeyStore keyStore = KeyStore.getInstance("PKCS11", this.pkcs11Provider);
-		LoadStoreParameter loadStoreParameter = new Pkcs11LoadStoreParameter(
-				this.view, this.messages);
-		keyStore.load(loadStoreParameter);
-		Enumeration<String> aliases = keyStore.aliases();
-		while (aliases.hasMoreElements()) {
-			/*
-			 * Apparently the first eID cards have some issue with the PKCS#15
-			 * structure causing problems in the PKCS#11 object listing.
-			 */
-			String currentAlias = aliases.nextElement();
-			this.view.addDetailMessage("key alias: " + currentAlias);
-		}
-		PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore.getEntry(
-				alias, null);
-		if (null == privateKeyEntry) {
-			/*
-			 * Seems like this can happen for very old eID cards.
-			 */
-			throw new RuntimeException(
-					"private key entry for alias not found: " + alias);
-		}
-		return privateKeyEntry;
-	}
-
-	public PrivateKeyEntry getPrivateKeyEntry() throws IOException,
-			KeyStoreException, NoSuchAlgorithmException, CertificateException,
-			UnrecoverableEntryException {
-		PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry("Authentication");
-		return privateKeyEntry;
-	}
-
-	public byte[] signAuthn(byte[] toBeSigned) throws IOException,
-			KeyStoreException, NoSuchAlgorithmException, CertificateException,
-			UnrecoverableEntryException, InvalidKeyException,
+			UnrecoverableEntryException, InvalidKeyException, PKCS11Exception,
 			SignatureException {
-		PrivateKeyEntry privateKeyEntry = getPrivateKeyEntry();
-		PrivateKey privateKey = privateKeyEntry.getPrivateKey();
-		X509Certificate[] certificateChain = (X509Certificate[]) privateKeyEntry
-				.getCertificateChain();
-		this.authnCertificateChain = new LinkedList<X509Certificate>();
-		for (X509Certificate certificate : certificateChain) {
-			this.authnCertificateChain.add(certificate);
-		}
+             if(this.pkcs11 ==null)
+            {
+                try {
+                    if(!isEidPresent() ) {
+                        return null;
+                    }
+                 } catch (Exception ex) {
+                    System.out.println("Exception "+ex.getMessage());
+                    Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
 
-		// create signature
-		Signature signature = Signature.getInstance("SHA1withRSA");
-		signature.initSign(privateKey);
-		signature.update(toBeSigned);
-		byte[] signatureValue = signature.sign();
-		return signatureValue;
+            if(this.pkcs11 != null) {
+
+                X509Certificate certificate = null;
+                long session  = this.pkcs11.C_OpenSession(this.slotIdx, PKCS11Constants.CKF_SERIAL_SESSION, null, null);
+                try {
+                        be.fedict.eid.applet.Dialogs dialogs = new Dialogs(this.view, this.messages);
+                        char[] pin = dialogs.getPin();
+
+                        this.pkcs11.C_Login(session, PKCS11Constants.CKU_USER, pin);
+
+                        CK_ATTRIBUTE[] attributes = new CK_ATTRIBUTE[2];
+                        attributes[0] = new CK_ATTRIBUTE();
+                        attributes[0].type = PKCS11Constants.CKA_CLASS;
+                        attributes[0].pValue = PKCS11Constants.CKO_CERTIFICATE;
+                        attributes[1] = new CK_ATTRIBUTE();
+                        attributes[1].type = PKCS11Constants.CKA_LABEL;
+                        attributes[1].pValue = getSignatureLabel().getBytes("UTF-8");
+                        this.pkcs11.C_FindObjectsInit(session, attributes);
+
+                        this.view.addDetailMessage(getAuthenticationLabel());
+                        this.view.addDetailMessage(getSignatureLabel());
+                        try {
+                                long[] certHandles = this.pkcs11.C_FindObjects(session, 1);
+                                if (0 == certHandles.length) {
+                                        this.view.addDetailMessage("no PKCS#11 key handle for label: "+getSignatureLabel());
+                                        throw new RuntimeException("cannot sign via PKCS#11");
+                                }
+                                if(certHandles.length == 1) {
+
+                                    CK_ATTRIBUTE[] template = new CK_ATTRIBUTE[1];
+                                    template[0] = new CK_ATTRIBUTE();
+                                    template[0].type = PKCS11Constants.CKA_VALUE;
+                                    this.pkcs11.C_GetAttributeValue(session, certHandles[0], template);
+                                    byte[] certBytes = (byte[]) template[0].pValue;
+                                    if(certBytes != null) {
+                                        certificate = new X509CertImpl(certBytes);
+                                        //this.view.addDetailMessage("X509Certificate : " + certificate.getSerialNumber().toString());
+                                        //this.view.addDetailMessage("X509Principal name : " + certificate.getIssuerX500Principal().toString());
+                                        //this.view.addDetailMessage("X509Certificate : " + certificate.toString());
+                                    }
+                                }
+                        } finally {
+                                this.pkcs11.C_FindObjectsFinal(session);
+                        }
+                        if(certificate != null) {
+                                this.signCertificateChain = new LinkedList<X509Certificate>();
+                                this.signCertificateChain.add(certificate);
+                                X509Certificate certi =  getIssuerCert(false) ;
+                                this.signCertificateChain.add(certi);
+                               // this.view.addDetailMessage("X509Certificate ISSUER : " + certi.toString());
+                                X509Certificate rootCerti =  getIssuerCert(true) ;
+                                this.signCertificateChain.add(rootCerti);
+                                //this.view.addDetailMessage("X509Certificate ROOT : " + rootCerti.toString());
+                  }
+
+                } catch (PKCS11Exception ex) {
+                    System.out.println("PKCS11Exception");
+                    //Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                catch(RuntimeException rex) {
+                    System.out.println("RuntimeException");
+                    //Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, rex);
+                    if("operation canceled.".equals(rex.getMessage())) {
+                        throw new IOException("El usuario ha cancelado el proceso.");
+                    }
+                     else {
+                        throw new IOException(rex.getMessage());
+                     }
+                }
+                finally {
+                    this.pkcs11.C_CloseSession(session);
+                }
+            }
+             X509Certificate[] resultChain = new X509Certificate[3];
+            signCertificateChain.toArray(resultChain);
+            return resultChain;
+
+        }
+        public byte[] signAuthentication(byte[] toBeSigned) throws IOException,
+			KeyStoreException, NoSuchAlgorithmException, CertificateException,
+			UnrecoverableEntryException, InvalidKeyException, PKCS11Exception,
+			SignatureException {
+            if(this.pkcs11 ==null)
+            {
+                try {
+                    if(!isEidPresent() ) {
+                        return null;
+                    }
+                 } catch (Exception ex) {
+                    System.out.println("Exception "+ex.getMessage());
+                    Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            if(this.pkcs11 != null) {
+
+                X509Certificate certificate = null;
+                long session  = this.pkcs11.C_OpenSession(this.slotIdx, PKCS11Constants.CKF_SERIAL_SESSION, null, null);
+                try {
+                        be.fedict.eid.applet.Dialogs dialogs = new Dialogs(this.view, this.messages);
+                        char[] pin = dialogs.getPin();
+                        
+                        this.pkcs11.C_Login(session, PKCS11Constants.CKU_USER, pin);
+
+                        CK_ATTRIBUTE[] attributes = new CK_ATTRIBUTE[2];
+                        attributes[0] = new CK_ATTRIBUTE();
+                        attributes[0].type = PKCS11Constants.CKA_CLASS;
+                        attributes[0].pValue = PKCS11Constants.CKO_CERTIFICATE;
+                        attributes[1] = new CK_ATTRIBUTE();
+                        attributes[1].type = PKCS11Constants.CKA_LABEL;
+                        attributes[1].pValue = getAuthenticationLabel().getBytes("UTF-8");
+                        this.pkcs11.C_FindObjectsInit(session, attributes);
+                        
+                        this.view.addDetailMessage(getAuthenticationLabel());
+                        this.view.addDetailMessage(getSignatureLabel());
+                        try {
+                                long[] certHandles = this.pkcs11.C_FindObjects(session, 1);
+                                if (0 == certHandles.length) {
+                                        /*
+                                         * In case of OpenSC PKCS#11.
+                                         */
+                                        this.view.addDetailMessage("no PKCS#11 key handle for label: "+getAuthenticationLabel());
+                                        throw new RuntimeException("cannot sign via PKCS#11");
+                                }
+                                if(certHandles.length == 1) {
+                                    
+                                    CK_ATTRIBUTE[] template = new CK_ATTRIBUTE[1];
+                                    template[0] = new CK_ATTRIBUTE();
+                                    template[0].type = PKCS11Constants.CKA_VALUE;
+                                    this.pkcs11.C_GetAttributeValue(session, certHandles[0], template);
+                                    byte[] certBytes = (byte[]) template[0].pValue;
+                                    if(certBytes != null) {
+                                        certificate = new X509CertImpl(certBytes);
+                                        //this.view.addDetailMessage("X509Certificate : " + certificate.getSerialNumber().toString());
+                                        //this.view.addDetailMessage("X509Principal name : " + certificate.getIssuerX500Principal().toString());
+                                        //this.view.addDetailMessage("X509Certificate : " + certificate.toString());
+                                    }
+                                }
+                        } finally {
+                                this.pkcs11.C_FindObjectsFinal(session);
+                        }
+                        if(certificate != null) {
+                                this.authnCertificateChain = new LinkedList<X509Certificate>();
+                                this.authnCertificateChain.add(certificate);
+                                X509Certificate certi =  getIssuerCert(false) ;
+                                this.authnCertificateChain.add(certi);
+                               // this.view.addDetailMessage("X509Certificate ISSUER : " + certi.toString());
+                                X509Certificate rootCerti =  getIssuerCert(true) ;
+                                this.authnCertificateChain.add(rootCerti);
+                                //this.view.addDetailMessage("X509Certificate ROOT : " + rootCerti.toString());
+
+                                attributes = new CK_ATTRIBUTE[2];
+                                attributes[0] = new CK_ATTRIBUTE();
+                                attributes[0].type = PKCS11Constants.CKA_CLASS;
+                                attributes[0].pValue = PKCS11Constants.CKO_PRIVATE_KEY;
+                                attributes[1] = new CK_ATTRIBUTE();
+                                attributes[1].type = PKCS11Constants.CKA_LABEL;
+                                attributes[1].pValue = getAuthenticationLabel().getBytes("UTF-8");
+                                this.pkcs11.C_FindObjectsInit(session, attributes);
+                                long keyHandle = -1;
+
+                                try {
+                                        long[] keyHandles = this.pkcs11.C_FindObjects(session, 1);
+                                        if (0 == keyHandles.length) {
+                                                
+                                                this.view.addDetailMessage("no PKCS#11 key handle for label: "+getAuthenticationLabel());
+                                                throw new RuntimeException("cannot sign via PKCS#11");
+                                        }
+                                        if(keyHandles.length == 1) {
+                                            keyHandle = keyHandles[0];
+                                        }
+                                } finally {
+                                        this.pkcs11.C_FindObjectsFinal(session);
+                                }
+                                if(keyHandle != -1) {
+                                    CK_MECHANISM mechanism = new CK_MECHANISM();
+                                    mechanism.mechanism = PKCS11Constants.CKM_SHA1_RSA_PKCS;
+                                    mechanism.pParameter = null;
+                                    this.pkcs11.C_SignInit(session, mechanism, keyHandle);
+                                    ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
+                                    digestInfo.write(Constants.SHA1_DIGEST_INFO_PREFIX);
+                                    digestInfo.write(toBeSigned);
+                                    byte[] signatureValue = pkcs11.C_Sign(session, toBeSigned);
+                                    return signatureValue;
+                                }
+                        }
+
+                } catch (PKCS11Exception ex) {
+                    System.out.println("PKCS11Exception");
+                    //Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                catch(RuntimeException rex) {
+                    System.out.println("RuntimeException");
+                    //Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, rex);
+                    if("operation canceled.".equals(rex.getMessage())) {
+                        throw new IOException("El usuario ha cancelado el proceso.");
+                    }
+                     else {
+                        throw new IOException(rex.getMessage());
+                     }
+                }
+                finally {
+                    this.pkcs11.C_CloseSession(session);
+                }
+            }
+            return null;
 	}
 
+        private String authenticationLabel;
+
+        public String getAuthenticationLabel() {
+            return authenticationLabel;
+        }
+
+        public void setAuthenticationLabel(String authenticationLabel) {
+            this.authenticationLabel = authenticationLabel;
+        }
+
+        public String getSignatureLabel() {
+            return signatureLabel;
+        }
+
+        public void setSignatureLabel(String signatureLabel) {
+            this.signatureLabel = signatureLabel;
+        }
+        private String signatureLabel;
+        
 	private List<X509Certificate> authnCertificateChain;
 
 	public List<X509Certificate> getAuthnCertificateChain() {
 		return this.authnCertificateChain;
 	}
-
-	private List<X509Certificate> signCertificateChain;
 
 	public List<X509Certificate> getSignCertificateChain() {
 		return this.signCertificateChain;
@@ -447,10 +644,6 @@ public class Pkcs11Eid {
 
 	public void close() throws PKCS11Exception, NoSuchFieldException,
 			IllegalAccessException {
-		if (null != this.pkcs11Provider) {
-			Security.removeProvider(this.pkcs11Provider.getName());
-			this.pkcs11Provider = null;
-		}
 		cFinalize();
 	}
 
@@ -472,110 +665,80 @@ public class Pkcs11Eid {
 		 * We sign directly via the PKCS#11 wrapper since this is the only way
 		 * to sign the given digest value.
 		 */
+                 if(this.pkcs11 ==null)
+                {
+                    try {
+                        if(!isEidPresent() ) {
+                            return null;
+                        }
+                     } catch (Exception ex) {
+                        System.out.println("Exception "+ex.getMessage());
+                        Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
 		long session = this.pkcs11.C_OpenSession(this.slotIdx,
 				PKCS11Constants.CKF_SERIAL_SESSION, null, null);
-		byte[] signatureValue;
+		byte[] signatureValue = null;
 		try {
+                        be.fedict.eid.applet.Dialogs dialogs = new Dialogs(this.view, this.messages);
+                        char[] pin = dialogs.getPin();
+
+                        this.pkcs11.C_Login(session, PKCS11Constants.CKU_USER, pin);
+
 			CK_ATTRIBUTE[] attributes = new CK_ATTRIBUTE[2];
 			attributes[0] = new CK_ATTRIBUTE();
 			attributes[0].type = PKCS11Constants.CKA_CLASS;
 			attributes[0].pValue = PKCS11Constants.CKO_PRIVATE_KEY;
 			attributes[1] = new CK_ATTRIBUTE();
 			attributes[1].type = PKCS11Constants.CKA_LABEL;
-			attributes[1].pValue = "Signature";
+			attributes[1].pValue = getSignatureLabel().getBytes("UTF-8");
 			this.pkcs11.C_FindObjectsInit(session, attributes);
-			long keyHandle;
+			long keyHandle =  -1 ;
 			try {
 				long[] keyHandles = this.pkcs11.C_FindObjects(session, 1);
 				if (0 == keyHandles.length) {
 					/*
 					 * In case of OpenSC PKCS#11.
 					 */
-					this.view
-							.addDetailMessage("no PKCS#11 key handle for label \"Signature\"");
+					this.view.addDetailMessage("no PKCS#11 key handle for label:  "+ getSignatureLabel());
 					throw new RuntimeException("cannot sign via PKCS#11");
 				}
-				keyHandle = keyHandles[0];
-				this.view.addDetailMessage("key handle: " + keyHandle);
+				if(keyHandles.length == 1) {
+                                            keyHandle = keyHandles[0];
+                                 }
 			} finally {
 				this.pkcs11.C_FindObjectsFinal(session);
 			}
 
-			CK_MECHANISM mechanism = new CK_MECHANISM();
-			mechanism.mechanism = PKCS11Constants.CKM_RSA_PKCS;
-			mechanism.pParameter = null;
-			this.pkcs11.C_SignInit(session, mechanism, keyHandle);
+                        if(keyHandle != -1) {
+                            CK_MECHANISM mechanism = new CK_MECHANISM();
+                            mechanism.mechanism = PKCS11Constants.CKM_SHA1_RSA_PKCS;
+                            mechanism.pParameter = null;
+                            this.pkcs11.C_SignInit(session, mechanism, keyHandle);
+                            ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
+                            digestInfo.write(Constants.SHA1_DIGEST_INFO_PREFIX);
+                            digestInfo.write(digestValue);
+                            signatureValue = pkcs11.C_Sign(session, digestValue);
 
-			ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
-			if ("SHA-1".equals(digestAlgo) || "SHA1".equals(digestAlgo)) {
-				digestInfo.write(Constants.SHA1_DIGEST_INFO_PREFIX);
-			} else if ("SHA-224".equals(digestAlgo)) {
-				digestInfo.write(Constants.SHA224_DIGEST_INFO_PREFIX);
-			} else if ("SHA-256".equals(digestAlgo)) {
-				digestInfo.write(Constants.SHA256_DIGEST_INFO_PREFIX);
-			} else if ("SHA-384".equals(digestAlgo)) {
-				digestInfo.write(Constants.SHA384_DIGEST_INFO_PREFIX);
-			} else if ("SHA-512".equals(digestAlgo)) {
-				digestInfo.write(Constants.SHA512_DIGEST_INFO_PREFIX);
-			} else if ("RIPEMD160".equals(digestAlgo)) {
-				digestInfo.write(Constants.RIPEMD160_DIGEST_INFO_PREFIX);
-			} else if ("RIPEMD128".equals(digestAlgo)) {
-				digestInfo.write(Constants.RIPEMD128_DIGEST_INFO_PREFIX);
-			} else if ("RIPEMD256".equals(digestAlgo)) {
-				digestInfo.write(Constants.RIPEMD256_DIGEST_INFO_PREFIX);
-			} else {
-				throw new RuntimeException("digest also not supported: "
-						+ digestAlgo);
-			}
-			digestInfo.write(digestValue);
+                        }
 
-			signatureValue = pkcs11.C_Sign(session, digestInfo.toByteArray());
-		} finally {
+		} 
+                catch(RuntimeException rex) {
+                     System.out.println("RuntimeException");
+                    //Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, rex);
+                    if("operation canceled.".equals(rex.getMessage())) {
+                        throw new IOException("El usuario ha cancelado el proceso.");
+                    }
+                     else {
+                        throw new IOException(rex.getMessage());
+                     }
+                }
+                finally {
 			this.pkcs11.C_CloseSession(session);
 		}
 
-		/*
-		 * We use the Sun JCE to construct the certificate path.
-		 */
-		// setup configuration file
-		File tmpConfigFile = File.createTempFile("pkcs11-", "conf");
-		tmpConfigFile.deleteOnExit();
-		PrintWriter configWriter = new PrintWriter(new FileOutputStream(
-				tmpConfigFile), true);
-		configWriter.println("name=SmartCard");
-		configWriter.println("library=" + getPkcs11Path());
-		configWriter.println("slotListIndex= " + this.slotIdx);
-
-		// load security provider
-		this.pkcs11Provider = new SunPKCS11(tmpConfigFile.getAbsolutePath());
-		if (-1 == Security.addProvider(this.pkcs11Provider)) {
-			throw new RuntimeException("could not add security provider");
-		}
-
-		// load key material
-		KeyStore keyStore = KeyStore.getInstance("PKCS11", this.pkcs11Provider);
-		keyStore.load(null, null);
-		String alias = "Signature";
-		PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) keyStore.getEntry(
-				alias, null);
-		if (null == privateKeyEntry) {
-			/*
-			 * Seems like this can happen for very old eID cards.
-			 */
-			throw new RuntimeException(
-					"private key entry for alias not found: " + alias);
-		}
-		X509Certificate[] certificateChain = (X509Certificate[]) privateKeyEntry
-				.getCertificateChain();
-		this.signCertificateChain = new LinkedList<X509Certificate>();
-		for (X509Certificate certificate : certificateChain) {
-			this.signCertificateChain.add(certificate);
-		}
-
-		// TODO: why keep this also in close()?
-		Security.removeProvider(this.pkcs11Provider.getName());
-		this.pkcs11Provider = null;
-
+                //The certificate path is already built  and stored in "this.signCertificateChain"
+	
 		return signatureValue;
 	}
 
@@ -629,3 +792,4 @@ public class Pkcs11Eid {
 				true, pkcs11Information);
 	}
 }
+

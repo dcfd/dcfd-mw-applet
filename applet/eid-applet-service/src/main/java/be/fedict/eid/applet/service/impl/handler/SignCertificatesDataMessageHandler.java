@@ -218,6 +218,7 @@ public class SignCertificatesDataMessageHandler implements
 		} else {
 			LOG.debug("regular SignatureService SPI implementation");
 			try {
+                                signatureService.setHttpSessionObject(request.getSession());
 				digestInfo = signatureService.preSign(null,
 						signingCertificateChain);
 			} catch (NoSuchAlgorithmException e) {

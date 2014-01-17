@@ -161,6 +161,9 @@ public class AbstractXmlSignatureServiceTest {
 		public void setUriDereferencer(URIDereferencer uriDereferencer) {
 			this.uriDereferencer = uriDereferencer;
 		}
+                public void setHttpSessionObject(Object sessionObject){
+
+                }
 	}
 
 	@Test

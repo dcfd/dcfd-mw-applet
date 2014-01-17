@@ -100,4 +100,7 @@ public class SignatureServiceBean implements SignatureService {
 		 */
 		return null;
 	}
+        public void setHttpSessionObject(Object session){
+
+        }
 }

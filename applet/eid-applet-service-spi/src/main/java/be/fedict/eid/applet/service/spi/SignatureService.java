@@ -74,4 +74,7 @@ public interface SignatureService {
 			RevokedCertificateSecurityException,
 			TrustCertificateSecurityException, CertificateSecurityException,
 			SecurityException;
+
+
+        void setHttpSessionObject(Object session);
 }
