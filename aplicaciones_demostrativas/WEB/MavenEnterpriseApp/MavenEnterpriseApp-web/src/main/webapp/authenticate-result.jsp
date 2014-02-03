@@ -25,7 +25,9 @@
         <div style="clear: both; border-bottom: 2px solid #000"></div>
 
     <h1>P&aacutegina con el resultado de la Autenticaci&oacute;n</h1>
-<p>Usuario Autenticado con &eacute;xito: <%=session.getAttribute("eid.identifier")%>
+<p>Usuario: <%=session.getAttribute("eid.identifier")%>
+</p>
+<p>Resultado de la Autenticaci&oacute;n: <%=session.getAttribute("AuthenticationResult")%>
 </p>
 
 <a href="authenticate.jsp">Autenticar nuevamente</a>
