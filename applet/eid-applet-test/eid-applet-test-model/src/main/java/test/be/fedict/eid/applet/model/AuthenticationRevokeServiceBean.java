@@ -44,4 +44,7 @@ public class AuthenticationRevokeServiceBean implements AuthenticationService {
 		LOG.debug("validate certificate chain: " + certificateChain);
 		throw new RevokedCertificateSecurityException();
 	}
+        public void setHttpSessionObject(Object sessionObject) {
+
+            }
 }

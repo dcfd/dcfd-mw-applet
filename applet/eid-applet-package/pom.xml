@@ -89,6 +89,10 @@
 						<configuration>
 							<archive>
 								<addMavenDescriptor>false</addMavenDescriptor>
+								<manifestEntries>
+									<Permissions>all-permissions</Permissions>
+									<Codebase>https://*.be localhost 127.0.0.1</Codebase>
+								</manifestEntries>
 							</archive>
 							<type>PKCS12</type>
 							<keystore>target/sign.p12</keystore>
@@ -109,6 +113,10 @@
 						<configuration>
 							<archive>
 								<addMavenDescriptor>false</addMavenDescriptor>
+								<manifestEntries>
+									<Permissions>all-permissions</Permissions>
+									<Codebase>https://*.be localhost 127.0.0.1</Codebase>
+								</manifestEntries>
 							</archive>
 						</configuration>
 					</plugin>

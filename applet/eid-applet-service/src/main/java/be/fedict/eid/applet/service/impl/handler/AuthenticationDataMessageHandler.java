@@ -345,6 +345,7 @@ public class AuthenticationDataMessageHandler implements
 		certificateChain.add(message.citizenCaCert);
 		certificateChain.add(message.rootCaCert);
 		try {
+            authenticationService.setHttpSessionObject(request.getSession());
 			authenticationService.validateCertificateChain(certificateChain);
 		} catch (ExpiredCertificateSecurityException e) {
 			return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);

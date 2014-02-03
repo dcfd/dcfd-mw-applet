@@ -44,4 +44,7 @@ public class AuthenticationExpiredServiceBean implements AuthenticationService {
 		LOG.debug("validate certificate chain: " + certificateChain);
 		throw new ExpiredCertificateSecurityException();
 	}
+        public void setHttpSessionObject(Object sessionObject) {
+
+        }
 }
