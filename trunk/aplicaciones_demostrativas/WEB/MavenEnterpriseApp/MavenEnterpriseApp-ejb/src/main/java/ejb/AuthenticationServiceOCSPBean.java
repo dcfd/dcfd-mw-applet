@@ -23,6 +23,9 @@ import be.fedict.eid.applet.service.spi.AuthenticationService;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
+import com.mycompany.CertificateStatus;
+import com.mycompany.OcspClient;
+
 /**
  *
  * @author jubarran
@@ -35,18 +38,36 @@ public class AuthenticationServiceOCSPBean  implements AuthenticationService {
    /* private static final Log LOG = LogFactory
 			.getLog(AuthenticationServiceOCSPBean.class);*/
 
+    private HttpSession session;
     @Override
    public void validateCertificateChain(List<X509Certificate> certificateChain)
 			throws SecurityException {
        		//LOG.debug("validate certificate chain: " + certificateChain);
 
-		HttpServletRequest httpServletRequest;
+		
 		try {
-			//TODO:   Perform real OCSP autenticathion.
+                        OcspClient oscpClient = new OcspClient(certificateChain.get(0));
+                        oscpClient.getPublicKeyCertificate().checkValidity();
+                        CertificateStatus status = oscpClient.consultarEstadoDeCertificado(oscpClient.getPublicKeyCertificate(), certificateChain.get(1));
+                        if (status == CertificateStatus.Good) {
+                            System.out.println("OK");
+                            session.setAttribute("AuthenticationResult", "Certificado Validado");
+                        } else if (status == CertificateStatus.Revoked) {
+                            System.out.println("Revocado");
+                            //out_Error.append("Certificado Revocado");
+                            session.setAttribute("AuthenticationResult", "Certificado Recovado");
+                        } else {
+                            System.out.println("Desconocido");
+                            //out_Error.append("Certificado/Respuesta Desconocido(s)");
+                            session.setAttribute("AuthenticationResult", "Certificado Desconocido");
+                        }
 		} catch (Exception e) {
                     e.printStackTrace();
                 }
 
    }
+    public void setHttpSessionObject(Object sessionObject) {
+        session = (HttpSession)sessionObject;
+    }
 
 }
