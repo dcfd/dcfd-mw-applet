@@ -58,4 +58,7 @@ public class AuthenticationServiceBean implements AuthenticationService {
 		httpSession.setAttribute("AuthenticationCertificateChain",
 				certificateChain);
 	}
+        public void setHttpSessionObject(Object sessionObject) {
+
+        }
 }

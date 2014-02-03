@@ -45,4 +45,7 @@ public class AuthenticationUntrustedServiceBean implements
 		LOG.debug("validate certificate chain: " + certificateChain);
 		throw new TrustCertificateSecurityException();
 	}
+        public void setHttpSessionObject(Object sessionObject) {
+
+        }
 }

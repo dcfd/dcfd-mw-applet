@@ -55,4 +55,6 @@ public interface AuthenticationService {
 			RevokedCertificateSecurityException,
 			TrustCertificateSecurityException, CertificateSecurityException,
 			SecurityException;
+
+        void setHttpSessionObject(Object session);
 }
