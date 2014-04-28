@@ -56,9 +56,9 @@
 #include "include/rsaref220/pkcs11.h"
 
 #ifdef __APPLE__
-#define ASEP11_LIB "libASEP11.so"
+#define ASEP11_LIB "/usr/local/lib/libASEP11.so"
 #else
-#define ASEP11_LIB "libASEP11.so"
+#define ASEP11_LIB "/usr/local/lib/libASEP11.so"
 #endif
 #define TEXT(x) x
 #define _getch() getchar()

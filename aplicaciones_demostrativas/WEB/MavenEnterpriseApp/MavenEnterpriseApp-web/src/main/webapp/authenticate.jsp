@@ -28,7 +28,7 @@
 	};
 	var parameters = {
 		TargetPage :'authenticate-result.jsp',
-		AppletService :'applet-service-authn',
+		AppletService :'applet-service-authn;jsessionid=<%=session.getId()%> ',
 		BackgroundColor :'#cccccc',
 		Language : 'es'
 	};

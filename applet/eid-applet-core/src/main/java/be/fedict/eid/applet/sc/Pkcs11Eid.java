@@ -137,7 +137,13 @@ public class Pkcs11Eid {
 			/*
 			 * eID Middleware 4.0 - XP
 			 */
-			pkcs11File = new File("C:\\WINDOWS\\system32\\beidpkcs11.dll");
+			pkcs11File = new File("C:\\Firma Digital\\mw\\beidpkcs11.dll");
+                        
+			if (pkcs11File.exists()) {
+				return pkcs11File.getAbsolutePath();
+			}
+
+                        pkcs11File = new File("C:\\WINDOWS\\system32\\beidpkcs11.dll");
 			if (pkcs11File.exists()) {
 				return pkcs11File.getAbsolutePath();
 			}
