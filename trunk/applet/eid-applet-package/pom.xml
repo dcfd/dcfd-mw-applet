@@ -91,7 +91,8 @@
 								<addMavenDescriptor>false</addMavenDescriptor>
 								<manifestEntries>
 									<Permissions>all-permissions</Permissions>
-									<Codebase>https://*.be localhost 127.0.0.1</Codebase>
+                                    <Application-Name>eidApplet-Micit</Application-Name>
+									<Codebase>https://*.rolosa.com localhost 127.0.0.1</Codebase>
 								</manifestEntries>
 							</archive>
 							<type>PKCS12</type>
@@ -115,7 +116,8 @@
 								<addMavenDescriptor>false</addMavenDescriptor>
 								<manifestEntries>
 									<Permissions>all-permissions</Permissions>
-									<Codebase>https://*.be localhost 127.0.0.1</Codebase>
+                                    <Application-Name>eidApplet-Micit</Application-Name>
+									<Codebase>https://*.rolosa.com localhost 127.0.0.1</Codebase>
 								</manifestEntries>
 							</archive>
 						</configuration>

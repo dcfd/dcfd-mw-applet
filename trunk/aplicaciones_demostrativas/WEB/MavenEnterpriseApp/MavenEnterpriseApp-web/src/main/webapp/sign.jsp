@@ -30,7 +30,7 @@
 	};
 	var parameters = {
 		TargetPage :'sign-result.jsp',
-		AppletService :'applet-service-sign',
+		AppletService :'applet-service-sign;jsessionid=<%=session.getId()%> ',
 		BackgroundColor :'#cccccc',
 		Language :'es'
 	};
