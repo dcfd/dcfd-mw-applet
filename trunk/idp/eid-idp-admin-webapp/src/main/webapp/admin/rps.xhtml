@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:s="http://jboss.com/products/seam/taglib">
+<body>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:define name="body">
+			<h2>Relying Parties</h2>
+
+			<h:form>
+
+				<h:outputLabel value="No relying parties configured."
+					rendered="#{idpRPList.rowCount == 0}" />
+
+				<rich:dataTable id="data" var="item" value="#{idpRPList}" rows="10"
+					rowClasses="listingTable_Row1,listingTable_Row2"
+					rendered="#{idpRPList.rowCount > 0}">
+
+					<h:column>
+						<f:facet name="header">Name</f:facet>
+						<h:outputText value="#{item.name}" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">Domain</f:facet>
+						<h:outputText value="#{item.domain}" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">Certificate Subject</f:facet>
+						<h:outputText value="#{item.certificateSubject}" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">Modify</f:facet>
+						<h:commandLink action="#{idpRP.modify}" id="modify" value="Modify" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">Remove</f:facet>
+						<a4j:commandLink action="#{idpRP.select}" immediate="true"
+							id="remove" value="Remove"
+							onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
+					</h:column>
+
+					<f:facet name="footer">
+						<rich:datascroller for="data" pageIndexVar="pageIndex"
+							pagesVar="pages" fastControls="hide">
+						</rich:datascroller>
+					</f:facet>
+
+				</rich:dataTable>
+
+				<p />
+
+				<h:commandButton action="#{idpRP.add}" id="add" value="Add" />
+
+
+				<rich:modalPanel id="removeConfirm">
+					<div class="center">
+						<h:outputText value="Sure you want to remove this Relying Party ?" />
+						<p>
+							<h:panelGrid id="confirmPanel" columns="2" border="0"
+								styleClass="center">
+								<a4j:commandButton id="remove2" value="Remove"
+									action="#{idpRP.remove}" immediate="true"
+									oncomplete="#{facesContext.maximumSeverity == null ?
+                                    'Richfaces.hideModalPanel(\'removeConfirm\');' :
+                                    'Richfaces.showModalPanel(\'removeConfirm\');'}" />
+								<a4j:commandButton id="cancel" value="Cancel"
+									onclick="Richfaces.hideModalPanel('removeConfirm');" />
+							</h:panelGrid>
+						</p>
+						<rich:messages styleClass="error" />
+					</div>
+				</rich:modalPanel>
+
+			</h:form>
+
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core">
+<body>
+	<ui:composition template="/WEB-INF/template-applet.xhtml">
+
+		<ui:define name="body_title">
+			<h2>#{messages.authentication}</h2>
+
+			<p>#{messages.authenticationInfo}</p>
+		</ui:define>
+
+		<ui:define name="applet">
+
+			<script>
+				var attributes = {
+					code : 'be.fedict.eid.applet.Applet.class',
+					archive : 'eid-applet-package-${eid-applet.version}.jar',
+					width : 600,
+					height : 300
+				};
+				var parameters = {
+					TargetPage : 'protocol-exit',
+					AppletService : 'applet-authentication-service;jsessionid=#{facesContext.externalContext.getSession(false).id}',
+					Language : '#{localeSelector.language}',
+					NavigatorUserAgent : navigator.userAgent,
+					NavigatorAppName : navigator.appName,
+					NavigatorAppVersion : navigator.appVersion,
+					NoChunkedTransferEncoding : 'true'
+				};
+				deployJavaEIDApplet.runApplet(attributes, parameters);
+			</script>
+
+		</ui:define>
+
+	</ui:composition>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	targetNamespace="urn:be:fedict:eid:idp:saml2:ws" xmlns:tns="urn:be:fedict:eid:idp:saml2:ws"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+
+	<types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema">
+			<import namespace="urn:oasis:names:tc:SAML:2.0:protocol"
+				schemaLocation="saml-schema-protocol-2.0.xsd" />
+		</schema>
+	</types>
+
+	<message name="ArtifactResolve">
+		<part name="ArtifactResolve" element="samlp:ArtifactResolve" />
+	</message>
+
+	<message name="ArtifactResponse">
+		<part name="ArtifactResponse" element="samlp:ArtifactResponse" />
+	</message>
+
+	<portType name="ArtifactServicePortType">
+		<operation name="resolve">
+			<input message="tns:ArtifactResolve" />
+			<output message="tns:ArtifactResponse" />
+		</operation>
+	</portType>
+
+	<binding name="ArtifactServiceBinding" type="tns:ArtifactServicePortType">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+			style="document" />
+		<operation name="resolve">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+		</operation>
+	</binding>
+
+	<service name="ArtifactService">
+		<port name="ArtifactServicePort" binding="tns:ArtifactServiceBinding">
+			<soap:address location="http://localhost:8080/eid-idp-saml2-ws/artifact" />
+		</port>
+	</service>
+</definitions>

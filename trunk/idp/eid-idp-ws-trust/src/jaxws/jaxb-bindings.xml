@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxb:bindings version="2.1" xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd
+	http://java.sun.com/xml/ns/jaxws http://java.sun.com/xml/ns/jaxws/wsdl_customizationschema_2_0.xsd">
+
+	<jxb:bindings
+		schemaLocation="http://docs.oasis-open.org/ws-sx/ws-trust/200512/ws-trust-1.3.xsd"
+		node="/xs:schema">
+		<jxb:schemaBindings>
+			<jxb:package name="be.fedict.eid.idp.wstrust.jaxb.wstrust" />
+		</jxb:schemaBindings>
+		<jxb:bindings
+			schemaLocation="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+			node="/xs:schema">
+			<jxb:schemaBindings>
+				<jxb:package name="be.fedict.eid.idp.wstrust.jaxb.wsse" />
+			</jxb:schemaBindings>
+			<jxb:bindings
+				schemaLocation="http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd"
+				node="/xs:schema">
+				<jxb:schemaBindings>
+					<jxb:package name="be.fedict.eid.idp.wstrust.jaxb.xmldsig" />
+				</jxb:schemaBindings>
+			</jxb:bindings>
+		</jxb:bindings>
+		<jxb:bindings
+			schemaLocation="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+			node="/xs:schema">
+			<jxb:schemaBindings>
+				<jxb:package name="be.fedict.eid.idp.wstrust.jaxb.wssu" />
+			</jxb:schemaBindings>
+		</jxb:bindings>
+		<jxb:bindings
+			schemaLocation="http://schemas.xmlsoap.org/ws/2004/09/policy/ws-policy.xsd"
+			node="/xs:schema">
+			<jxb:schemaBindings>
+				<jxb:package name="be.fedict.eid.idp.wstrust.jaxb.wspolicy" />
+			</jxb:schemaBindings>
+		</jxb:bindings>
+		<jxb:bindings
+			schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd"
+			node="/xs:schema">
+			<jxb:schemaBindings>
+				<jxb:package name="be.fedict.eid.idp.wstrust.jaxb.wsaddr" />
+			</jxb:schemaBindings>
+		</jxb:bindings>
+	</jxb:bindings>
+
+</jxb:bindings>

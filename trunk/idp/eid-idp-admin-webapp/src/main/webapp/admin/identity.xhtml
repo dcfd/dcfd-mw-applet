@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:s="http://jboss.com/products/seam/taglib">
+<body>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:define name="body">
+			<h2>Service Identity</h2>
+
+			<h:form>
+
+				<h:panelGrid columns="2">
+
+					<h:outputLabel value="#{idpIdentity.identityLabel}" for="identity" />
+					<h:selectOneMenu id="identity" value="#{idpIdentity.name}"
+						onchange="submit();">
+						<f:selectItems value="#{idpIdentity.identityNames}" />
+					</h:selectOneMenu>
+				</h:panelGrid>
+			</h:form>
+
+			<p />
+
+			<h:form>
+
+				<h:panelGrid columns="2">
+					<h:outputLabel value="Name (*)" for="identity_name" />
+					<s:decorate>
+						<h:inputText id="identity_name" value="#{idpIdentity.name}"
+							required="true" readonly="#{idpIdentity.isNameReadOnly()}">
+						</h:inputText>
+						<h:message for="identity_name" styleClass="error" />
+					</s:decorate>
+
+
+					<h:outputLabel value="Keystore Type (*)" for="keystore_type" />
+					<s:decorate>
+						<h:selectOneMenu id="keystore_type"
+							value="#{idpIdentity.keyStoreType}" required="true">
+							<f:selectItems value="#{keyStoreTypes}" />
+							<h:message for="keystore_type" styleClass="error" />
+						</h:selectOneMenu>
+					</s:decorate>
+					<h:outputLabel value="Keystore Path (*)" for="keystore_path" />
+					<s:decorate>
+						<h:inputText id="keystore_path"
+							value="#{idpIdentity.keyStorePath}" required="true" size="50">
+						</h:inputText>
+						<h:message for="keystore_path" styleClass="error" />
+					</s:decorate>
+
+					<h:outputLabel value="Keystore Password (*)" for="keystore_pw" />
+					<s:decorate>
+						<h:inputText id="keystore_pw"
+							value="#{idpIdentity.keyStorePassword}" required="true">
+						</h:inputText>
+						<h:message for="keystore_pw" styleClass="error" />
+					</s:decorate>
+
+					<h:outputLabel value="Key Entry Password (*)" for="keyentry_pw" />
+					<s:decorate>
+						<h:inputText id="keyentry_pw"
+							value="#{idpIdentity.keyEntryPassword}" required="true">
+						</h:inputText>
+					</s:decorate>
+
+					<h:outputLabel value="Key Entry Alias" for="keyentry_alias" />
+					<h:inputText id="keyentry_alias"
+						value="#{idpIdentity.keyEntryAlias}">
+					</h:inputText>
+
+				</h:panelGrid>
+
+
+				<h:panelGrid columns="4">
+					<h:commandButton id="identity_activate" value="Activate"
+						action="#{idpIdentity.activate}" rendered="#{!idpIdentity.active}" />
+					<h:commandButton id="identity_test" value="Test"
+						action="#{idpIdentity.test}" />
+					<h:commandButton id="identity_save" value="Save"
+						action="#{idpIdentity.save}" />
+					<h:commandButton id="identity_remove" value="Remove"
+						action="#{idpIdentity.remove}" />
+				</h:panelGrid>
+
+				<h:messages styleClass="error" />
+
+			</h:form>
+
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:s="http://jboss.com/products/seam/taglib">
+<body>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:define name="body">
+			<h2>Administrator Privileges</h2>
+
+			<h:form>
+
+				<rich:dataTable id="data" var="item" value="#{idpAdminList}"
+					rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
+
+					<h:column>
+						<f:facet name="header">Name</f:facet>
+						<h:outputText value="#{item.name}" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">Remove</f:facet>
+						<a4j:commandLink action="#{idpAdmin.select}" immediate="true"
+							id="remove" value="Remove"
+							onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">Approve</f:facet>
+						<h:commandLink id="register" value="Approve"
+							action="#{idpAdmin.registerPending}" rendered="#{item.pending}" />
+					</h:column>
+				</rich:dataTable>
+
+				<rich:modalPanel id="removeConfirm">
+					<div class="center">
+						<h:outputText value="Sure you want to remove this administrator?" />
+						<p>
+							<h:panelGrid id="confirmPanel" columns="2" border="0"
+								styleClass="center">
+								<a4j:commandButton id="remove2" value="Remove"
+									action="#{idpAdmin.remove}" immediate="true"
+									oncomplete="#{facesContext.maximumSeverity == null ?
+                                    'Richfaces.hideModalPanel(\'removeConfirm\');' :
+                                    'Richfaces.showModalPanel(\'removeConfirm\');'}" />
+								<a4j:commandButton id="cancel" value="Cancel"
+									onclick="Richfaces.hideModalPanel('removeConfirm');" />
+							</h:panelGrid>
+						</p>
+						<rich:messages styleClass="error" />
+					</div>
+				</rich:modalPanel>
+
+			</h:form>
+
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

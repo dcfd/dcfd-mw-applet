@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:be:fedict:eid:idp:spi:protocol"
+	xmlns:tns="urn:be:fedict:eid:idp:spi:protocol" elementFormDefault="qualified"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<element name="IdentityProviderProtocols" type="tns:IdentityProviderProtocolsType" />
+	<complexType name="IdentityProviderProtocolsType">
+		<sequence>
+			<element name="IdentityProviderProtocol" type="tns:IdentityProviderProtocolType"
+				maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<element name="IdentityProviderProtocol" type="tns:IdentityProviderProtocolType" />
+	<complexType name="IdentityProviderProtocolType">
+		<sequence>
+			<element name="Name" type="xsd:string" />
+			<element name="Description" type="xsd:string" minOccurs="0" />
+			<element name="ProtocolService" type="xsd:string" />
+			<element name="ContextPath" type="xsd:string" />
+			<element name="Endpoints" type="tns:EndpointsType" minOccurs="0" />
+			<element name="WSEndpoints" type="tns:WSEndpointsType"
+				minOccurs="0" />
+		</sequence>
+	</complexType>
+	<complexType name="EndpointsType">
+		<sequence>
+			<element name="Endpoint" type="tns:EndpointType" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+	<complexType name="EndpointType">
+		<sequence>
+			<element name="Name" type="xsd:string" />
+			<element name="Description" type="xsd:string" minOccurs="0" />
+			<element name="ServletClass" type="xsd:string" />
+			<element name="ContextPath" type="xsd:string" />
+		</sequence>
+	</complexType>
+	<complexType name="WSEndpointsType">
+		<sequence>
+			<element name="WSEndpoint" type="tns:WSEndpointType"
+				maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+	<complexType name="WSEndpointType">
+		<sequence>
+			<element name="Name" type="xsd:string" />
+			<element name="Description" type="xsd:string" minOccurs="0" />
+			<element name="WSImplClass" type="xsd:string" />
+			<element name="ContextPath" type="xsd:string" />
+		</sequence>
+	</complexType>
+
+</schema>

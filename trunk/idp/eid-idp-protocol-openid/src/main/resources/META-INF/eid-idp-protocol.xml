@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<IdentityProviderProtocols xmlns="urn:be:fedict:eid:idp:spi:protocol">
+    <IdentityProviderProtocol>
+        <Name>OpenID Protocol Service Identification</Name>
+        <Description>This eID IdP Protocol Service provides an OpenID protocol
+            for eID identification purposes.
+        </Description>
+        <ProtocolService>be.fedict.eid.idp.protocol.openid.OpenIDProtocolServiceIdent</ProtocolService>
+        <ContextPath>/openid/ident</ContextPath>
+        <Endpoints>
+            <Endpoint>
+                <Name>OpenID Identification Service</Name>
+                <ServletClass>be.fedict.eid.idp.protocol.openid.OpenIDIdentityHttpServletIdent</ServletClass>
+                <ContextPath>/openid/ident</ContextPath>
+            </Endpoint>
+            <Endpoint>
+                <Name>OpenID Identification XRDS</Name>
+                <ServletClass>be.fedict.eid.idp.protocol.openid.OpenIDIdentityHttpServletIdent</ServletClass>
+                <ContextPath>/openid/ident/xrds</ContextPath>
+            </Endpoint>
+        </Endpoints>
+    </IdentityProviderProtocol>
+    <IdentityProviderProtocol>
+        <Name>OpenID Protocol Service Authentication</Name>
+        <Description>This eID IdP Protocol Service provides an OpenID protocol
+            for eID authentication purposes.
+        </Description>
+        <ProtocolService>be.fedict.eid.idp.protocol.openid.OpenIDProtocolServiceAuth</ProtocolService>
+        <ContextPath>/openid/auth</ContextPath>
+        <Endpoints>
+            <Endpoint>
+                <Name>OpenID Authentication Service</Name>
+                <ServletClass>be.fedict.eid.idp.protocol.openid.OpenIDIdentityHttpServletAuth</ServletClass>
+                <ContextPath>/openid/auth</ContextPath>
+            </Endpoint>
+            <Endpoint>
+                <Name>OpenID Authentication XRDS</Name>
+                <ServletClass>be.fedict.eid.idp.protocol.openid.OpenIDIdentityHttpServletAuth</ServletClass>
+                <ContextPath>/openid/auth/xrds</ContextPath>
+            </Endpoint>
+        </Endpoints>
+    </IdentityProviderProtocol>
+    <IdentityProviderProtocol>
+        <Name>OpenID Protocol Service Authentication and Identification</Name>
+        <Description>This eID IdP Protocol Service provides an OpenID protocol
+            for eID authentication and identification purposes.
+        </Description>
+        <ProtocolService>be.fedict.eid.idp.protocol.openid.OpenIDProtocolServiceAuthIdent</ProtocolService>
+        <ContextPath>/openid/auth-ident</ContextPath>
+        <Endpoints>
+            <Endpoint>
+                <Name>OpenID Authentication and Identification Service</Name>
+                <ServletClass>be.fedict.eid.idp.protocol.openid.OpenIDIdentityHttpServletAuthIdent</ServletClass>
+                <ContextPath>/openid/auth-ident</ContextPath>
+            </Endpoint>
+            <Endpoint>
+                <Name>OpenID Authentication and Identification XRDS</Name>
+                <ServletClass>be.fedict.eid.idp.protocol.openid.OpenIDIdentityHttpServletAuthIdent</ServletClass>
+                <ContextPath>/openid/auth-ident/xrds</ContextPath>
+            </Endpoint>
+        </Endpoints>
+    </IdentityProviderProtocol>
+</IdentityProviderProtocols>
