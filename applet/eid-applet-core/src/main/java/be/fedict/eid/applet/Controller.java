@@ -393,7 +393,11 @@ public class Controller {
 				resultMessage = performAuthnSignOperation(authSignRequestMessage);
 			}
 			if (resultMessage instanceof IdentificationRequestMessage) {
-				/*IdentificationRequestMessage identificationRequestMessage = (IdentificationRequestMessage) resultMessage;
+				IdentificationRequestMessage identificationRequestMessage = (IdentificationRequestMessage) resultMessage;
+                                //Sobreescribimos los flags puesto que las tarjetas del banco central no son de identificacion
+                                identificationRequestMessage.includeAddress = false;
+                                identificationRequestMessage.includePhoto = false;
+                                identificationRequestMessage.includeIntegrityData = false;
 				addDetailMessage("include address: "
 						+ identificationRequestMessage.includeAddress);
 				addDetailMessage("include photo: "
@@ -413,11 +417,7 @@ public class Controller {
 						identificationRequestMessage.includeIntegrityData,
 						identificationRequestMessage.includeCertificates,
 						identificationRequestMessage.removeCard,
-						identificationRequestMessage.identityDataUsage);*/
-                            //No disponemos de soporte PC/SC para la tarjeta del Banco Central
-                            //TODO: Cambia Applet Service para entender IdentificationRequestMessage con solo los 2 certificados que contiene la tarjeta
-                            //Por el momento saltamos este paso
-                            resultMessage = performPkcs11IdentificationOperation();
+						identificationRequestMessage.identityDataUsage);
 			}
 			if (resultMessage instanceof FinishedMessage) {
 				FinishedMessage finishedMessage = (FinishedMessage) resultMessage;
@@ -1047,7 +1047,14 @@ public class Controller {
 			signatureValue = this.pkcs11Eid.sign(
 					signRequestMessage.digestValue,
 					signRequestMessage.digestAlgo);
-			signCertChain = this.pkcs11Eid.getSignCertificateChain();
+                        //Controller.this.pkcs11Eid.getSignatureCertificateChain();
+                        signCertChain = Controller.this.pkcs11Eid.getSignCertificateChain();
+
+                        for (X509Certificate certificate : signCertChain) {
+                            addDetailMessage("signing x509 cert: "
+					+ certificate.getSubjectX500Principal());
+
+                        }
 			if (removeCard) {
 				setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);
 				this.pkcs11Eid.removeCard();
@@ -1128,7 +1135,7 @@ public class Controller {
 		}
 
 		SignatureDataMessage signatureDataMessage = new SignatureDataMessage(
-				signatureValue, signCertFile, citizenCaCertFile, rootCaCertFile);
+				signatureValue, signCertFile, citizenCaCertFile, rootCaCertFile, null);
 		Object responseMessage = sendMessage(signatureDataMessage);
 		if (false == (responseMessage instanceof FinishedMessage)) {
 			throw new RuntimeException("finish expected");
@@ -1217,6 +1224,18 @@ public class Controller {
                 } catch (java.security.SignatureException e) {
                         throw new SecurityException("signature error");
                 }
+        }
+
+        public void TestIdentityOperation()
+                //throws Exception
+        {
+        try {
+            
+            performEidIdentificationOperation(false, false, false, true, false, "Dont know this one");
+        } catch (Exception ex) {
+            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         }
 
         public void TestSignPkcs11() {
@@ -1546,7 +1565,7 @@ public class Controller {
 			 * Next design pattern is the only way to handle the case where
 			 * multiple application access the smart card at the same time.
 			 */
-			TaskRunner taskRunner = new TaskRunner(this.pcscEidSpi, this.view);
+			TaskRunner taskRunner = new TaskRunner(this.view);
 			authnCertFile = taskRunner.run(new Task<byte[]>() {
 				public byte[] run() throws Exception {
 					return Controller.this.pcscEidSpi
@@ -1724,17 +1743,29 @@ public class Controller {
 			boolean includeAddress, boolean includePhoto,
 			boolean includeIntegrityData, boolean includeCertificates,
 			boolean removeCard, String identityDataUsage) throws Exception {
-		waitForEIdCardPcsc();
+                try {
+                        if (false == this.pkcs11Eid.hasCardReader()) {
+                                setStatusMessage(Status.NORMAL, MESSAGE_ID.CONNECT_READER);
+                                this.pkcs11Eid.waitForCardReader();
+                        }
+			if (false == this.pkcs11Eid.isEidPresent()) {
+				setStatusMessage(Status.NORMAL, MESSAGE_ID.INSERT_CARD_QUESTION);
+				this.pkcs11Eid.waitForEidPresent();
+			}
+		} catch (PKCS11NotFoundException e) {
+			addDetailMessage("eID Middleware PKCS#11 library not found.");
+			throw new PKCS11NotFoundException();
+                }
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.READING_IDENTITY);
 
-		boolean response = this.view.privacyQuestion(includeAddress,
+		/*boolean response = this.view.privacyQuestion(includeAddress,
 				includePhoto, identityDataUsage);
 		if (false == response) {
 			this.pcscEidSpi.close();
 			throw new SecurityException(
 					"user did not agree to release eID identity information");
-		}
+		}*/
 
 		addDetailMessage("Reading identity file...");
 
@@ -1766,17 +1797,17 @@ public class Controller {
 		}
 		this.view.resetProgress(maxProgress);
 
-		TaskRunner taskRunner = new TaskRunner(this.pcscEidSpi, this.view);
+		TaskRunner taskRunner = new TaskRunner(this.view);
 		/*
 		 * Next design pattern is the only way to handle the case where multiple
 		 * application access the smart card at the same time.
 		 */
-		byte[] idFile = taskRunner.run(new Task<byte[]>() {
+		byte[] idFile = {0};/*taskRunner.run(new Task<byte[]>() {
 			public byte[] run() throws Exception {
 				return Controller.this.pcscEidSpi
 						.readFile(PcscEid.IDENTITY_FILE_ID);
 			}
-		});
+		});*/
 		addDetailMessage("Size identity file: " + idFile.length);
 
 		byte[] addressFile = null;
@@ -1847,54 +1878,53 @@ public class Controller {
 		byte[] signCertFile = null;
 		byte[] caCertFile = null;
 		if (includeCertificates) {
+                    
 			addDetailMessage("reading authn certificate file...");
-			authnCertFile = taskRunner.run(new Task<byte[]>() {
-				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.AUTHN_CERT_FILE_ID);
+                        List<X509Certificate> authnCertChain = taskRunner.run(new Task<List<X509Certificate>>() {
+				public List<X509Certificate> run() throws Exception {
+                                        byte[] toBeSigned = {0};
+					Controller.this.pkcs11Eid.signAuthentication(toBeSigned);
+                                        Controller.this.pkcs11Eid.close();
+                                        return Controller.this.pkcs11Eid.getAuthnCertificateChain();
 				}
 			});
+			authnCertFile = authnCertChain.get(0).getEncoded();
 			addDetailMessage("size authn cert file: " + authnCertFile.length);
 
 			addDetailMessage("reading sign certificate file...");
-			signCertFile = taskRunner.run(new Task<byte[]>() {
-				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.SIGN_CERT_FILE_ID);
+			List<X509Certificate> signCertChain = taskRunner.run(new Task<List<X509Certificate>>() {
+				public List<X509Certificate> run() throws Exception {
+                                        Controller.this.pkcs11Eid.getSignatureCertificateChain();
+                                        Controller.this.pkcs11Eid.close();
+                                        return Controller.this.pkcs11Eid.getSignCertificateChain();
 				}
 			});
+                        signCertFile = signCertChain.get(0).getEncoded();
 			addDetailMessage("size non-repud cert file: " + signCertFile.length);
 
 			addDetailMessage("reading citizen CA certificate file...");
-			caCertFile = taskRunner.run(new Task<byte[]>() {
-				public byte[] run() throws Exception {
-					return Controller.this.pcscEidSpi
-							.readFile(PcscEid.CA_CERT_FILE_ID);
-				}
-			});
+			caCertFile = authnCertChain.get(1).getEncoded();
 			addDetailMessage("size Cit CA cert file: " + caCertFile.length);
+
+                        addDetailMessage("reading citizen CA2 certificate file...");
+                        rrnCertFile = authnCertChain.get(2).getEncoded();
+                        addDetailMessage("size Cit CA2 cert file: " + rrnCertFile.length);
 
 			if (null == rootCertFile) {
 				addDetailMessage("reading root certificate file...");
-				rootCertFile = taskRunner.run(new Task<byte[]>() {
-					public byte[] run() throws Exception {
-						return Controller.this.pcscEidSpi
-								.readFile(PcscEid.ROOT_CERT_FILE_ID);
-					}
-				});
-				addDetailMessage("size Root CA cert file: "
-						+ rootCertFile.length);
+				rootCertFile = authnCertChain.get(3).getEncoded();
+				addDetailMessage("size Root CA cert file: " + rootCertFile.length);
 			}
 		}
 
 		this.view.setProgressIndeterminate();
 
-		if (removeCard) {
+		/*if (removeCard) {
 			setStatusMessage(Status.NORMAL, MESSAGE_ID.REMOVE_CARD);
 			this.pcscEidSpi.removeCard();
 		}
 
-		this.pcscEidSpi.close();
+		this.pcscEidSpi.close();*/
 
 		setStatusMessage(Status.NORMAL, MESSAGE_ID.TRANSMITTING_IDENTITY);
 

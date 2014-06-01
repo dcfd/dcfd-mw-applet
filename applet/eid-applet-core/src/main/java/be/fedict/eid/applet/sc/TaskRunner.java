@@ -33,18 +33,14 @@ public class TaskRunner {
 
 	private static final int BACKOFF_SLEEP = 1000 * 2;
 
-	private final PcscEidSpi pcscEidSpi;
-
 	private final View view;
 
 	/**
 	 * Main constructor.
 	 * 
-	 * @param pcscEidSpi
 	 * @param view
 	 */
-	public TaskRunner(PcscEidSpi pcscEidSpi, View view) {
-		this.pcscEidSpi = pcscEidSpi;
+	public TaskRunner(View view) {
 		this.view = view;
 	}
 
@@ -71,15 +67,6 @@ public class TaskRunner {
 				throw new RuntimeException("error sleeping");
 			}
 			tries--;
-			/*
-			 * Because software like ActivClient select the JavaCard card
-			 * manager to browse the available JavaCard applets on inserted
-			 * smart cards, we risk of not having the Belpic JavaCard applet
-			 * selected per default. To circumvent this situation we explicitly
-			 * select the Belpic JavaCard applet after a failed eID APDU
-			 * sequence.
-			 */
-			this.pcscEidSpi.selectBelpicJavaCardApplet();
 		}
 		throw new RuntimeException("maximum tries exceeded. I give up.");
 	}

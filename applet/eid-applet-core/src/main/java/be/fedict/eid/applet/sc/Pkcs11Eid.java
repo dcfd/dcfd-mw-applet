@@ -64,26 +64,55 @@ public class Pkcs11Eid {
 		return this.pkcs11;
 	}
 
-	private X509Certificate getIssuerCert(boolean is_RootCA) {
+        public final int rootCACertificate = 0;
+        public final int childCACertificate = 1;
+        public final int child_childCACertificate = 2;
+
+        /**
+         *
+         * @param in_CAType Certiificate Authority type
+         * 0 - rootCertificate
+         * 1 - childCertificate
+         * 2 - child_childCertificate
+         * @return
+         */
+
+	private X509Certificate getIssuerCert(int in_CAType) {
                 String osName = System.getProperty("os.name");
 		File certificate = null;
 		if (osName.startsWith("Linux") || osName.startsWith("Mac")) {
 			/*
 			 * Covers 4.0 eID Middleware.
 			 */
-                        if(!is_RootCA) {
-                            certificate = new File("/usr/lib/dcfd/certificados/CA SINPE - PERSONA FISICA.cer");
-                        }
-                        else {
+                    switch(in_CAType){
+                        case rootCACertificate:
                             certificate = new File("/usr/lib/dcfd/certificados/CA RAIZ NACIONAL COSTA RICA.cer");
-                        }
+                            break;
+                        case childCACertificate:
+                            certificate = new File("/usr/lib/dcfd/certificados/CA POLITICA PERSONA FISICA - COSTA RICA.cer");
+                            break;
+                        case child_childCACertificate:
+                            certificate = new File("/usr/lib/dcfd/certificados/CA SINPE - PERSONA FISICA.cer");
+                            break;
+                        default:
+                            Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, "Unknown Certificate Authority Type: "+in_CAType);
+                            return null;
+                    }
                 } else { //Windows
-                        if(!is_RootCA) {
-                            certificate = new File("C:\\Firma Digital\\certificados\\CA SINPE - PERSONA FISICA.cer");
-                        }
-                        else {
+                    switch(in_CAType){
+                        case rootCACertificate:
                             certificate = new File("C:\\Firma Digital\\certificados\\CA RAIZ NACIONAL COSTA RICA.cer");
-                        }
+                            break;
+                        case childCACertificate:
+                            certificate = new File("C:\\Firma Digital\\certificados\\CA POLITICA PERSONA FISICA - COSTA RICA.cer");
+                            break;
+                        case child_childCACertificate:
+                            certificate = new File("C:\\Firma Digital\\certificados\\CA SINPE - PERSONA FISICA.cer");
+                            break;
+                        default:
+                            Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, "Unknown Certificate Authority Type: "+in_CAType);
+                            return null;
+                    }
                 }
                 if(certificate != null) {
 
@@ -458,10 +487,14 @@ public class Pkcs11Eid {
                         if(certificate != null) {
                                 this.signCertificateChain = new LinkedList<X509Certificate>();
                                 this.signCertificateChain.add(certificate);
-                                X509Certificate certi =  getIssuerCert(false) ;
-                                this.signCertificateChain.add(certi);
-                               // this.view.addDetailMessage("X509Certificate ISSUER : " + certi.toString());
-                                X509Certificate rootCerti =  getIssuerCert(true) ;
+                                //this.view.addDetailMessage("X509Certificate certificate : " + certificate.toString());
+                                X509Certificate certificateSINPE =  getIssuerCert(child_childCACertificate) ;
+                                this.signCertificateChain.add(certificateSINPE);
+                                //this.view.addDetailMessage("X509Certificate certificateSINPE : " + certificateSINPE.toString());
+                                X509Certificate certificatePOLITICA =  getIssuerCert(childCACertificate) ;
+                                this.signCertificateChain.add(certificatePOLITICA);
+                                //this.view.addDetailMessage("X509Certificate certificatePOLITICA : " + certificatePOLITICA.toString());
+                                X509Certificate rootCerti =  getIssuerCert(rootCACertificate) ;
                                 this.signCertificateChain.add(rootCerti);
                                 //this.view.addDetailMessage("X509Certificate ROOT : " + rootCerti.toString());
                   }
@@ -484,7 +517,7 @@ public class Pkcs11Eid {
                     this.pkcs11.C_CloseSession(session);
                 }
             }
-             X509Certificate[] resultChain = new X509Certificate[3];
+             X509Certificate[] resultChain = new X509Certificate[4];
             signCertificateChain.toArray(resultChain);
             return resultChain;
 
@@ -555,10 +588,12 @@ public class Pkcs11Eid {
                         if(certificate != null) {
                                 this.authnCertificateChain = new LinkedList<X509Certificate>();
                                 this.authnCertificateChain.add(certificate);
-                                X509Certificate certi =  getIssuerCert(false) ;
-                                this.authnCertificateChain.add(certi);
+                                X509Certificate certificateSINPE =  getIssuerCert(child_childCACertificate) ;
+                                this.authnCertificateChain.add(certificateSINPE);
                                // this.view.addDetailMessage("X509Certificate ISSUER : " + certi.toString());
-                                X509Certificate rootCerti =  getIssuerCert(true) ;
+                                X509Certificate certificatePOLITICA =  getIssuerCert(childCACertificate) ;
+                                this.authnCertificateChain.add(certificatePOLITICA);
+                                X509Certificate rootCerti =  getIssuerCert(rootCACertificate) ;
                                 this.authnCertificateChain.add(rootCerti);
                                 //this.view.addDetailMessage("X509Certificate ROOT : " + rootCerti.toString());
 
