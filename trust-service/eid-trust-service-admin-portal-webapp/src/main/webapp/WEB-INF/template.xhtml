@@ -20,6 +20,17 @@
 
 <body>
 	<div id="header">
+        <div style="display: block; height: 100px;">
+            <div style="float: left">
+                <h:graphicImage url="/images/logoMicitt.png" height="80px" width="108px" alt="Micitt"/>
+            </div>
+            <div style="float: left">
+                <h:graphicImage url="/images/logoFirmadigital.png" height="90px" width="240px" alt="Firma Digital" style="margin-left:100px;"/>
+            </div>
+            <div style="float: right">
+                <h:graphicImage url="/images/logoRolosa.png" height="99px" width="108px" alt="Rolosa"/>
+            </div>
+        </div>
 		<h1>#{messages.title}</h1>
 	</div>
 
@@ -59,7 +70,7 @@
 		<div id="login">
 			<s:div rendered="#{identity.isLoggedIn()}" id="loginPanel">
 				<h:panelGrid columns="2">
-					<s:graphicImage value="#{eid.photo}" />
+					
 					<h:panelGroup>
 						<h:panelGrid columns="1">
 							<h:outputText
