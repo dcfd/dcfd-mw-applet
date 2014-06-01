@@ -11,7 +11,9 @@
 		debug="false" />
 
 	<international:locale-config
-		default-locale="en" supported-locales="en" />
+		default-locale="es" supported-locales="es" />
+	<international:locale-selector
+		cookie-enabled="true" />
 
 	<!-- security configuration -->
 	<security:identity authenticate-method="#{ts_authenticator.authenticate}" />

@@ -96,11 +96,11 @@
         </init-param>
         <init-param>
             <param-name>IncludeIdentity</param-name>
-            <param-value>true</param-value>
+            <param-value>false</param-value>
         </init-param>
         <init-param>
             <param-name>IncludePhoto</param-name>
-            <param-value>true</param-value>
+            <param-value>false</param-value>
         </init-param>
         <init-param>
             <param-name>PreLogoff</param-name>
