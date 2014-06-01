@@ -122,6 +122,12 @@ public class SignatureDataMessageHandler implements
 		}
 		LOG.debug("non-repudiation signing certificate: "
 				+ signingCertificate.getSubjectX500Principal());
+
+        for (X509Certificate certificate : certificateChain) {
+            LOG.debug("signing x509 cert: "
+                          + certificate.getSubjectX500Principal());
+
+        }
 		PublicKey signingPublicKey = signingCertificate.getPublicKey();
 
 		/*

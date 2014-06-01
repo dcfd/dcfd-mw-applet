@@ -92,6 +92,8 @@ public class IdentityDataMessageHandler implements
 
 	public static final String CA_CERT_SESSION_ATTRIBUTE = "eid.certs.ca";
 
+    public static final String CA2_CERT_SESSION_ATTRIBUTE = "eid.certs.ca2";
+
 	/**
 	 * Please use ROOT_CERT_SESSION_ATTRIBUTE instead.
 	 */
@@ -158,6 +160,7 @@ public class IdentityDataMessageHandler implements
 		X509Certificate authnCert = null;
 		X509Certificate signCert = null;
 		X509Certificate caCert = null;
+        X509Certificate ca2Cert = null;
 		X509Certificate rootCert = null;
 		if (includeCertificates) {
 			if (null == message.authnCertFile) {
@@ -172,6 +175,10 @@ public class IdentityDataMessageHandler implements
 				throw new ServletException(
 						"CA cert not included while requested");
 			}
+            if (null == message.rrnCertFile) {
+				throw new ServletException(
+						"CA2 cert not included while requested");
+			}
 			if (null == message.rootCertFile) {
 				throw new ServletException(
 						"root cert not included while requested");
@@ -179,6 +186,7 @@ public class IdentityDataMessageHandler implements
 			authnCert = getCertificate(message.authnCertFile);
 			signCert = getCertificate(message.signCertFile);
 			caCert = getCertificate(message.caCertFile);
+            ca2Cert = getCertificate(message.rrnCertFile);
 			rootCert = getCertificate(message.rootCertFile);
 		}
 
@@ -333,6 +341,7 @@ public class IdentityDataMessageHandler implements
 			session.setAttribute(AUTHN_CERT_SESSION_ATTRIBUTE, authnCert);
 			session.setAttribute(SIGN_CERT_SESSION_ATTRIBUTE, signCert);
 			session.setAttribute(CA_CERT_SESSION_ATTRIBUTE, caCert);
+            session.setAttribute(CA2_CERT_SESSION_ATTRIBUTE, ca2Cert);
 			session.setAttribute(ROOT_CERT_SESSION_ATTRIBUTE, rootCert);
 		}
 
@@ -352,11 +361,13 @@ public class IdentityDataMessageHandler implements
 			eidCertsData.authn = authnCert;
 			eidCertsData.sign = signCert;
 			eidCertsData.ca = caCert;
+            //eidCertsData.ca2 = ca2Cert; //TODO  Extender EIdCertsData para soportar CA2 certificate data
 			eidCertsData.root = rootCert;
 
 			session.setAttribute(AUTHN_CERT_SESSION_ATTRIBUTE, authnCert);
 			session.setAttribute(SIGN_CERT_SESSION_ATTRIBUTE, signCert);
 			session.setAttribute(CA_CERT_SESSION_ATTRIBUTE, caCert);
+            session.setAttribute(CA2_CERT_SESSION_ATTRIBUTE, ca2Cert);
 			session.setAttribute(ROOT_CERT_SESSION_ATTRIBUTE, rootCert);
 		}
 

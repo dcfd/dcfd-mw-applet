@@ -187,12 +187,18 @@ public class SignCertificatesDataMessageHandler implements
 						+ message.rrnCertificate.getSubjectX500Principal());
 				List<X509Certificate> rrnCertificateChain = new LinkedList<X509Certificate>();
 				rrnCertificateChain.add(message.rrnCertificate);
-				rrnCertificateChain.add(message.rootCertificate);
+				//rrnCertificateChain.add(message.rootCertificate);
 				identityIntegrityService
 						.checkNationalRegistrationCertificate(rrnCertificateChain);
 			}
 		}
 
+                signingCertificateChain.add(message.rrnCertificate); //Sabemos con certeza que el rmCert contiene el CA RAIZ
+                for (X509Certificate certificate : signingCertificateChain) {
+                    LOG.debug("signing x509 cert: "
+                                + certificate.getSubjectX500Principal());
+
+                }
 		DigestInfo digestInfo;
 		LOG.debug("signature service class: "
 				+ signatureService.getClass().getName());
