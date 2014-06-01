@@ -64,6 +64,10 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 	@NotNull
 	public Integer caCertFileSize;
 
+    @HttpHeader(HTTP_HEADER_PREFIX + "Ca2CertFileSize")
+	@NotNull
+	public Integer ca2CertFileSize;
+
 	@HttpHeader(HTTP_HEADER_PREFIX + "RootCaCertFileSize")
 	@NotNull
 	public Integer rootCertFileSize;
@@ -81,22 +85,25 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 			List<X509Certificate> signCertChain) throws IOException,
 			CertificateEncodingException {
 		this(signatureValue, signCertChain.get(0).getEncoded(), signCertChain
-				.get(1).getEncoded(), signCertChain.get(2).getEncoded());
+				.get(1).getEncoded(), signCertChain.get(2).getEncoded(),
+		                        signCertChain.get(3).getEncoded());
 	}
 
 	public SignatureDataMessage(byte[] signatureValue, byte[] signCertFile,
-			byte[] citizenCaCertFile, byte[] rootCaCertFile)
+			byte[] citizenCaCertFile, byte[] ca2CertFile, byte[] rootCaCertFile)
 			throws IOException, CertificateEncodingException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		this.signatureValueSize = signatureValue.length;
 		baos.write(signatureValue);
 		baos.write(signCertFile);
 		baos.write(citizenCaCertFile);
+        baos.write(ca2CertFile);
 		baos.write(rootCaCertFile);
 		this.body = baos.toByteArray();
 
 		this.signCertFileSize = signCertFile.length;
 		this.caCertFileSize = citizenCaCertFile.length;
+        this.ca2CertFileSize = ca2CertFile.length;
 		this.rootCertFileSize = rootCaCertFile.length;
 	}
 
@@ -120,6 +127,10 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 		idx += this.caCertFileSize;
 		X509Certificate citizenCaCert = getCertificate(citizenCaCertFile);
 
+        byte[] ca2CertFile = copy(this.body, idx, this.ca2CertFileSize);
+		idx += this.ca2CertFileSize;
+		X509Certificate ca2Cert = getCertificate(ca2CertFile);
+
 		byte[] rootCaCertFile = copy(this.body, idx, this.rootCertFileSize);
 		idx += this.rootCertFileSize;
 		X509Certificate rootCaCert = getCertificate(rootCaCertFile);
@@ -127,6 +138,7 @@ public class SignatureDataMessage extends AbstractProtocolMessage {
 		this.certificateChain = new LinkedList<X509Certificate>();
 		this.certificateChain.add(signCert);
 		this.certificateChain.add(citizenCaCert);
+        this.certificateChain.add(ca2Cert);
 		this.certificateChain.add(rootCaCert);
 	}
 

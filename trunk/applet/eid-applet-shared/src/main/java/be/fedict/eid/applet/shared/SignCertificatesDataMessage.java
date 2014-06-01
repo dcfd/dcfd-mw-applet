@@ -163,7 +163,7 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 			throws IOException, CertificateEncodingException {
 		this(signCertChain[0].getEncoded(), signCertChain[1].getEncoded(),
 				signCertChain[2].getEncoded(), null, null, null, null, null,
-				null);
+				signCertChain[3].getEncoded()); //reusamos el rnCert 
 	}
 
 	private byte[] copy(byte[] source, int idx, int count) {
@@ -232,7 +232,7 @@ public class SignCertificatesDataMessage extends AbstractProtocolMessage {
 
 	public byte[] addressSignatureData;
 
-	public X509Certificate rrnCertificate;
+	public X509Certificate rrnCertificate; //Contendra el CA RAIZ
 
     public X509Certificate rootCertificate;
 
