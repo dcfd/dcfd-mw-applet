@@ -51,4 +51,7 @@ public class AuthenticationServiceBean implements AuthenticationService {
 		LOG.debug("validate");
 		// do nothing
 	}
+        public void setHttpSessionObject(Object sessionObject){
+
+        }
 }
