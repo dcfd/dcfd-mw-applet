@@ -27,6 +27,8 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.CertStore;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -332,7 +334,7 @@ public class TSPTimeStampService implements TimeStampService {
 					"TSP response token has no signer certificate");
 		}
 		List<X509Certificate> tspCertificateChain = new LinkedList<X509Certificate>();
-		X509Certificate certificate = signerCert;
+		/*X509Certificate certificate = signerCert;
 		do {
 			LOG.debug("adding to certificate chain: "
 					+ certificate.getSubjectX500Principal());
@@ -343,7 +345,19 @@ public class TSPTimeStampService implements TimeStampService {
 			}
 			String aki = Hex.encodeHexString(getAuthorityKeyId(certificate));
 			certificate = certificateMap.get(aki);
-		} while (null != certificate);
+		} while (null != certificate);*/
+
+        X509Certificate tsaIssuer = loadCertificate("be/fedict/eid/applet/service/CA POLITICA SELLADO DE TIEMPO - COSTA RICA.crt");
+        X509Certificate rootCA = loadCertificate("be/fedict/eid/applet/service/CA RAIZ NACIONAL COSTA RICA.cer");
+        LOG.debug("adding to certificate chain: "
+                        + signerCert.getSubjectX500Principal());
+        tspCertificateChain.add(signerCert);
+        LOG.debug("adding to certificate chain: "
+                        + tsaIssuer.getSubjectX500Principal());
+        tspCertificateChain.add(tsaIssuer);
+        LOG.debug("adding to certificate chain: "
+                        + rootCA.getSubjectX500Principal());
+        tspCertificateChain.add(rootCA);
 
 		// verify TSP signer signature
 		timeStampToken.validate(tspCertificateChain.get(0),
@@ -358,6 +372,28 @@ public class TSPTimeStampService implements TimeStampService {
 		byte[] timestamp = timeStampToken.getEncoded();
 		return timestamp;
 	}
+
+	private static X509Certificate loadCertificate(String resourceName) {
+		LOG.debug("loading certificate: " + resourceName);
+		Thread currentThread = Thread.currentThread();
+		ClassLoader classLoader = currentThread.getContextClassLoader();
+		InputStream certificateInputStream = classLoader
+				.getResourceAsStream(resourceName);
+		if (null == certificateInputStream) {
+			throw new IllegalArgumentException("resource not found: "
+					+ resourceName);
+		}
+		try {
+			CertificateFactory certificateFactory = CertificateFactory
+					.getInstance("X.509");
+			return (X509Certificate) certificateFactory
+					.generateCertificate(certificateInputStream);
+		} catch (CertificateException e) {
+			throw new RuntimeException("X509 error: " + e.getMessage(), e);
+		}
+	}
+
+
 
 	private byte[] getSubjectKeyId(X509Certificate cert) throws IOException {
 		byte[] extvalue = cert

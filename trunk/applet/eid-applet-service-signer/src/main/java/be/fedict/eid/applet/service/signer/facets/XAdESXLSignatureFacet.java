@@ -248,6 +248,10 @@ public class XAdESXLSignatureFacet implements SignatureFacet {
 	public void postSign(Element signatureElement,
 			List<X509Certificate> signingCertificateChain) {
 		LOG.debug("XAdES-X-L post sign phase");
+        for(X509Certificate xCert : signingCertificateChain){
+             LOG.debug("Cert chain: "
+			+ xCert.getSubjectX500Principal());
+        }
 
 		// check for XAdES-BES
 		Element qualifyingPropertiesElement = (Element) findSingleNode(
