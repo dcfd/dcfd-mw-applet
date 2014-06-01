@@ -1,0 +1,626 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article version="5.0"
+	xsi:schemaLocation="http://docbook.org/ns/docbook http://www.docbook.org/xml/5.0/xsd/docbook.xsd"
+	xmlns="http://docbook.org/ns/docbook" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<articleinfo>
+		<title>FedICT eID Identity Provider Security Analysis</title>
+		<subtitle>
+			Security considerations on the FedICT eID Identity Provider
+		</subtitle>
+		<copyright>
+			<year>2009-2011</year>
+			<holder>FedICT</holder>
+		</copyright>
+		<releaseinfo>draft 10 Feb 2011</releaseinfo>
+		<abstract>
+			<para>
+				This document answers the security considerations which are
+				mentioned in the protocol standards that are used by the FedICT
+				eID
+				Identity Provider software.
+			</para>
+		</abstract>
+	</articleinfo>
+	<section>
+		<title>Introduction</title>
+		<para>
+			The FedICT eID Identity Provider (eID IdP) is an identity
+			provider
+			which uses standardized protocols to offer identification and
+			authentication
+			services to service providers. Each of the protocols
+			has security
+			considerations which need to be answered, either by
+			accepting the
+			threat or by
+			mitigating it.
+		</para>
+		<para>
+			The security considerations for the different protocols are
+			published along side
+			their specification. In this document we list all
+			relevant security
+			considerations
+			and for each of them we provide an
+			answer on how it is handled.
+		</para>
+		<para>
+			One goal of this document is to help relying parties or the IdP
+			service provider
+			to assess their risk in using or operating the IdP.
+			Another goal is
+			for the
+			development team to check if all known security
+			considerations have
+			indeed been
+			taken into consideration and that
+			actions (or non-actions) are
+			motivated.
+		</para>
+		<para>
+			This document only describes the threat mitigation at the FedICT
+			IdP
+			server
+			and SDK software
+			level. Additional mitigation at the relying
+			party or IdP
+			infrastructure is
+			out of scope for this document. This
+			document is not a manual for
+			the
+			relying party or IdP operator on how
+			to completely secure the usage
+			or operation of
+			the IdP. The main
+			documents for those purposes are the protocol
+			standards
+			documentation.
+			This document is a compagnion to the protocol
+			standards documents
+			so
+			the reader can know how the IdP and the SDK behave without having
+			to
+			look at the code.
+
+		</para>
+		<para>
+			Following sources were used to compile the list of security
+			considerations:
+			<itemizedlist>
+				<listitem>
+					<para>
+						Security and Privacy Considerations for the OASIS
+						Security
+						Assertion
+						Markup Language (SAML) V2.0
+					</para>
+				</listitem>
+				<listitem>
+					<para>OpenID Authentication 2.0 - Final</para>
+				</listitem>
+				<listitem>
+					<para>WS-Federation Language 1.1</para>
+				</listitem>
+				<listitem>
+					<para>OWASP Top 10 2010</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+	</section>
+	<section>
+		<title>SAML v2.0 Security Considerations</title>
+		<section>
+			<title>General Security Considerations</title>
+			<section>
+				<title>SAML Assertions</title>
+				<para>
+					Threat summary: be careful to whom you deliver assertions,
+					because once
+					delivered they are out of reach for the identity
+					provider.
+				</para>
+				<para>
+					This is partially mitigated by allowing the IdP
+					administrators
+					to restrict
+					the set of attributes that is sent to a specific relying
+					party after
+					identification. Note that this does not prohibit relying
+					parties to obtain
+					the complete set of eID attributes by using the
+					IdP
+					anonymously
+					(non-signed authentication request).
+				</para>
+			</section>
+			<section>
+				<title>SAML Protocol</title>
+				<section>
+					<title>Denial of Service</title>
+					<para>
+						Threat summary: processing a SAML request is a
+						relatively
+						resource-heavy
+						task compared to the creation of a request.
+					</para>
+					<para>
+						This threat is not mitigated by the FedICT IdP.
+					</para>
+				</section>
+			</section>
+		</section>
+		<section>
+			<title>SAML Bindings Security Considerations</title>
+			<section>
+				<title>HTTP POST Binding</title>
+				<section>
+					<title>Stolen Assertion</title>
+					<para>
+						Threat summary: stolen assertions can be used by an
+						attacker
+						to log in
+					</para>
+					<para>
+						The IdP provides a configurable timeframe in which
+						the assertion is
+						valid by setting a
+						<code>NotBefore</code>
+						and
+						<code>NotAfter</code>
+						value in the assertion. This timeframe is
+						verified by the Java SDK
+						at the relying party's side.
+					</para>
+				</section>
+				<section>
+					<title>Man in the Middle Attack</title>
+					<para>
+						Threat summary: an attacker can use a stolen assertion
+						at
+						another
+						site.
+					</para>
+					<para>
+						The IdP sets the
+						<code>InResponseTo</code>
+						field which can be matchedby the relying party to a
+						previously sent
+						request. This field is checked by the
+						Java SDK.
+					</para>
+					<para>
+						The IdP also sets the
+						<code>Recipient</code>
+						field which allows the relying party to check if it is
+						the intended
+						recipient. This field is checked by the
+						Java SDK.
+					</para>
+					<para>
+						The IdP also sets the
+						<code>AudienceURI</code>
+						field in the audience restriction assertion condition.
+						This field
+						is checked by the Java SDK.
+					</para>
+				</section>
+				<section>
+					<title>Forged Assertion</title>
+					<para>Threat summary: An attacker could forge or alter an
+						assertion
+					</para>
+					<para>
+						All responses and assertions are signed by the IdP. The
+						Java
+						SDK validates the signature and optionally allows
+						the SDK user to
+						validate the certificate.
+					</para>
+				</section>
+				<section>
+					<title>Browser State Exposure</title>
+					<para>
+						Threat summary: locally stored browser state can get
+						compromised and reused
+					</para>
+					<para>
+						The IdP sets the
+						<code>OneTimeUse</code>
+						condition. The Java SDK
+						behaves as if this condition is
+						always set.
+					</para>
+				</section>
+				<section>
+					<title>Replay</title>
+					<para>Threat summary: an assertion can be replayed</para>
+					<para>
+						The Java SDK enforces a one time use of the assertion
+					</para>
+				</section>
+				<section>
+					<title>Modification or Exposure of state information</title>
+					<para>Threat summary: relay state could be modified</para>
+					<para>
+						The Java SDK optionally allows the SDK user to set the
+						<code>RelayState</code>
+						. The confidentiality is under
+						control
+						of the user, while the
+						integrity is provided by
+						signatures on
+						request and response.
+					</para>
+				</section>
+			</section>
+			<section>
+				<title>HTTP Artifact Binding</title>
+				<section>
+					<title>Stolen Artifact</title>
+					<para>
+						Threat summary: artifacts can be stolen and user by an
+						attacker
+					</para>
+					<para>
+						The IdP sets the
+						<code>NotBefore</code>
+						and
+						<code>NotAfter</code>
+						values
+						to a configurable interval.
+					</para>
+					<para>
+						The IdP also check the time difference
+						between creating the
+						artifact and the request for the
+						assertion. The
+						maximum allowed time
+						difference is configurable
+					</para>
+				</section>
+				<section>
+					<title>Attacks on the SAML Protocol Message Exchange</title>
+					<para>
+						Threat summary: the message exchange can be attacked in
+						several ways: replay,
+						MITM, modification, ...
+					</para>
+					<para>
+						The IdP signs the assertions, response and artifact
+						response.
+					</para>
+					<para>
+						Signing of the artifact resolve is optional.
+					</para>
+				</section>
+				<section>
+					<title>Malicious Destination Site</title>
+					<para>
+						Threat summary: a SAML artifact could be reused at
+						another
+						relying party
+					</para>
+					<para>
+						The IdP puts the
+						<code>InResponseTo</code>
+						field which allows the relying parties
+						to assert if the received
+						response is intended for them.
+					</para>
+				</section>
+				<section>
+					<title>Forged SAML Artifact</title>
+					<para>
+						Threat summary: A malicious user could forge a SAML
+						artifact.
+					</para>
+					<para>
+						The IdP uses OpenSAML to generate artifacts. OpenSAML
+						generates hashed secure random artifact values.
+					</para>
+				</section>
+				<section>
+					<title>Browser State Exposure</title>
+					<para>
+						Threat summary: artifacts can linger around in browser
+						caches
+					</para>
+					<para>
+						The IdP enforces one time usage of artifacts.
+					</para>
+				</section>
+				<section>
+					<title>Replay</title>
+					<para>
+						Threat summary: Reuse of an artifact by repeating
+						protocol
+						messages
+					</para>
+					<para>
+						The IdP enforces one time usage of artifacts.
+					</para>
+				</section>
+			</section>
+		</section>
+		<section>
+			<title>SAML Profile Security Considerations</title>
+			<para>
+				The only SAML profile used by the IdP is the SSO profile.
+			</para>
+			<section>
+				<title>Eavesdropping</title>
+				<para>
+					Eavesdropping is possible in web browsers
+				</para>
+				<para>
+					The IdP can optionally encrypt attributes in the assertion's
+					attribute statements.
+				</para>
+			</section>
+			<section>
+				<title>Theft of the User Authentication Information</title>
+				<para>
+					Threat summary: authentication data can be stolen
+				</para>
+				<para>
+					This does not apply to the IdP as it uses strong eID
+					authentication
+					by definition.
+				</para>
+			</section>
+			<section>
+				<title>Theft of the Bearer Token</title>
+				<para>
+					Threat summary: assertion can be stolen
+				</para>
+				<para>
+					The IdP forces one time request of assertions.
+				</para>
+			</section>
+			<section>
+				<title>Replay</title>
+				<para>
+					Refer to the replay threats in the bindings section.
+				</para>
+			</section>
+			<section>
+				<title>Message insertion</title>
+				<para>
+					Refer to the integrity related threats in the bindings
+					section.
+				</para>
+			</section>
+			<section>
+				<title>Message deletion</title>
+				<para>
+					Threat summary: deleting messages from the SAML
+					communication
+					can lead to Denial of Service
+				</para>
+				<para>
+					The IdP implements no specific measures
+				</para>
+			</section>
+			<section>
+				<title>Message Modification</title>
+				<para>
+					Threat summary: modifying SAML messages can lead to unwanted
+					effects
+				</para>
+				<para>
+					The IdP signs all assertions and responses it issues.
+					The
+					artifact in the SAML artifact binding is not signed.
+				</para>
+			</section>
+			<section>
+				<title>Man-in-the-Middle</title>
+				<para>
+					Refer to the above threats of modification and eavesdropping
+				</para>
+			</section>
+			<section>
+				<title>Impersonation without Reauthentication</title>
+				<para>
+					Threat summary: when no reauthentication is enforced, an
+					attacker could benefit from that.
+				</para>
+				<para>
+					The IdP has no concept of authentication sessions, the
+					subject
+					is always forced to reauthenticate.
+				</para>
+			</section>
+		</section>
+	</section>
+	<section>
+		<title>OpenID Security Considerations</title>
+		<section>
+			<title>Preventing attacks</title>
+			<section>
+				<title>Eavesdropping Attacks</title>
+				<para>Threat summary: the nonce needs to be verified</para>
+				<para>The OpenID4Java library verifies the nonce by default
+				</para>
+			</section>
+			<section>
+				<title>Man-in-the-Middle Attacks</title>
+				<para>Threat summary: interception and modification of messages
+					should be prevented
+				</para>
+				<para>The IdP does not sign its XRDS file</para>
+				<para>The IdP does offer its services over SSL, so users and
+					relying
+					parties can use those versions
+				</para>
+			</section>
+		</section>
+		<section>
+			<title>User Agents</title>
+			<para>Not in the IdP software scope</para>
+		</section>
+		<section>
+			<title>User interface considerations</title>
+			<para>Not in the IdP software scope</para>
+		</section>
+		<section>
+			<title>HTTP and HTTPS URL Identifiers</title>
+			<para>The IdP offers its services over SSL, so users can use the
+				HTTPS URL identifier
+			</para>
+		</section>
+		<section>
+			<title>Denial of Service attacks</title>
+			<para>Threat summary: an authentication request is relatively cheap
+				vs validating such a request
+			</para>
+			<para>The IdP does not protect against this type of attack</para>
+		</section>
+		<section>
+			<title>Protocol Variants</title>
+			<para>
+				The IdP observes following protocol variant:
+				<itemizedlist>
+					<listitem>
+						<para>Wildcards are allowed in Realms.
+						</para>
+					</listitem>
+					<listitem>
+						<para>Prior association is required.
+						</para>
+					</listitem>
+					<listitem>
+						<para>The IdP only supports OpenID Provider-driven
+							identifier
+							selection.
+						</para>
+					</listitem>
+					<listitem>
+						<para>Self-issued certificates are allowed.</para>
+					</listitem>
+					<listitem>
+						<para>The XRDS file must not be signed.</para>
+					</listitem>
+					<listitem>
+						<para>The XRDS file must not be retrieved over secure
+							channel.
+						</para>
+					</listitem>
+					<listitem>
+						<para>All types of sessions are allowed during
+							association.
+						</para>
+					</listitem>
+					<listitem>
+						<para>The RP must not have a XRDS document.</para>
+					</listitem>
+					<listitem>
+						<para>All association types are allowed.</para>
+					</listitem>
+					<listitem>
+						<para>The assocation must not take place over secure
+							channel.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+		</section>
+	</section>
+	<section>
+		<title>WS Federation Security Considerations</title>
+		<para>The IdP only supports a small part of the WS-Federation
+			standard:
+			Sign-On Web Passive Requestor.
+			The security considerations
+			boil down to using SSL for all
+			communication. The IdP offers all its
+			services over SSL as
+			also indicated in its metadata. It is up to the
+			relying party to use
+			the SSL endpoints and to properly validate
+			the
+			certificates.
+		</para>
+	</section>
+	<section>
+		<title>OWASP Top 10</title>
+		<para>
+			<itemizedlist>
+				<listitem>
+					<para>Injection: The IdP uses hibernate as its type safe
+						database
+						layer. All queries that are made from strings
+						are named queries
+						with parameters.
+					</para>
+				</listitem>
+				<listitem>
+					<para>Cross Site Scripting: The IdP does not show user input
+						parameters. All other visualization happens
+						in the eID applet or in
+						type safe JSF pages.
+					</para>
+				</listitem>
+				<listitem>
+					<para>Broken authentication and session management: The IdP
+						does not
+						have authenticated sessions. For
+						authentication it relies on the
+						eID applet.
+					</para>
+				</listitem>
+				<listitem>
+					<para>Insecure direct object references: the IdP does not
+						expose
+						objects directly. The IdP relies on solid
+						frameworks and sound
+						layering.
+					</para>
+				</listitem>
+				<listitem>
+					<para>Cross site request forgery: there are no actions in
+						the public
+						interface
+						that can be performed in the IdP. The actions in the
+						operator interface require eID authentication first and
+						subsquently happen within JSF/Seam conversations.
+					</para>
+				</listitem>
+				<listitem>
+					<para>Security Misconfiguration: the standard IdP JBoss
+						distribution has not been hardened for production use.
+					</para>
+				</listitem>
+				<listitem>
+					<para>Failure to restrict URL access: all URLS are publicly
+						available. All operator functionality is
+						authenticated with eID.
+					</para>
+				</listitem>
+				<listitem>
+					<para>Unvalidated redirects and forwards: The IdP redirects
+						users as
+						part of its sign-on protocols. Those redirects
+						are strictly defined
+						by their standards and are
+						implemented as such.
+					</para>
+				</listitem>
+				<listitem>
+					<para>Insecure cryptographic storage: no user information is
+						stored
+						in the IdP. Private key material is stored
+						in JKS, PKCS12 or PKCS11
+						files.
+					</para>
+				</listitem>
+				<listitem>
+					<para>Insufficient Transport Layer protection: all IdP
+						services are
+						available over SSL.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+	</section>
+</article>

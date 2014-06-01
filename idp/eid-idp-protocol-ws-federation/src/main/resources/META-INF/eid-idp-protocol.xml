@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<IdentityProviderProtocols xmlns="urn:be:fedict:eid:idp:spi:protocol">
+    <IdentityProviderProtocol>
+        <Name>WS-Federation Protocol Service Identification</Name>
+        <Description>This eID IdP Protocol Service provides an WS-Federation
+            protocol for eID identification purposes.
+        </Description>
+        <ProtocolService>be.fedict.eid.idp.protocol.ws_federation.WSFederationProtocolServiceIdent</ProtocolService>
+        <ContextPath>/ws-federation/ident</ContextPath>
+        <Endpoints>
+            <Endpoint>
+                <Name>WS-Federation Identification Metadata</Name>
+                <ServletClass>be.fedict.eid.idp.protocol.ws_federation.WSFederationMetadataHttpServletIdent</ServletClass>
+                <ContextPath>/ws-federation/metadata/ident-metadata.xml</ContextPath>
+            </Endpoint>
+        </Endpoints>
+    </IdentityProviderProtocol>
+    <IdentityProviderProtocol>
+        <Name>WS-Federation Protocol Service Authentication</Name>
+        <Description>This eID IdP Protocol Service provides an WS-Federation
+            protocol for eID authentication purposes.
+        </Description>
+        <ProtocolService>be.fedict.eid.idp.protocol.ws_federation.WSFederationProtocolServiceAuth</ProtocolService>
+        <ContextPath>/ws-federation/auth</ContextPath>
+        <Endpoints>
+            <Endpoint>
+                <Name>WS-Federation Authentication Metadata</Name>
+                <ServletClass>be.fedict.eid.idp.protocol.ws_federation.WSFederationMetadataHttpServletAuth</ServletClass>
+                <ContextPath>/ws-federation/metadata/auth-metadata.xml</ContextPath>
+            </Endpoint>
+        </Endpoints>
+    </IdentityProviderProtocol>
+    <IdentityProviderProtocol>
+        <Name>WS-Federation Protocol Service Authentication and Identification</Name>
+        <Description>This eID IdP Protocol Service provides an WS-Federation
+            protocol for eID authentication and identification purposes.
+        </Description>
+        <ProtocolService>be.fedict.eid.idp.protocol.ws_federation.WSFederationProtocolServiceAuthIdent</ProtocolService>
+        <ContextPath>/ws-federation/auth-ident</ContextPath>
+        <Endpoints>
+            <Endpoint>
+                <Name>WS-Federation Authentication and Identification Metadata</Name>
+                <ServletClass>be.fedict.eid.idp.protocol.ws_federation.WSFederationMetadataHttpServletAuthIdent</ServletClass>
+                <ContextPath>/ws-federation/metadata/auth-ident-metadata.xml</ContextPath>
+            </Endpoint>
+        </Endpoints>
+        <WSEndpoints>
+            <WSEndpoint>
+                <Name>WS-Trust STS web service</Name>
+                <WSImplClass>be.fedict.eid.idp.protocol.ws_federation.sts.SecurityTokenServicePortImpl</WSImplClass>
+                <ContextPath>/sts</ContextPath>
+            </WSEndpoint>
+        </WSEndpoints>
+    </IdentityProviderProtocol>
+</IdentityProviderProtocols>

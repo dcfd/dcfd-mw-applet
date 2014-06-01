@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+    <display-name>eID IdP SP</display-name>
+
+    <listener>
+        <listener-class>be.fedict.eid.idp.sp.StartupServletContextListener
+        </listener-class>
+    </listener>
+
+    <!-- Photo servlet -->
+    <servlet>
+        <servlet-name>PhotoServlet</servlet-name>
+        <servlet-class>be.fedict.eid.idp.sp.PhotoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PhotoServlet</servlet-name>
+        <url-pattern>/photo.jpg</url-pattern>
+    </servlet-mapping>
+
+    <!-- PKI servlet -->
+    <servlet>
+        <servlet-name>PkiServlet</servlet-name>
+        <servlet-class>be.fedict.eid.idp.sp.PkiServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PkiServlet</servlet-name>
+        <url-pattern>/pki</url-pattern>
+    </servlet-mapping>
+
+    <!-- Configuration servlet -->
+    <servlet>
+        <servlet-name>ConfigServlet</servlet-name>
+        <servlet-class>be.fedict.eid.idp.sp.ConfigServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ConfigServlet</servlet-name>
+        <url-pattern>/configuration</url-pattern>
+    </servlet-mapping>
+
+    <!-- PrivateKey servlet -->
+    <servlet>
+        <servlet-name>PublicKeyServlet</servlet-name>
+        <servlet-class>be.fedict.eid.idp.sp.PublicKeyServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PublicKeyServlet</servlet-name>
+        <url-pattern>/public</url-pattern>
+    </servlet-mapping>
+
+    <!-- SAML2 Authentication Protocol -->
+    <servlet>
+        <servlet-name>SAML2AuthenticationRequestServlet</servlet-name>
+        <servlet-class>
+            be.fedict.eid.idp.sp.protocol.saml2.AuthenticationRequestServlet
+        </servlet-class>
+        <init-param>
+            <param-name>AuthenticationRequestService</param-name>
+            <param-value>
+                be/fedict/eid/idp/sp/saml2/AuthenticationRequestServiceBean
+            </param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SAML2AuthenticationRequestServlet</servlet-name>
+        <url-pattern>/saml-request</url-pattern>
+    </servlet-mapping>
+
+    <!-- SAML2 Browser POST Binding Response Servlet -->
+    <servlet>
+        <servlet-name>SAML2AuthenticationResponseServlet</servlet-name>
+        <servlet-class>
+            be.fedict.eid.idp.sp.protocol.saml2.post.AuthenticationResponseServlet
+        </servlet-class>
+        <init-param>
+            <param-name>ResponseSessionAttribute</param-name>
+            <param-value>Response</param-value>
+        </init-param>
+        <init-param>
+            <param-name>RedirectPage</param-name>
+            <param-value>/authn-result.jsp</param-value>
+        </init-param>
+        <init-param>
+            <param-name>AuthenticationResponseServiceClass</param-name>
+            <param-value>
+                be.fedict.eid.idp.sp.saml2.AuthenticationResponseServiceBean
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>ErrorPage</param-name>
+            <param-value>/error.jsp</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ErrorMessageSessionAttribute</param-name>
+            <param-value>ErrorMessage</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SAML2AuthenticationResponseServlet</servlet-name>
+        <url-pattern>/saml2-landing</url-pattern>
+    </servlet-mapping>
+
+    <!-- SAML2 Artifact Binding Response Servlet -->
+    <servlet>
+        <servlet-name>SAML2ArtifactAuthenticationResponseServlet</servlet-name>
+        <servlet-class>
+            be.fedict.eid.idp.sp.protocol.saml2.artifact.AuthenticationResponseServlet
+        </servlet-class>
+        <init-param>
+            <param-name>ResponseSessionAttribute</param-name>
+            <param-value>Response</param-value>
+        </init-param>
+        <init-param>
+            <param-name>RedirectPage</param-name>
+            <param-value>/authn-result.jsp</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ArtifactAuthenticationResponseService</param-name>
+            <param-value>
+                be/fedict/eid/idp/sp/saml2/AuthenticationResponseServiceBean
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>ErrorPage</param-name>
+            <param-value>/error.jsp</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ErrorMessageSessionAttribute</param-name>
+            <param-value>ErrorMessage</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SAML2ArtifactAuthenticationResponseServlet</servlet-name>
+        <url-pattern>/saml2-artifact-landing</url-pattern>
+    </servlet-mapping>
+
+    <!-- OpenID Authentication Protocol -->
+    <servlet>
+        <servlet-name>OpenIDAuthenticationRequestServlet</servlet-name>
+        <servlet-class>
+            be.fedict.eid.idp.sp.protocol.openid.AuthenticationRequestServlet
+        </servlet-class>
+        <init-param>
+            <param-name>TrustServer</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>AuthenticationRequestService</param-name>
+            <param-value>
+                be/fedict/eid/idp/sp/openid/AuthenticationRequestServiceBean
+            </param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OpenIDAuthenticationRequestServlet</servlet-name>
+        <url-pattern>/openid-request</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OpenIDAuthenticationResponseServlet</servlet-name>
+        <servlet-class>
+            be.fedict.eid.idp.sp.protocol.openid.AuthenticationResponseServlet
+        </servlet-class>
+        <init-param>
+            <param-name>ResponseSessionAttribute</param-name>
+            <param-value>Response</param-value>
+        </init-param>
+        <init-param>
+            <param-name>RedirectPage</param-name>
+            <param-value>/authn-result.jsp</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ErrorPage</param-name>
+            <param-value>/error.jsp</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ErrorMessageSessionAttribute</param-name>
+            <param-value>ErrorMessage</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OpenIDAuthenticationResponseServlet</servlet-name>
+        <url-pattern>/openid-landing</url-pattern>
+    </servlet-mapping>
+
+    <!-- WS-Federation Authentication Protocol -->
+    <servlet>
+        <servlet-name>WSFederationAuthenticationRequestServlet</servlet-name>
+        <servlet-class>
+            be.fedict.eid.idp.sp.protocol.ws_federation.AuthenticationRequestServlet
+        </servlet-class>
+        <init-param>
+            <param-name>AuthenticationRequestService</param-name>
+            <param-value>
+                be/fedict/eid/idp/sp/wsfed/AuthenticationRequestServiceBean
+            </param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WSFederationAuthenticationRequestServlet</servlet-name>
+        <url-pattern>/wsfed-request</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>WSFederationAuthenticationResponseServlet</servlet-name>
+        <servlet-class>
+            be.fedict.eid.idp.sp.protocol.ws_federation.AuthenticationResponseServlet
+        </servlet-class>
+        <init-param>
+            <param-name>ResponseSessionAttribute</param-name>
+            <param-value>Response</param-value>
+        </init-param>
+        <init-param>
+            <param-name>RedirectPage</param-name>
+            <param-value>/authn-result.jsp</param-value>
+        </init-param>
+        <init-param>
+            <param-name>AuthenticationResponseService</param-name>
+            <param-value>
+                be/fedict/eid/idp/sp/wsfed/AuthenticationResponseServiceBean
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>ErrorPage</param-name>
+            <param-value>/error.jsp</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ErrorMessageSessionAttribute</param-name>
+            <param-value>ErrorMessage</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WSFederationAuthenticationResponseServlet</servlet-name>
+        <url-pattern>/wsfed-landing</url-pattern>
+    </servlet-mapping>
+
+</web-app>

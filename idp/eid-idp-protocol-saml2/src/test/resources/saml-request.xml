@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?><saml2p:AuthnRequest xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" AssertionConsumerServiceURL="http://sp.be/response" Destination="http://idp.be" ForceAuthn="true" ID="a77a1c87-e590-47d7-a3e0-afea455ebc01" IssueInstant="1970-01-01T00:00:00.000Z" ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Version="2.0">
+   <saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">http://sp.be/response</saml2:Issuer>
+</saml2p:AuthnRequest>

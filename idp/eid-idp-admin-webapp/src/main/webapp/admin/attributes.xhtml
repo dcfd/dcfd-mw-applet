@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:s="http://jboss.com/products/seam/taglib">
+<body>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:define name="body">
+
+			<h2>Attributes</h2>
+
+			<h:form>
+
+				<rich:dataTable id="data" var="item" value="#{idpAttributeUriList}"
+					rows="10">
+
+					<rich:column sortBy="#{item.attribute.uri}">
+						<f:facet name="header">Attribute</f:facet>
+						<h:outputText value="#{item.attribute.uri}" />
+					</rich:column>
+					<rich:column sortBy="#{item.pk.protocolId}">
+						<f:facet name="header">Protocol</f:facet>
+						<h:outputText value="#{item.pk.protocolId}" />
+					</rich:column>
+					<h:column>
+						<f:facet name="header">URI</f:facet>
+						<s:decorate>
+							<h:inputText id="uri" value="#{item.uri}" size="50" />
+							<h:message for="uri" styleClass="error" />
+						</s:decorate>
+					</h:column>
+
+					<f:facet name="footer">
+						<rich:datascroller for="data" pageIndexVar="pageIndex"
+							pagesVar="pages" fastControls="hide">
+						</rich:datascroller>
+					</f:facet>
+
+				</rich:dataTable>
+
+				<h:commandButton value="Save" action="#{idpAttribute.save}" />
+
+			</h:form>
+
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

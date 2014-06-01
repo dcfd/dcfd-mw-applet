@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core">
+<body>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:define name="body">
+
+			<h2>#{messages.supportedProtocols}</h2>
+			<rich:dataTable value="#{idpProtocolServices}" var="row">
+				<rich:column>
+					<h:outputLink value="#{row.path}">
+						<h:outputText value="#{row.name}" />
+					</h:outputLink>
+				</rich:column>
+			</rich:dataTable>
+
+			<h2>#{messages.protocolEndpoints}</h2>
+			<rich:dataTable value="#{idpServiceEndpoints}" var="row">
+				<rich:column>
+					<h:outputLink value="#{row.path}">
+						<h:outputText value="#{row.name}" />
+					</h:outputLink>
+				</rich:column>
+			</rich:dataTable>
+
+			<h2>#{messages.serviceIdentity}</h2>
+			<h:panelGrid columns="2">
+				<h:outputText value="#{messages.identityThumbprint}:" />
+				<h:outputText value="#{idpProtocolService.thumbprint}" />
+			</h:panelGrid>
+
+			<p>
+				<h:outputLink value="./identity.pem">
+					<h:outputText value="#{messages.identityCertificateChain}" />
+				</h:outputLink>
+			</p>
+
+			<h:panelGrid columns="1">
+				<rich:simpleTogglePanel switchType="client"
+					label="#{messages.identityCertificateChain}" opened="false">
+					<pre>
+						<h:outputText
+							value="#{idpProtocolService.identityCertificateChain}" />
+					</pre>
+				</rich:simpleTogglePanel>
+			</h:panelGrid>
+
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

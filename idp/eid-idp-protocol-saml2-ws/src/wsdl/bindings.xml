@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<jxb:bindings version="2.1" xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd">
+
+    <jxb:bindings schemaLocation="saml-schema-protocol-2.0.xsd"
+                  node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="be.fedict.eid.idp.saml2.ws.jaxb"/>
+        </jxb:schemaBindings>
+        <jxb:bindings
+                schemaLocation="http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd"
+                node="/xs:schema">
+            <jxb:schemaBindings>
+                <jxb:package name="be.fedict.eid.idp.saml2.ws.jaxb.xmldsig"/>
+            </jxb:schemaBindings>
+        </jxb:bindings>
+        <jxb:bindings schemaLocation="saml-schema-assertion-2.0.xsd"
+                      node="/xs:schema">
+            <jxb:schemaBindings>
+                <jxb:package name="be.fedict.eid.idp.saml2.ws.jaxb"/>
+            </jxb:schemaBindings>
+        </jxb:bindings>
+        <jxb:bindings
+                schemaLocation="http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/xenc-schema.xsd">
+            <jxb:schemaBindings>
+                <jxb:package name="be.fedict.eid.idp.saml2.ws.jaxb.xenc"/>
+            </jxb:schemaBindings>
+        </jxb:bindings>
+    </jxb:bindings>
+
+</jxb:bindings>

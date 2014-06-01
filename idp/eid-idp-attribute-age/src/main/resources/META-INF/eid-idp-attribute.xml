@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<IdentityProviderAttributes xmlns="urn:be:fedict:eid:idp:spi:attribute">
+    <IdentityProviderAttribute>
+        <Name>Age</Name>
+        <URI>be:fedict:eid:idp:age</URI>
+        <Description>Age Attribute</Description>
+        <AttributeService>be.fedict.eid.idp.attribute.age.AgeAttributeService</AttributeService>
+    </IdentityProviderAttribute>
+</IdentityProviderAttributes>

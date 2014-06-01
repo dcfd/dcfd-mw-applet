@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages xmlns="http://jboss.com/products/seam/pages" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd">
+
+	<page view-id="/authentication.xhtml">
+		<action execute="#{idpSP.initLanguage}" />
+	</page>
+	<page view-id="/identification.xhtml">
+		<action execute="#{idpSP.initLanguage}" />
+	</page>
+
+	<page view-id="/main.seam">
+		<rewrite pattern="/main" />
+	</page>
+
+	<page view-id="/authentication.seam">
+		<rewrite pattern="/authentication" />
+	</page>
+
+	<page view-id="/identification.seam">
+		<rewrite pattern="/identification" />
+	</page>
+
+	<page view-id="/protocol-error.seam">
+		<rewrite pattern="/protocol-error" />
+	</page>
+
+	<page view-id="/unknown-protocol.seam">
+		<rewrite pattern="/unknown-protocol" />
+	</page>
+
+	<page view-id="/unsupported-browser.seam">
+		<rewrite pattern="/unsupported-browser" />
+	</page>
+
+	<page view-id="/protocol-response-post.seam">
+		<rewrite pattern="/protocol-response-post" />
+	</page>
+
+	<page view-id="/blocked.seam">
+		<rewrite pattern="/blocked" />
+	</page>
+
+</pages>

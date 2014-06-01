@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"
+	prefer="system">
+	<system
+		systemId="http://docs.oasis-open.org/ws-sx/ws-trust/200512/ws-trust-1.3.xsd"
+		uri="ws-trust-1.3.xsd" />
+	<system
+		systemId="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+		uri="oasis-200401-wss-wssecurity-secext-1.0.xsd" />
+	<system systemId="http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd"
+		uri="xmldsig-core-schema.xsd" />
+	<system systemId="http://www.w3.org/2001/XMLSchema.dtd" uri="XMLSchema.dtd" />
+	<system systemId="http://www.w3.org/2001/datatypes.dtd" uri="datatypes.dtd" />
+	<system systemId="http://schemas.xmlsoap.org/ws/2004/09/policy/ws-policy.xsd"
+		uri="ws-policy.xsd" />
+	<system systemId="http://www.w3.org/2006/03/addressing/ws-addr.xsd"
+		uri="ws-addr.xsd" />
+	<system
+		systemId="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+		uri="oasis-200401-wss-wssecurity-utility-1.0.xsd" />
+	<system systemId="http://www.w3.org/2001/xml.xsd" uri="xml.xsd" />
+</catalog>

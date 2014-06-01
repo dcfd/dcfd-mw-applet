@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jws:handler-chains xmlns:jws="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/javaee_web_services_metadata_handler_2_0.xsd">
+	<jws:handler-chain>
+		<jws:handler>
+			<jws:handler-name>STS WS-Security Handler</jws:handler-name>
+			<jws:handler-class>be.fedict.eid.idp.protocol.ws_federation.sts.WSSecuritySoapHandler</jws:handler-class>
+		</jws:handler>
+	</jws:handler-chain>
+</jws:handler-chains>
+

@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article version="5.0"
+	xsi:schemaLocation="http://docbook.org/ns/docbook http://www.docbook.org/xml/5.0/xsd/docbook.xsd"
+	xmlns="http://docbook.org/ns/docbook" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<articleinfo>
+		<title>
+			eID Identity Provider Administrator Manual
+		</title>
+		<subtitle>
+			Version &project.version;
+		</subtitle>
+		<copyright>
+			<year>2010-2013</year>
+			<holder>Fedict</holder>
+		</copyright>
+		<releaseinfo>17 Sep 2013</releaseinfo>
+		<authorgroup>
+			<author>
+				<firstname>Wim</firstname>
+				<surname>Vandenhaute</surname>
+			</author>
+			<author>
+				<firstname>Frank</firstname>
+				<surname>Cornelis</surname>
+			</author>
+		</authorgroup>
+		<abstract>
+			<para>
+				This manual serves as an entry point for setting up the eID
+				Identity Provider. The target audience is system
+				administrators.
+			</para>
+		</abstract>
+	</articleinfo>
+	<section>
+		<title>Introduction</title>
+		<para>
+			The key words "MUST", "MUST NOT", "REQUIRED", "SHOULD", "SHOULD
+			NOT",
+			"RECOMMENDED", "MAY", and "OPTIONAL" in this document (in uppercase,
+			as shown) are to be interpreted as described in
+			<ulink url="http://www.ietf.org/rfc/rfc2119.txt">[RFC2119]</ulink>
+			.
+		</para>
+		<para>
+			The eID Identity Provider Service provides a portal which Relying
+			Parties
+			(aka Service Providers) can use to identify/authenticate its
+			users
+			using the eID Applet. This can be done using following
+			authentication
+			protocols:
+			<orderedlist>
+				<listitem>
+					<para>
+						SAML v2.0 Browser Post/Redirect/Artifact Profile
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						OpenID v2.0
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						WS-Federation v1.1
+					</para>
+				</listitem>
+			</orderedlist>
+			The eID Identity Provider Service also comes with an Admin portal
+			that
+			allows administrators to manage the eID Identity Provider via an
+			easy
+			to use web portal interface. In the following sections we will
+			use
+			<code>$EID_IDP_ADDRESS</code>
+			as the (internal) web address where the eID IdP product has been
+			deployed.
+		</para>
+		<para>
+			The source code of the eID Identity Provider Service is
+			publicly available and can be found at
+			<ulink url="http://code.google.com/p/eid-idp/source/checkout">
+				eID Identity Provider Source Code
+			</ulink>
+			. Please note that the eID IdP has dependencies on the eID
+			Trust Service product, which can be found at
+			<ulink url="http://code.google.com/p/eid-trust-service/source/checkout">
+				eID Trust Service source code
+			</ulink>
+			and on the eID Applet product, which can be found at
+			<ulink url="http://code.google.com/p/eid-applet/source/checkout">
+				eID Applet source code
+			</ulink>
+		</para>
+	</section>
+	<section>
+		<title>Installation</title>
+		<para>
+			The eID Identity Provider Service JBoss distribution is based on
+			the eID Trust Service JBoss distribution. This means that all
+			generic
+			eID Trust Service configuration is also applicable to the eID
+			Identity
+			Provider Service. We refer to the eID Trust Service
+			Administrator
+			Manual for all non eID IdP specific configuration
+			aspects.
+		</para>
+		<para>
+			The eID Identity Provider Service distribution also bundles the
+			eID
+			Trust Service. If you do not want to deploy the eID Trust
+			Service
+			along with the eID Identity Provider Service you can remove the
+			following files from the distribution:
+			<itemizedlist>
+				<listitem>
+					<para>
+						<code>
+							jboss/server/default/deploy/eid-trust-service-deploy-1.0.0-SNAPSHOT.ear
+						</code>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<code>
+							jboss/server/all/deploy/eid-trust-service-deploy-1.0.0-SNAPSHOT.ear
+						</code>
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+		<section>
+			<title>Database</title>
+			<para>
+				The eID Identity Provider Service comes with distributions for
+				the
+				following database products:
+				<itemizedlist>
+					<listitem>
+						<para>MySQL</para>
+					</listitem>
+					<listitem>
+						<para>PostgreSQL</para>
+					</listitem>
+					<listitem>
+						<para>Oracle</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<section>
+				<title>MySQL</title>
+				<para>
+					The database initialization is similar to that of the eID
+					Trust
+					Service product. The eID Identity Provider Service specific
+					database initialization script is called
+					<code>eid-idp-ddl-mysql.sql</code>
+					and is located under the
+					<code>sql</code>
+					directory.
+				</para>
+			</section>
+			<section>
+				<title>PostgreSQL</title>
+				<para>
+					The database initialization is similar to that of the eID
+					Trust
+					Service product. The eID Identity Provider Service specific
+					database initialization script is called
+					<code>eid-idp-ddl-postgresql.sql</code>
+					and is located under the
+					<code>sql</code>
+					directory.
+				</para>
+			</section>
+			<section>
+				<title>Oracle</title>
+				<para>
+					The database initialization is similar to that of the eID
+					Trust
+					Service product. The eID Identity Provider Service specific
+					database initialization script is called
+					<code>eid-idp-ddl-oracle.sql</code>
+					and is located under the
+					<code>sql</code>
+					directory.
+				</para>
+				<para>
+					Note that the SQL-DDL script will create a hibernate
+					sequence ( use
+					for generation of entity IDs ) by default.
+					Case your distribution
+					will also run the eID Trust Service
+					this sequence will already be
+					created, causing the script
+					to fail on that one. As this is the last
+					command in the
+					initialization script this does not really matter yet
+					can
+					be confusing. The command is:
+					<code>create sequence hibernate_sequence;</code>
+				</para>
+			</section>
+		</section>
+	</section>
+	<section>
+		<title>Deployment</title>
+		<para>
+			Deploy the eID Identity Provider Service the same way you deploy
+			the eID Trust Service.
+		</para>
+		<section>
+			<title>eID IdP Admin Portal</title>
+			<para>
+				The eID Identity Provider Service Administrator Portal is
+				available
+				at
+				<code>$EID_IDP_ADDRESS/eid-idp-admin-portal/</code>
+				. After deployment of the eID Identity Provider Service you
+				should
+				register an administrator by logging into the admin portal.
+				Additional administrators can be registered by letting them
+				first log
+				into the admin portal. This will result in them being
+				added as
+				<emphasis>pending</emphasis>
+				administrators, ready to
+				be approved by a normal administrator.
+			</para>
+			<para>
+				In the admin portal you should at least configure the following
+				under
+				<emphasis>PKI Validation</emphasis>
+				:
+				<itemizedlist>
+					<listitem>
+						<para>
+							eID Trust Service XKMS2 URL. For example
+							<code>
+								https://www.e-contract.be/eid-trust-service-ws/xkms2
+							</code>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							eID Trust Service Authentication Trust Domain.
+							For example:
+							<code>BE-AUTH</code>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							eID Trust Service Identification (National Registry)
+							Trust Domain.
+							For example:
+							<code>BE-NAT-REG</code>
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<section>
+				<title>eID IdP Service Identity</title>
+				<para>
+					The eID IdP should have a service identity configured. This
+					identity will be used to sign outgoing SAML v2.0 responses and the
+					SAML v2.0 assertions embedded in the WS-Federation Security Token.
+					So every authentication protocol that requires to sign the response
+					message will use this service identity. This is important to
+					provide integrity of the assertion/response and authentication of
+					the asserting party being the eID IdP to the SAML Relying Party.
+					How to configure the service identity is documented in the eID
+					Trust Service Admin Manual.
+				</para>
+			</section>
+			<section>
+				<title>eID IdP SSL Certificate</title>
+				<para>
+					Without configuration of the eID IdP SSL Certificate,
+					authentications performed by the eID Applet will be subject
+					to
+					man-in-the-middle attacks. The TLS server certificate is
+					digested
+					and used in the authentication signature but
+					without specifying the
+					SSL certificate no verification can
+					be done.
+				</para>
+			</section>
+			<section>
+				<title>Unique User Identifiers</title>
+				<para>
+					You can configure the eID IdP so that each application will
+					receive a unique user identifier that is different from the
+					national registration number. You can configure this globally (i.e.
+					for all applications) or on a per application basis.
+				</para>
+				<para>
+					Global configuration can be done via "Configuration", "IdP
+					Default Configuration", "Default HMAC-SHA1 identifier secret".
+				</para>
+				<para>
+					Per application configuration can be done via "Relying
+					Parties", then select/create a relying party. Go to the "Secrets"
+					tab and set a value for "HMAC-SHA1 Identifier Secret".
+				</para>
+				<para>
+					If you don't configure the HMAC secret, the national
+					registration number will not be hashed.
+				</para>
+			</section>
+		</section>
+		<section>
+			<title>eID IdP Core</title>
+			<para>
+				The eID Identity Provider Service core is available at:
+				<code>$EID_IDP_ADDRESS/eid-idp/</code>
+				. This site can handle incoming authentication requests from
+				Relying
+				Parties.
+			</para>
+			<section>
+				<title>OpenID and Apache</title>
+				<para>
+					The OpenID XRDS mimetype might be wrong when using recent
+					versions
+					of Apache as front-end web server.
+					This can be fixed by the
+					following Apache config work-around:
+					<programlisting language="XML"><![CDATA[<Location "/eid-idp/endpoints/openid/ident/xrds">
+        ForceType application/xrds+xml
+</Location>
+
+<Location "/eid-idp/endpoints/openid/auth/xrds">
+        ForceType application/xrds+xml
+</Location>
+
+<Location "/eid-idp/endpoints/openid/auth-ident/xrds">
+        ForceType application/xrds+xml
+</Location>]]></programlisting>
+				</para>
+			</section>
+		</section>
+	</section>
+	<appendix id="links">
+		<title>Useful links</title>
+		<para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<ulink url="http://saml.xml.org/saml-specifications">
+							SAML v2.0 Specification
+						</ulink>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<ulink url="http://openid.net/specs/openid-authentication-2_0.html">
+							OpenID v2.0 Specification
+						</ulink>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<ulink
+							url="http://openid.net/specs/openid-attribute-exchange-1_0.html">
+							OpenID Attribute Exchange v1.0
+						</ulink>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<ulink
+							url="http://svn.openid.net/repos/specifications/user_interface/1.0/trunk/openid-user-interface-extension-1_0.html">
+							OpenID User Interface Extension v1.0
+						</ulink>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<ulink
+							url="http://download.boulder.ibm.com/ibmdl/pub/software/dw/specs/ws-fed/WS-Federation-V1-1B.pdf">
+							WS-Federation 1.1 Specification
+						</ulink>
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+	</appendix>
+	<appendix>
+		<title>eID Identity Provider Service Admin Manual License</title>
+		<para>
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="cc.logo.large.png"
+						scale="100" />
+				</imageobject>
+			</mediaobject>
+			This document has been released under the Creative Commons license.
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="share.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You are free to Share — to copy, distribute and transmit the work.
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="by.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You must attribute the work in the manner specified by the author or
+			licensor (but not in any way that suggests that they endorse you or
+			your use of the work).
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="nc.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You may not use this work for commercial purposes.
+			<mediaobject>
+				<imageobject>
+					<imagedata format="PNG" fileref="nd.large.png" scale="20" />
+				</imageobject>
+			</mediaobject>
+			You may not alter, transform, or build upon this work.
+		</para>
+		<para>
+			More information about the Creative Commons license conditions can
+			be
+			found at
+			<ulink url="http://creativecommons.org/">Creative Commons
+				organization
+			</ulink>
+			.
+		</para>
+	</appendix>
+	<appendix>
+		<title>eID Identity Provider Service License</title>
+		<para>
+			The eID Identity Provider Service source code has been released
+			under the
+			GNU LGPL version 3.0.
+		</para>
+		<para>
+			<code>
+				This is free software; you can redistribute it and/or modify it
+				under the terms of the GNU Lesser General Public License version
+				3.0
+				as published by the Free Software Foundation.
+
+				This software is
+				distributed in the hope that it will be useful, but WITHOUT ANY
+				WARRANTY; without even the implied warranty of MERCHANTABILITY
+				or
+				FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
+				Public
+				License for more details.
+
+				You should have received a copy of the GNU
+				Lesser General Public License along with this software; if not,
+				see
+				http://www.gnu.org/licenses/.
+			</code>
+		</para>
+	</appendix>
+	<appendix>
+		<title>Revision history</title>
+		<table>
+			<title>Revision history</title>
+			<tgroup cols="3">
+				<colspec colwidth="1*" />
+				<colspec colwidth="1*" />
+				<colspec colwidth="2*" />
+				<thead>
+					<row>
+						<entry>Date</entry>
+						<entry>Author</entry>
+						<entry>Description</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>27 Dec 2010</entry>
+						<entry>Wim Vandenhaute</entry>
+						<entry>Initial Version.</entry>
+					</row>
+					<row>
+						<entry>16 Feb 2010</entry>
+						<entry>Wim Vandenhaute</entry>
+						<entry>Update on supported SAML bindings, typos and
+							usefull links.
+						</entry>
+					</row>
+					<row>
+						<entry>23 Aug 2012</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>Versioning, RRN hashing.</entry>
+					</row>
+					<row>
+						<entry>25 Jan 2013</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>OpenID and Apache.</entry>
+					</row>
+					<row>
+						<entry>17 Sep 2013</entry>
+						<entry>Frank Cornelis</entry>
+						<entry>Removed FedICT branding.</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+	</appendix>
+</article>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:be:fedict:eid:idp:spi:attribute"
+	xmlns:tns="urn:be:fedict:eid:idp:spi:attribute" elementFormDefault="qualified"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<element name="IdentityProviderAttributes" type="tns:IdentityProviderAttributesType" />
+	<complexType name="IdentityProviderAttributesType">
+		<sequence>
+			<element name="IdentityProviderAttribute" type="tns:IdentityProviderAttributeType"
+				maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<element name="IdentityProviderAttribute" type="tns:IdentityProviderAttributeType" />
+	<complexType name="IdentityProviderAttributeType">
+		<sequence>
+			<element name="Name" type="xsd:string" />
+			<element name="URI" type="xsd:string" />
+			<element name="Description" type="xsd:string" minOccurs="0" />
+			<element name="AttributeService" type="xsd:string" />
+		</sequence>
+	</complexType>
+
+</schema>

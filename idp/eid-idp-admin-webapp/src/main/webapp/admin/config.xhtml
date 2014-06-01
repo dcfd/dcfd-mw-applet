@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:s="http://jboss.com/products/seam/taglib">
+<body>
+	<ui:composition template="/WEB-INF/template.xhtml">
+		<ui:define name="body">
+			<h2>Configuration</h2>
+
+			<h:form>
+
+				<rich:tabPanel switchType="client"
+					selectedTab="#{idpConfig.selectedTab}">
+
+					<rich:tab name="tab_idp" label="Generic">
+						<h:panelGrid columns="2">
+							<h:outputText value="Token issuer name:" />
+							<h:inputText value="#{idpConfig.issuer}" />
+
+							<h:outputText
+								value="Default HMAC-SHA1 identifier secret (hexadecimal):" />
+							<s:decorate>
+								<h:inputText value="#{idpConfig.hmacSecret}" id="hmacsecret"
+									size="50" />
+								<h:message for="hmacsecret" styleClass="error" />
+							</s:decorate>
+						</h:panelGrid>
+						<h:commandButton value="Save" action="#{idpConfig.saveIdP}" />
+					</rich:tab>
+
+					<rich:tab name="tab_xkms" label="PKI validation">
+						<h:panelGrid columns="2">
+							<h:outputText value="eID Trust Service XKMS2 URL:" />
+							<h:inputText value="#{idpConfig.xkmsUrl}" size="50" />
+
+							<h:outputText
+								value="eID Trust Service Authentication Trust Domain:" />
+							<h:inputText value="#{idpConfig.xkmsAuthTrustDomain}" />
+
+							<h:outputText
+								value="eID Trust Service Identification (National Registry) Trust Domain:" />
+							<h:inputText value="#{idpConfig.xkmsIdentTrustDomain}" />
+						</h:panelGrid>
+						<h:commandButton value="Save" action="#{idpConfig.saveXkms}" />
+					</rich:tab>
+
+					<rich:tab name="tab_network" label="Network">
+						<h:panelGrid columns="2">
+							<h:outputText value="HTTP Proxy" />
+							<h:selectBooleanCheckbox value="#{idpConfig.httpProxy}" />
+
+							<h:outputText value="HTTP Proxy Host: " />
+							<h:inputText value="#{idpConfig.httpProxyHost}" size="50" />
+
+							<h:outputText value="HTTP Proxy Port: " />
+							<h:inputText value="#{idpConfig.httpProxyPort}" size="10" />
+						</h:panelGrid>
+						<h:commandButton value="Save" action="#{idpConfig.saveNetwork}" />
+					</rich:tab>
+
+					<rich:tab name="tab_applet" label="eID Applet">
+						<h:panelGrid columns="2">
+
+							<h:outputLabel value="SSL Server Certificate Subject" />
+							<h:outputLabel
+								value="#{idpConfig.appletConfig.serverCertificateSubject}" />
+
+							<h:outputLabel for="upload" value="SSL Server Certificate" />
+							<rich:fileUpload fileUploadListener="#{idpConfig.uploadListener}"
+								maxFilesQuantity="1" id="upload" immediateUpload="true">
+							</rich:fileUpload>
+
+							<h:outputLabel for="omitSecureChannelBinding"
+								value="Omit secure channel binding" />
+							<h:selectBooleanCheckbox id="omitSecureChannelBinding"
+								value="#{idpConfig.omitSecureChannelBinding}" />
+
+							<h:outputLabel for="removeCard" value="Remove eID card" />
+							<h:selectBooleanCheckbox id="removeCard"
+								value="#{idpConfig.removeCard}" />
+
+							<h:outputLabel for="transactionMessageSigning"
+								value="Transaction message signing (eID secure pinpad reader)" />
+							<h:selectBooleanCheckbox id="transactionMessageSigning"
+								value="#{idpConfig.transactionMessageSigning}" />
+
+						</h:panelGrid>
+						<h:panelGrid columns="2">
+							<h:commandButton value="Save" action="#{idpConfig.saveApplet}" />
+							<h:commandButton value="Remove Certificate"
+								action="#{idpConfig.removeApplet}" />
+						</h:panelGrid>
+
+						<p>
+							<rich:simpleTogglePanel switchType="client" opened="false"
+								rendered="#{idpConfig.appletConfig.serverCertificate != null}"
+								label="Server Certificate">
+								<h:outputText id="cert_view" styleClass="text block"
+									value="#{idpConfig.appletConfig.serverCertificate}" />
+							</rich:simpleTogglePanel>
+						</p>
+					</rich:tab>
+
+					<rich:tab name="tab_security" label="Security">
+						<h:panelGrid columns="2">
+							<h:outputText value="Response token validity (minutes): " />
+							<h:inputText value="#{idpConfig.tokenValidity}" size="10" />
+
+							<h:outputLabel for="hsts" value="HTTP Strict Transport Security" />
+							<h:selectBooleanCheckbox id="hsts" value="#{idpConfig.hsts}" />
+
+							<h:outputLabel for="xssProtection" value="XSS Protection" />
+							<h:selectBooleanCheckbox id="xssProtection"
+								value="#{idpConfig.xssProtection}" />
+
+							<h:outputLabel for="xFrameOptions" value="X-Frame-Options" />
+							<h:selectOneMenu id="xFrameOptions"
+								value="#{idpConfig.XFrameOptions}">
+								<f:selectItems value="#{xFrameOptionsList}" />
+								<h:message for="xFrameOptions" styleClass="error" />
+							</h:selectOneMenu>
+						</h:panelGrid>
+						<h:commandButton value="Save" action="#{idpConfig.saveSecurity}" />
+					</rich:tab>
+
+				</rich:tabPanel>
+
+			</h:form>
+
+		</ui:define>
+	</ui:composition>
+</body>
+</html>
