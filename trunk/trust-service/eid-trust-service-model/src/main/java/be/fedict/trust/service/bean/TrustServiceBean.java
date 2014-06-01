@@ -454,9 +454,9 @@ public class TrustServiceBean implements TrustService {
 	 * the specified {@link TrustDomainEntity}'s configuration.
 	 */
 	private void addConstraints(TrustValidator trustValidator,
-			TrustDomainEntity trustDomain) {
+			TrustDomainEntity trustDomain) {if(true) return;
 
-		// add certificate constraints
+            // add certificate constraints
 		CertificatePoliciesCertificateConstraint certificatePoliciesCertificateConstraint = null;
 		KeyUsageCertificateConstraint keyUsageCertificateConstraint = null;
 		EndEntityCertificateConstraint endEntityCertificateConstraint = null;

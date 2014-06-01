@@ -134,6 +134,7 @@ public class InitializationServiceBean implements InitializationService {
 		if (null == this.localizationDAO
 				.findLocalization(TrustServiceConstants.INFO_MESSAGE_KEY)) {
 			Map<Locale, String> texts = new HashMap<Locale, String>();
+            texts.put(new Locale("es"), "");
 			texts.put(Locale.ENGLISH, "");
 			texts.put(new Locale("nl"), "");
 			texts.put(Locale.FRENCH, "");
@@ -184,12 +185,12 @@ public class InitializationServiceBean implements InitializationService {
 		List<TrustPointEntity> trustPoints = new LinkedList<TrustPointEntity>();
 
 		// Belgian eID Root CA trust points
-		X509Certificate rootCaCertificate = loadCertificate("be/fedict/trust/belgiumrca.crt");
+		X509Certificate rootCaCertificate = loadCertificate("be/fedict/trust/CA RAIZ NACIONAL COSTA RICA.cer");
 		CertificateAuthorityEntity rootCa = this.certificateAuthorityDAO
 				.findCertificateAuthority(rootCaCertificate);
 		if (null == rootCa) {
 			rootCa = this.certificateAuthorityDAO.addCertificateAuthority(
-					rootCaCertificate, "http://crl.eid.belgium.be/belgium.crl");
+					rootCaCertificate, "http://www.firmadigital.go.cr/repositorio/CA%20RAIZ%20NACIONAL%20-%20COSTA%20RICA.crl");
 		}
 
 		if (null == rootCa.getTrustPoint()) {
@@ -201,13 +202,13 @@ public class InitializationServiceBean implements InitializationService {
 		}
 		trustPoints.add(rootCa.getTrustPoint());
 
-		X509Certificate rootCa2Certificate = loadCertificate("be/fedict/trust/belgiumrca2.crt");
+		X509Certificate rootCa2Certificate = loadCertificate("be/fedict/trust/CA POLITICA PERSONA FISICA - COSTA RICA.cer");
 		CertificateAuthorityEntity rootCa2 = this.certificateAuthorityDAO
 				.findCertificateAuthority(rootCa2Certificate);
 		if (null == rootCa2) {
 			rootCa2 = this.certificateAuthorityDAO.addCertificateAuthority(
 					rootCa2Certificate,
-					"http://crl.eid.belgium.be/belgium2.crl");
+					"http://www.firmadigital.go.cr/repositorio/CA%20POLITICA%20PERSONA%20FISICA%20-%20COSTA%20RICA.crl");
 		}
 
 		if (null == rootCa2.getTrustPoint()) {
@@ -219,6 +220,26 @@ public class InitializationServiceBean implements InitializationService {
 		}
 		trustPoints.add(rootCa2.getTrustPoint());
 
+        //X509Certificate rootCa3Certificate = loadCertificate("be/fedict/trust/CA SINPE - PERSONA FISICA.cer");
+        X509Certificate rootCa3Certificate = loadCertificate("be/fedict/trust/CA SINPE - PERSONA FISICA(1).crt");
+		CertificateAuthorityEntity rootCa3 = this.certificateAuthorityDAO
+				.findCertificateAuthority(rootCa3Certificate);
+		if (null == rootCa3) {
+			rootCa3 = this.certificateAuthorityDAO.addCertificateAuthority(
+					rootCa3Certificate,
+					//"http://fdi.sinpe.fi.cr/repositorio/CA%20SINPE%20-%20PERSONA%20FISICA.crl");
+                                        "http://fdi.sinpe.fi.cr/repositorio/CA%20SINPE%20-%20PERSONA%20FISICA(1).crl");
+		}
+
+		if (null == rootCa3.getTrustPoint()) {
+			TrustPointEntity rootCa3TrustPoint = this.trustDomainDAO
+					.addTrustPoint(
+							TrustServiceConstants.DEFAULT_CRON_EXPRESSION,
+							rootCa3);
+			rootCa3.setTrustPoint(rootCa3TrustPoint);
+		}
+		trustPoints.add(rootCa3.getTrustPoint());
+
 		return trustPoints;
 	}
 
@@ -228,7 +249,7 @@ public class InitializationServiceBean implements InitializationService {
 
 	private void initBelgianEidTestCardsTrustDomain() {
 
-		List<TrustPointEntity> trustPoints = new LinkedList<TrustPointEntity>();
+		/*List<TrustPointEntity> trustPoints = new LinkedList<TrustPointEntity>();
 
 		// Belgian Test Root CA trust point
 		X509Certificate rootCertificate = loadCertificate("be/fedict/trust/belgiumtestrca.crt");
@@ -263,7 +284,7 @@ public class InitializationServiceBean implements InitializationService {
 
 			this.trustDomainDAO.addCertificatePolicy(trustDomain,
 					"2.16.56.1.40.40.40.1");
-		}
+		}*/
 	}
 
 	private void initBelgianEidAuthTrustDomain(
@@ -280,20 +301,20 @@ public class InitializationServiceBean implements InitializationService {
 		trustDomain.setTrustPoints(trustPoints);
 
 		// initialize certificate constraints
-		if (trustDomain.getCertificateConstraints().isEmpty()) {
+		if (trustDomain.getCertificateConstraints().isEmpty()) {if(true) return;
 			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
 					KeyUsageType.DIGITAL_SIGNATURE, true);
 			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
 					KeyUsageType.NON_REPUDIATION, false);
 
-			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+			/*this.trustDomainDAO.addCertificatePolicy(trustDomain,
 					"2.16.56.1.1.1.2.2");
 			this.trustDomainDAO.addCertificatePolicy(trustDomain,
 					"2.16.56.1.1.1.7.2");
 			this.trustDomainDAO.addCertificatePolicy(trustDomain,
 					"2.16.56.9.1.1.2.2");
 			this.trustDomainDAO.addCertificatePolicy(trustDomain,
-					"2.16.56.9.1.1.7.2");
+					"2.16.56.9.1.1.7.2");*/
 		}
 	}
 
@@ -310,13 +331,13 @@ public class InitializationServiceBean implements InitializationService {
 		trustDomain.setTrustPoints(trustPoints);
 
 		// initialize certificate constraints
-		if (trustDomain.getCertificateConstraints().isEmpty()) {
+		if (trustDomain.getCertificateConstraints().isEmpty()) {if(true) return;
 			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
 					KeyUsageType.DIGITAL_SIGNATURE, false);
 			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
 					KeyUsageType.NON_REPUDIATION, true);
 
-			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+			/*this.trustDomainDAO.addCertificatePolicy(trustDomain,
 					"2.16.56.1.1.1.2.1");
 			this.trustDomainDAO.addCertificatePolicy(trustDomain,
 					"2.16.56.1.1.1.7.1");
@@ -325,7 +346,7 @@ public class InitializationServiceBean implements InitializationService {
 			this.trustDomainDAO.addCertificatePolicy(trustDomain,
 					"2.16.56.9.1.1.7.1");
 
-			this.trustDomainDAO.addQCStatementsConstraint(trustDomain, true);
+			this.trustDomainDAO.addQCStatementsConstraint(trustDomain, true);*/
 		}
 	}
 
@@ -342,19 +363,19 @@ public class InitializationServiceBean implements InitializationService {
 		trustDomain.setTrustPoints(trustPoints);
 
 		// initialize certificate constraints
-		if (trustDomain.getCertificateConstraints().isEmpty()) {
+		if (trustDomain.getCertificateConstraints().isEmpty()) {if(true) return;
 			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
 					KeyUsageType.DIGITAL_SIGNATURE, true);
 			this.trustDomainDAO.addKeyUsageConstraint(trustDomain,
 					KeyUsageType.NON_REPUDIATION, true);
 
-			this.trustDomainDAO.addCertificatePolicy(trustDomain,
+			/*this.trustDomainDAO.addCertificatePolicy(trustDomain,
 					"2.16.56.1.1.1.4");
 			this.trustDomainDAO.addCertificatePolicy(trustDomain,
 					"2.16.56.9.1.1.4");
 
 			this.trustDomainDAO.addDNConstraint(trustDomain,
-					"CN=RRN, O=RRN, C=BE");
+					"CN=RRN, O=RRN, C=BE");*/
 		}
 	}
 
@@ -365,8 +386,7 @@ public class InitializationServiceBean implements InitializationService {
 
 		List<TrustPointEntity> trustPoints = new LinkedList<TrustPointEntity>();
 
-		// Belgian TSA Root CA trust points
-		X509Certificate rootCertificate = loadCertificate("be/fedict/trust/belgiumtsa.crt");
+        /*    X509Certificate rootCertificate = loadCertificate("be/fedict/trust/CA POLITICA SELLADO DE TIEMPO - COSTA RICA.crt");
 		CertificateAuthorityEntity rootCa = this.certificateAuthorityDAO
 				.findCertificateAuthority(rootCertificate);
 		if (null == rootCa) {
@@ -381,25 +401,44 @@ public class InitializationServiceBean implements InitializationService {
 							rootCa);
 			rootCa.setTrustPoint(rootCaTrustPoint);
 		}
-		trustPoints.add(rootCa.getTrustPoint());
+		trustPoints.add(rootCa.getTrustPoint());*/
 
-		// Baltimore CA
-		X509Certificate baltimoreCertificate = loadCertificate("be/fedict/trust/baltimore.crt");
-		CertificateAuthorityEntity baltimoreCa = this.certificateAuthorityDAO
-				.findCertificateAuthority(baltimoreCertificate);
-		if (null == baltimoreCa) {
-			baltimoreCa = this.certificateAuthorityDAO.addCertificateAuthority(
-					baltimoreCertificate, null);
+
+                 // Belgian eID Root CA trust points
+		X509Certificate rootCaCertificate = loadCertificate("be/fedict/trust/CA RAIZ NACIONAL COSTA RICA.cer");
+		CertificateAuthorityEntity rootCa = this.certificateAuthorityDAO
+				.findCertificateAuthority(rootCaCertificate);
+		if (null == rootCa) {
+			rootCa = this.certificateAuthorityDAO.addCertificateAuthority(
+					rootCaCertificate, "http://www.firmadigital.go.cr/repositorio/CA%20RAIZ%20NACIONAL%20-%20COSTA%20RICA.crl");
 		}
 
-		if (null == baltimoreCa.getTrustPoint()) {
+		if (null == rootCa.getTrustPoint()) {
+			TrustPointEntity rootCaTrustPoint = this.trustDomainDAO
+					.addTrustPoint(
+							TrustServiceConstants.DEFAULT_CRON_EXPRESSION,
+							rootCa);
+			rootCa.setTrustPoint(rootCaTrustPoint);
+		}
+		trustPoints.add(rootCa.getTrustPoint());
+
+                 // TSA CA
+		X509Certificate tsaCertificate = loadCertificate("be/fedict/trust/CA POLITICA SELLADO DE TIEMPO - COSTA RICA.crt");
+		CertificateAuthorityEntity tsaCa = this.certificateAuthorityDAO
+				.findCertificateAuthority(tsaCertificate);
+		if (null == tsaCa) {
+			tsaCa = this.certificateAuthorityDAO.addCertificateAuthority(
+					tsaCertificate, null);
+		}
+
+		if (null == tsaCa.getTrustPoint()) {
 			TrustPointEntity baltimoreTrustPoint = this.trustDomainDAO
 					.addTrustPoint(
 							TrustServiceConstants.DEFAULT_CRON_EXPRESSION,
-							baltimoreCa);
-			baltimoreCa.setTrustPoint(baltimoreTrustPoint);
+							tsaCa);
+			tsaCa.setTrustPoint(baltimoreTrustPoint);
 		}
-		trustPoints.add(baltimoreCa.getTrustPoint());
+		trustPoints.add(tsaCa.getTrustPoint());
 
 		// Belgian TSA trust domain
 		TrustDomainEntity trustDomain = this.trustDomainDAO
