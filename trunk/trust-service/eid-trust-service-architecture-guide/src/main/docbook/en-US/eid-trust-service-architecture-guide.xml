@@ -2,9 +2,9 @@
 <!DOCTYPE article PUBLIC 
 	"-//OASIS//DTD DocBook XML V4.5//EN"
 	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<article lang="en">
+<article lang="es">
 	<articleinfo>
-		<title>Fedict eID Trust Service Developer Guide</title>
+		<title>Guía de Arquitectura eID Trust Service</title>
 		<copyright>
 			<year>2008-2010</year>
 			<holder>Fedict</holder>
@@ -24,43 +24,37 @@
 	<section>
 		<title>Introduction</title>
 		<para>
-			The key words "MUST", "MUST NOT", "REQUIRED", "SHOULD", "SHOULD NOT",
-			"RECOMMENDED", "MAY", and "OPTIONAL" in this document (in uppercase,
-			as shown) are to be interpreted as described in
-			<ulink url="http://www.ietf.org/rfc/rfc2119.txt">[RFC2119]</ulink>
-			.
-			The eID Trust Service provides two major service artifacts:
+			
+			El Trust Service  provee dos servicios principales:
 			<orderedlist>
 				<listitem>
 					eID Trust Service portal
-					<para>Via this web portal citizens can check the validity of their
-						eID certificates.</para>
+					<para>Via este portal web, los ciudadanos pueden revisar la validez de sus certificados</para>
 				</listitem>
 				<listitem>
-					eID Trust Service validation web service
-					<para>Via this SOAP web service Relying Parties (aka Service
-						Providers) can check the validity of certificate paths. This web
-						service is constructed according to the W3C XKMS2 web service
-						standard.</para>
+					eID Trust Service web service para validación
+					<para>Vía este web service SOPA, los Proveedores de Servicios 
+                                            pueden revisar la validez de rutas de certificados. Este web service está construido de acuerdo al  estándar  W3C XKMS2.</para>
 				</listitem>
 			</orderedlist>
-			Besides these two service artifacts, the eID Trust Service also comes
-			with an Admin portal that allows administrators to manage the eID
-			Trust Service via an easy to use web portal interface. In the
-			following paragraphs we will use $EID_TRUST_SERVICE_ADDRESS as the
-			(internal) web address where the eID Trust Service product has been
-			deployed.
+			A parte de estos dos artefactos, el eID Trust Service 
+                        también viene con un portal de Administración que permite  
+                        a los administradores utilizar y configurar el 
+                        eID Trust Service a través de una interfaz web. 
+                        En los siguientes párrafos utilizaremos el 
+                        $EID_TRUST_SERVICE_ADDRESS como la dirección web 
+                        interna de el eID Trust Service que ha sido desplegado.
 		</para>
 	</section>
 	<section>
-		<title>Architecture</title>
+		<title>Arquitectura</title>
 		<para>
-			The architecture of the Fedict eID Trust Service is shown in
+			La arquitectura de el eID Trust Service es mostrada en
 			<xref linkend="eid-trust-service-arch" />
-			. The details are explained in the subsequent sections.
+			. Los detalles se explican en las siguientes secciones.
 		</para>
 		<figure id="eid-trust-service-arch">
-			<title>eID Trust Service Architecture</title>
+			<title>Arquitectura del eID Trust Service</title>
 			<screenshot>
 				<mediaobject>
 					<imageobject>
@@ -71,82 +65,78 @@
 			</screenshot>
 		</figure>
 		<section>
-			<title>OCSP Responder and CRL Repository</title>
+			<title>OCSP Responder y CRL Repository</title>
 			<para>
-				The eID Trust Service makes use of the existing online eID
-				PKI-services for validation of the certificate paths.
+				El eID Trust Service utiliza servicios existentes 
+                            de validación-PKI para la validación de rutas de certificados.
 			</para>
 		</section>
 		<section>
 			<title>jTrust</title>
 			<para>
-				This software component handles the actual PKI-validation,
-				using online OCSP- and CRL-services. The internal design of this
-				component easily allows to add external trust linkers providing
-				scalability. The eID Trust Services does just so by for example
-				adding a custom trust linkers maintains a CRL cache.
+				Este componente de software maneja la validación-PKI, 
+                            utilizando OCSP en línea y servicios de CLR. El diseño 
+                            interno de este componente permite fácilmente agregar 
+                            enlazadores de confianza externo
+                            El eID Trust Service realiza tal tarea por ejemplo 
+                            agregando un enlazador de confianza personalizado 
+                            manteniendo una cache CRL.
 			</para>
 			<para>
-				As the jTrust-library makes use of the URI's in the
-				certificates for OCSP- and CRL-validation, only limited
-				configuration is needed.
+				Solamente se necesita una configuración limitada 
+                            puesto que la librería jTrust utiliza los URI's que 
+                            se encuentran dentro de los Certificados para OCSP 
+                            y validación CRL.
 			</para>
 			<para>
-				The source code of this component can be found at:
+				El código fuente de este componente puede ser encontrado en:
 				<ulink url="http://code.google.com/p/jtrust/">jTrust</ulink>
 			</para>
 		</section>
 		<section>
 			<title>Trust Service Model</title>
 			<para>
-				The eID Trust Service Model is a software module written in the
-				EJB3-technology. This module manages trust domains, service
-				configuration, certificate revocation cache and more. The jTrust
-				module makes use of this certificate revocation cache during
-				validation of the certificate path.
+				El eID Trust Service Model es un módulo de software 
+                            escrito en tecnología EJB3. Este módulo administra 
+                            dominios de confianza, configuración del servicio, 
+                            cache de revocación de certificados y más. 
+                            El módulo jTrust utiliza este cache de revocación de 
+                            certificados durante la validación de la ruta de certificados.
 			</para>
 		</section>
 		<section>
 			<title>XKMS v2.0</title>
 			<para>
-				The primairy interfance of the eID Trust Service for Service
-				Provides is a web service which is bases on the W3C XKMS v2
-				standard. The protocol binding used is HTTP SOAP. Depending on the
-				security policy configuration of the eID Trust Service (
-				configurable by an administrator ) an application can use this web
-				service without service authentication, with unilateral
-				TSL-authentication or authentication on message level using signed
-				XKMS2 responses.
+				La interfaz primaria de el eID Trust Service  para 
+                            Proveedores de Servicios es un web service el cual 
+                            está basado en el estándar W3C XKMS v . El protocolo 
+                            de enlace utilizado es HTTP SOAP. Dependiendo de la 
+                            configuración de políticas de seguridad de el eID
+                            Trust Service (configurable por un administrador) 
+                            una aplicación puede utilizar este web service sin 
+                            necesidad de autenticación de servicio, con autenticación 
+                            TLS unilateral o autenticación a nivel de mensajes 
+                            utilizando respuestas XKMS2 firmadas.
 			</para>
 		</section>
 		<section>
 			<title>SDK</title>
 			<para>
-				The eID Trust Service SDK allows Service Providers for easy
-				integration of the eID Trust Service in (web-)applications. The SDK
-				consist of:
+				El SDK del eID Trust Service permite a los Proveedores de Servicio la fácil integración de el eID Trust Service en aplicaciones (web). El SDK consiste de:
 				<itemizedlist>
 					<listitem>
-						A Java-based XKMS2 client reference implementation
+						Referencia de la implementación de un cliente XKMS2 basado en Java
 					</listitem>
 					<listitem>
-						A .NET (C#) 2.0 implementation available for both the
-						Microsoft
-						platform as the Mono platform.
+						Una implementación .NET (C#) 2.0, disponible para las plataformas Microsoft y Mono.
 					</listitem>
 				</itemizedlist>
 			</para>
 		</section>
 		<section>
-			<title>eID Applet and eID Applet Service</title>
+			<title>eID Applet y eID Applet Service</title>
 			<para>
-				Using these generic Java-applet based components, developers can
-				easily integrate eID functionality in web applications. The eID
-				Applet provided full support for the functionalities of the eID
-				card. This comprises identification, authentication and adding
-				digital signatures. The eID Trust Service makes use of the eID
-				Applet within the eID Trust Service Portal and the eID Trust Service
-				Admin Portal. The source code for the eID Applet can be found at
+				Utilizado estos componentes genéricos (Java-Applet), los desarrolladores pueden integrar fácilmente la funcionalidad eID en aplicaciones web. El eID Applet provee un completo soporte para las funcionalidades de la tarjeta inteligente. Esto comprende identificación, autenticación y firma digital. El eID Trust Service utiliza el eID Applet dentro del eID Trust Service Portal y del eID Trust Service Admin Portal. El código fuente para el eID Applet puede ser encontrado en:
 				<ulink url="http://code.google.com/p/eid-applet">eID Applet Source Code</ulink>
 				.
 			</para>
@@ -154,96 +144,75 @@
 		<section>
 			<title>Trust Service Portal</title>
 			<para>
-				Using the eID Trust Service Portal, civilians kan verify the
-				functionality of their eID card and validate their eID certificates
-				easily. The portal is translated in all national languages and
-				English. The user has the ability to select the language manually.
-				If not selected manually, the browser default setting will be used.
-				The portal furthermore includes an information panel, explaining eID
-				certificates and the eID card in general. This information can be
-				modified by an administrator in the eID Trust Service Admin Portal.
+				Utilizando el eID Trust Service Portal, los ciudadanos pueden verificar la funcionalidad de sus tarjetas inteligentes y validar sus certificados digitales fácilmente. El portal está traducido a muchos lenguajes. El usuario tiene la posibilidad de seleccionar el lenguaje manualmente. Si no se elige manualmente, la configuración del explorador web será usada. El portal además incluye un panel de información, explicando los certificados y la tarjeta en general. Esta información puede ser modificada por un administrador en el eID Trust Service Admin Portal.
 			</para>
 		</section>
 		<section>
 			<title>Admin Portal</title>
 			<para>
-				The eID Trust Service Admin Portal allows administratos to manage
-				and configure the eID Trust Service. Following configuration is
-				possible :
+				El eID Trust Service Admin Portal permite a los administradores configurar el eID Trust Service. La siguiente configuración es posible:
 				<itemizedlist>
 					<listitem>
 						<para>
-							Adding, approving and removing administrators.
+							Agregar, aprobar y remover administradores.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							Configuration of the WS Security Policy to be used as in if
-							outgoing XKMS2 responses should be signed or not and
-							configuration of the keystore used for that.
+							Configuración de la Política de seguridad del Web Service para ser usada si los mensajes XKMS2 salientes deberían ser firmados o no y configuración del keystore necesario para este fin.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							Configuration of an HTTP network-proxy use by the eID Trust
-							Service when accessing the CRL repository and the OCSP responder.
+							Configuración de un proxy de red HTTP utilizado por el eID Trust Service para acceder al CRL Repository y al OCSP responder.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							Configuration of a Clock Drift Detection task. Both NTP as
-							TSP is supported.
+							Configuración de tareas de detección de desfase de tiempo, NTP y TSP están soportados.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							Configuration of the information message shown in the eID
-							Trust Service Portal, this for all languages that the eID Trust
-							Service Portal supports.
+							Configuración del mensaje de información a ser mostrado en el eID Trust Service Portal, esto para todos los lenguajes que el eID Trust Service Portal soporta.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							Management of the different trust domains. This consist of:
+							Administración de dominios de confianza diferentes, Esto consiste en:
 							<itemizedlist>
 								<listitem>
-									<para>Adding and removing trust domains</para>
+									<para>Agregar y remover dominios de confianza</para>
 								</listitem>
 								<listitem>
-									<para>Adding and removing virtual trust domains</para>
+									<para>Agregar y remover dominios virtuales de confianza</para>
 								</listitem>
 								<listitem>
-									<para>Setting the default trust domain. This is the trust
-										domain that will be used in the eID Trust Web Service if no
-										trust domain was specified.</para>
+									<para>Establecer el dominio de confianza por defecto. Este es el dominio de confianza que será utilizado en el eID Trust Web Service si no se especifica ningún otro.</para>
 								</listitem>
 								<listitem>
-									<para>Selecting trust points within a trust domain</para>
+									<para>Seleccionar puntos de confianza dentro de un dominio de confianza</para>
 								</listitem>
 								<listitem>
-									<para>Selecting trust domains within a virtual trust domain
+									<para>Seleccionar puntos de confianza dentro de un dominio virtual de confianza
 									</para>
 								</listitem>
 								<listitem>
-									<para>Configuring the CRL refresh interval per trust point
+									<para>Configurar el intervalo de actualización de CRL por punto de confianza
 									</para>
 								</listitem>
 								<listitem>
-									<para>Configuring certificate constraints per trust domain
+									<para>Configurar restricciones de certificados por dominio de confianza
 									</para>
 								</listitem>
 								<listitem>
-									<para>Configuration if the CRL revocation cache can be used per
-										trust domain.</para>
+									<para>Configurar si el cache de CRL puede ser utilizado por dominio de confianza</para>
 								</listitem>
 								<listitem>
-									<para>Manually triggering a refresh of the CRL revocation cache
-										per trust point. This will trigger a refresh on all CA's below
-										that trust point.</para>
+									<para>Realizar una actualización manual del cache CRL por punto de confianza. Esto disparara una actualización en todos los CAs bajo ese punto de confianza.</para>
 								</listitem>
 								<listitem>
-									<para>Manually triggering a refresh of the CRL revocation cache
-										per CA.</para>
+									<para>Realizar una actualización manual del cache CRL por cada CA.</para>
 								</listitem>
 							</itemizedlist>
 						</para>
@@ -251,164 +220,77 @@
 				</itemizedlist>
 			</para>
 			<para>
-				An administrator authenticates himself within the eID Trust
-				Service Admin Portal using his eID card. If no administrator is yet
-				registered, the first user that successfully authenticates himself
-				will be automatically registered as an administrator. An
-				administrator has the possibility to register additional
-				administrators. A user can request to be an administrator by
-				successfully authentication for the eID Trust Service Admin Portal.
-				After doing so, an existing administrator will have the possibility
-				to approve this request. The eID administrator token will only be
-				checked on public-key match during an login to the eID Trust Service
-				Admin Portal. PKI-validation for administrator tokens adds little or
-				no added value.
+				Un Administrador se autentica a si mismo dentro del eID Trust Service Admin Portal utilizando su tarjeta inteligente. Si aun no existe ningún administrador registrado, el primer usuario que se autentique exitosamente, será registrado como un administrador. Un administrador tiene la posibilidad de registrar administradores adicionales. Un usuario puede solicitar ser un administrador a través de una autenticación exitosa en el eID Trust Service Admin Portal. Después de realizarlo, un administrador existente tendrá la posibilidad de aprobar esta solicitud. El administrador solo será autenticado utilizando la verificación de clave publica durante el inicio de sesión en el eID Trust Service Admin Portal. Validación-PKI para un administrador es innecesaria.
 			</para>
 		</section>
 	</section>
 	<section>
-		<title>High-level overview</title>
+		<title>Descripción general</title>
 		<para>
-			In this section we provide a high-level overview of the eID
-			Trust Service design. The design of the eID Trust Service Model is
-			inspired on that of ECPV [HM2003].
+			En esta sección proveeremos de una descripción general del diseño del eID Trust Service. El diseño del eID Trust Service está inspirado en el ECPV [HM2003].
 		</para>
 		<section>
-			<title>Domain entities</title>
+			<title>Entidades de Dominio</title>
 			<para>
-				Here we describe the domain entities used in the eID Trust
-				Service. JPA v1.0 from the Java EE architecture is used.
+				Aquí se describen las entidades de dominio utilizadas en el eID Trust Service. Se utiliza JPA v1.0 de la arquitectura JAVA EE.
 			</para>
 			<section>
-				<title>Trust Domain</title>
+				<title>Dominio de Confianza</title>
 				<para>
-					A Trust Domain covers a certain PKI topology. For example the
-					Belgian eID PKI structure, which consists of trust points Root CA
-					and Root CA2, the OIDs of the eID card and the EVK. Different trust
-					domains can be defined and configured by an administrator. For each
-					trust domain can be configured if CRL caching is allowed to be used
-					or not. A default trust domain can be assigned, which will be used
-					in requests to the eID Trust Service XKMS2 Web Service if no trust
-					domain is explicitely specified.
+					Un Dominio de Confianza cubre cierta topología PKI. Por ejemplo la estructura eID PKI de Bélgica, la cual consiste en puntos de confianza Raíz CA y Raíz CA2, los Oíd de la tarjeta inteligente y el EVK. Diferentes dominios de confianza pueden ser definidos y configurados por un administrador. Para cada dominio de confianza se puede configurar si cache de CRL es permitido o no. Un dominio de confianza por defecto puede ser asignado, el cual será utilizado en las solicitudes al web Service XKMS2 del eID Trust Service si no se especifica un dominio de confianza explícitamente.
 				</para>
 			</section>
 			<section>
-				<title>Certificate Constraint</title>
+				<title>Dominio Virtual de Confianza</title>
 				<para>
-					Each trust domain can have several certificate constraints
-					configured. These can be managed at runtime. Following certificate
-					constraints are available:
-					<itemizedlist>
-						<listitem>
-							<para>Distinguished Name Constraint</para>
-						</listitem>
-						<listitem>
-							<para>End Entity Constraint</para>
-						</listitem>
-						<listitem>
-							<para>Key Usage Constraint</para>
-						</listitem>
-						<listitem>
-							<para>Certificate Policy Constraint</para>
-						</listitem>
-						<listitem>
-							<para>QC Statement Constraint</para>
-						</listitem>
-					</itemizedlist>
+					Un Dominio Virtual de Confianza consiste en un conjunto de Dominios de Confianza ya definidos dentro del eID Trust Service. Una validación positiva dentro un dominio virtual de confianza especificado se traduce a sí misma en una validación positiva dentro de al menos uno de los dominios de confianza de el dominio virtual de confianza. De esta manera por ejemplo, se puede definir un dominio virtual de confianza para Europa, conteniendo todos los dominios de confianza de sus miembros.
 				</para>
 			</section>
 			<section>
-				<title>Virtual Trust Domain</title>
+				<title>Punto de Confianza</title>
 				<para>
-					A Virtual Trust Domain consists of a set of already defined
-					Trust Domains within the eID Trust Service. A positive validation
-					within a specified virtual trust domain translates itself to a
-					positive validation within at least one of the trust domains of the
-					virtual trust domain. This way for example a virtual trust domain
-					for Europe containing all trust domains of its members can be
-					defined.
+					Un Punto de Confianza corresponde con una Autoridad de Certificación de Raíz (CA). Un Punto de Confianza esta enlazado siempre a uno o muchos dominios de confianza. Un punto de confianza es utilizado por el validador PKI como punto inicial de la validación de la ruta de certificado. El intervalo de actualización de la cache CRL puede ser configurado por punto de confianza. Cuando el intervalo ha pasado, una actualización de la cache CRL de la CA correspondiente al punto de confianza será realizada, al igual que todas las CAs dependientes.
 				</para>
 			</section>
 			<section>
-				<title>Trust Point</title>
+				<title>CA - Autoridad de Certificación</title>
 				<para>
-					A Trust Point corresponds with a root Certification Authority
-					(CA).
-					A trust point is allways linked to one ( or more ) trust
-					domains. A
-					trust point is used by the PKI validator as starting
-					point of the
-					certificate path validation. The CRL revocation cache
-					refresh
-					interval can be configured per trust point. Whenever the
-					interval
-					has passed, a refresh of the CA's revocation cache
-					corresponding
-					with the trust point, as well as all lower CA's will
-					be refreshed.
-					An explicit CRL refresh interval is specified as the
-					<code>nextUpdate</code>
-					field of a CRL is usually not accurate enough on when the next CRL
-					is available.
-				</para>
-			</section>
-			<section>
-				<title>Certification Authority</title>
-				<para>
-					A certificate revocation cache is kept per CA. A CA's is not
-					necessarily linked to a trust point nor to a trust domain. Per CA a
-					record is being kept of the validity of its certificate revocation
-					cache entries. This validity interval corresponds with the
+					Una cache de revocación de certificados es mantenida por cada CA. Un CA no está necesariamente enlazada a un punto de confianza. Para cada CA, un registro es mantenido, de la validez de sus registros de revocación de certificados. Este intervalo de validez corresponde a los campos 
 					<code>thisUpdate</code>
-					and
+					y
 					<code>nextUpdate</code>
-					field of the specific CRL feeding the cache. The validity interval
-					is crucial to prevent the PKI validation taking decisions based on
-					expired certificate revocation cache entries.
+					de el CRL especifico que alimenta esa cache. La validez del intervalo es crucial para prevenir que la validación PKI tome decisiones basada en registros de certificados de revocación expirados.
 				</para>
 			</section>
 			<section>
-				<title>Certificate Revocation Cache Entry</title>
+				<title>Registro de Cache de Revocación de Certificados</title>
 				<para>
-					When a certificate is revoked, this will manifest itself in
-					the certificate revocation cache entry in the cache of the
-					corresponding CA. This entry holds the issuer, serial number and
-					revocation date of the specific certificate.
+					Cuando un certificado es revocado, esto será manifestado en la cache de revocación de certificados correspondiente a la CA. Este registro contiene el emisor, numero de serie y fecha de revocación del certificado.
 				</para>
 			</section>
 			<section>
-				<title>Administrator</title>
+				<title>Administrador</title>
 				<para>
-					The eID Trust Service Admin Portal allows for multiple
-					administrators. Authentication is done based on the eID card, using
-					the public key of the authentication certificate. An
-					administrator
-					can have a pending status if he yet has to be
-					approved by an
-					approved administrator.
+					El eID Trust Service Admin Portal, permite habilitar muchos administradores. La Autenticación es basada en la tarjeta inteligente utilizando la clave publica de el certificado de autenticación. Un Administrador puede tener un estado Pendiente si aun no ha sido aprobado por algún otro administrador.
 				</para>
 			</section>
 			<section>
-				<title>Clock Drift Configuration</title>
+				<title>Configuración de desfase de Reloj</title>
 				<para>
-					The eID Trust Service has a clock drift detection task
-					running. The interval of the task can be configured using a cron
-					expression. Both NTP and TSP are supported.
+					El eID Trust Service cuenta con una tarea de detección de desfase de reloj. El intervalo de la tarea puede ser configurado utilizando una expresión cron. NTP y TSP son soportados.
 				</para>
 			</section>
 			<section>
-				<title>WS Security Configuration</title>
-				<para>Whether or not eID Trust Service XKMS2 responses should be
-					signed or not can be configured at runtime, as well as the keystore
-					being used for that purpose.</para>
+				<title>Configuración de WS Security</title>
+				<para>Se puede configurar si las respuestas XKMS2 del eID Trust Service deberían ser firmadas, así mismo el keystore que será utilizado para este propósito.</para>
 			</section>
 		</section>
 		<section>
 			<title>eID Trust Service Model</title>
 			<para>
-				The design of the eID Trust Service Model is shown in
+				El diseño del eID Trust Service Model es mostrado en:
 				<xref linkend="eid-trust-service-model" />
-				The implementation makes use of the EJB 3.0 framework.
+				La implementación utiliza el framework EJB3.0.
 			</para>
 			<figure id="eid-trust-service-model">
 				<title>eID Trust Service Model</title>
@@ -422,136 +304,64 @@
 				</screenshot>
 			</figure>
 			<section>
-				<title>Entry Point</title>
+				<title>Punto de Entrada</title>
 				<para>
-					The entry point comes with a TrustService facade-component.
-					This component provides functionality to validate a given
-					certificate path. The validation logic provides a fall-back
-					strategy towards the used certificate revocation data source. At
-					first a check is done if, for the specific CA, local certficate
-					revocation data is available in the certificate revocation data
-					cache. If not so, a classical PKI-validation will be performed
-					using following certificate revocation check:
-					The OCSP responder is
-					consulted. If none exists for this CA or the request
-					failed
-					fall-back is done using the CRL of the CA.
+					El punto de entrada viene con un componente facade de TrustService. Este componente provee funcionalidad para validad una ruta de certificado dada. La lógica de validación provee una estrategia de respaldo hacia la fuente de datos de revocación de certificados utilizada. Primero una verificación es realizada si para un CA especifico, datos locales de revocación de certificados están disponibles en la cache de revocación de certificados. Si no, una validación-PKI clásica será realizada utilizando el siguiente proceso: El OCSP responder es consultado, si no existe para este CA o el request ha fallado, el último recurso es utilizar el CRL de la CA.
 				</para>
 				<para>
-					At the same time, a harvester-component is being informed of
-					the missing certificate
-					revocation data cache entries for the CA.
-					The communication between
-					the front-end component en the background
-					harvester component is being done using a JMS queue.
-				</para>
-				<para>
-					If existing certificate revocation data cache entries are
-					available ( and usable, i.e. freshness verification ) for the CA,
-					then those will be used. In this case there is no need for the eID
-					Trust Service to consult online OCSP and/or CRL PKI-services.
+					Al mismo tiempo el harvester es informado de la falta de datos  de revocación de certificado para la CA. La comunicación entre el componente del front-end y el harvester es realizada utilizando una cola JMS.
+Si están disponibles registros de revocación de certificados (y son utilizables, de acuerdo a la verificación de actualización) para la CA, entonces esos serán utilizados. En este caso, no es necesario para el eID Trust Service consultar servicios PKI en línea de OCSP y/o CRL.
 				</para>
 			</section>
 			<section>
 				<title>Harvester</title>
 				<para>
-					The harvester is implemented as an EJB3 Message Driven Bean
-					(MDB). It receives messages from the front-end service-components
-					via the harvester JMS-queue, triggering it to start harvesting.
+					El harvester es implementado como un EJB3 Message Driven Bean (MDB). Este recibe mensajes desde los componentes del front-end a través de la cola JMS de harvester, iniciando el procesamiento del mismo.
 				</para>
 				<para>
-					The harvester downloads the CRL of the specified CA, verifies
-					its validity and processes the local certificate revocation data
-					cache. After this, the harvester activates the certficate
-					revocation cache for the specified CA. Future certificate-path
-					validations can now make use of this.
+					El harvester descarga el CRL de la CA especificada, verifica su validez y procesa la cache de datos de revocación de certificados. Después de esto, el harvester activa la cache de revocación de certificados para la CA especificada y v validaciones de ruta de certificado futuras pueden utilizar estos datos.
 				</para>
 				<para>
-					The advantage of an MDB-based harvester is that the JMS
-					architecture provides automatic retry in case of failure to
-					download and/or process the CRL. Therefor no extra logic has to be
-					implemented in the harvester to support this.
+					La ventaja de un harvester basado en MDB es que la arquitectura JMS provee reintentos automáticos en caso de falla en la descarga o procesamiento del CRL. Así de este modo, no es necesaria ninguna lógica extra en el harvester para soportar esta funcionalidad.
 				</para>
 				<para>
-					Besides harvesting CRLs for revocation data, the harvester MDB
-					also handles the clock drift detection task.
+					Además de recolectar CRLs para datos de revocación, el harvester-MDB también maneja la tarea de detección de desfase del reloj.
 				</para>
 			</section>
 			<section>
 				<title>Scheduler</title>
 				<para>
-					The scheduler is responsible for the frequent updating of the
-					certificate revocation cache and clock drift detection.
+					El scheduler es responsable de la frecuencia de actualización de la cache de revocación de certificados y la detección de desfase de reloj. Esta manejado por el Java EE Timer Service. El beneficio de este es el aspecto transaccional. EL scheduler reprogramara también le Java EE Timer al finalizar sus tareas.
 				</para>
 				<para>
-					It is driven by the Java EE Timer Service. The benefit of this
-					is the transactional aspect. The scheduler will also, when finished
-					with this tasks, reprogram the Java EE Timer.
+					El intervalo de actualización de la cache de revocación de certificados es establecida por cada punto de confianza. El scheduler puede ser activado manualmente por un administrador a través de una reprogramación del Java EE Timer.
 				</para>
 				<para>
-					Updating of the certificate revocation cache occurs so no
-					running front-end certification path validations experience
-					nuisance of this. Therefor there is global cache lock or cache lock
-					with CA granularity.
+					El intervalo de validez, mantenido por cada CA, es crucial para prevenir validaciones PKI tomando decisiones basadas en datos de revocación desactualizados (en el caso de que algo haya salido mal con el scheduler). Como tanto el harvester y el scheduler son manejados por un administrador de transacciones, se garantiza plenamente la consistencia entre los registros de la cache y la validación del intervalo. 
 				</para>
 				<para>
-					The certificate revocation cache refresh interval is set per
-					trust point. The scheduler can be manually actived by an
-					administrator via a short reprogrammation of the corresponding Java
-					EE Timer.
-				</para>
-				<para>
-					The validity interval, kept per CA, is crucial to prevent
-					PKI-validation taking decisions based on old certificate revocation
-					data (in case something went wrong with the scheduler). As both the
-					harvester as the scheduler are managed by a container transaction
-					manager, consistency between cache entries en the validity interval
-					is guaranteed.
-				</para>
-				<para>
-					Besides scheduling certificate revocation cache refreshes, the
-					scheduler also handles the clock drift detection task in the same
-					manner. When the corresponding Java EE Timer is fired, the clock
-					drift configuration is fetched from database and an NTP or TSP
-					request is performed.
+					A parte de programar actualizaciones de cache de revocación de datos, el scheduler también maneja la tarea de detección de desfase de reloj. Cuando el correspondiente Java EE Timer es disparado, la configuración de detección de desfase es obtenida de la base de datos y una solicitud  NTP o TSP es realizada.
 				</para>
 			</section>
 			<section>
-				<title>Certificate Revocation Cache</title>
+				<title>Cache de Revocación de Certificados</title>
 				<para>
-					Due to the coordinated activities of the harvester and the
-					scheduler, the certification revocation cache only contains data
-					for CA's that are used actively by the Service Provider
-					applications. The system adds during execution automatically new
-					CA's to the revocation data cache. This has a positive impact on
-					the maintenance of the eID Trust Service. It is not necessary for
-					the system, during bootstrapping, to iterate over all CA's en
-					process the corresponding CRL's into the revocation data cache.
-					Automatic maintenance of the cache happens transparently to the
-					Service Provider applications.
+					Debido a las actividades coordinadas del harvester y del scheduler, la cache de revocación de certificados solamente contiene datos para las CAs que son usadas activamente por las aplicaciones del Proveedor de Servicios. El sistema agrega automáticamente nuevos CAs a la cache de datos de revocación, durante la ejecución. Esto tiene un impacto positivo en el mantenimiento del eID Trust Service.  Un mantenimiento automático de la cache ocurre transparentemente para las aplicaciones de los Proveedores de Servicio.
 				</para>
 			</section>
 			<section>
-				<title>Time</title>
+				<title>Tiempo</title>
 				<para>
-					Correctness of the time is critical in a PKI-validation ( OCSP
-					and CRL freshness checks ). The eID Trust Service Model contains a
-					clock drift detection task ( managed by a Java EE Timer ) that
-					periodically checks the correctness of the local machine clock.
-					This can be done using an NTP- or TSP-service. Location, timeout
-					and maximum skew can be configured by an administrator in the eID
-					Trust Service Admin Portal.
+					La correctitud del tiempo es crítica en una validación-PKI (revisiones actuales de OCSP y CRL). El eID Trust Service Model contiene una tarea de detección de desfase de reloj (administrada por un Java EE Timer) que revisa periódicamente la correctitud de el reloj local de la maquina. Esto puede realizarse utilizando un servicio NTP o TSP. Ubicación, tiempo de espera y desfase máximo pueden ser configurados por un administrador a través del eID Trust Service Portal.
 				</para>
 			</section>
 		</section>
 		<section>
 			<title>JAX-WS Web Service Runtime</title>
 			<para>
-				The eID Trust Service uses JAX-WS 2.1 RI as runtime for the XKMS v2
-				web service.
-				The used JAX-WS runtime setup is shown in
+				El eID Trust Service usa JAX-WS 2.1 RI en tiempo de ejecución para el web service XKMS v2. La configuración  de JAX-WS en tiempo de ejecución es mostrada en
 				<xref linkend="eid-trust-service-jaxws-runtime" />
-				The implementation makes use of the EJB 3.0 framework.
+				La implementación usa el framework EJB 3.0.
 			</para>
 			<figure id="eid-trust-service-jaxws-runtime">
 				<title>eID Trust Service JAX-WS Web Service Runtime</title>
@@ -565,92 +375,54 @@
 				</screenshot>
 			</figure>
 			<para>
-				A WSDL-first development strategy was used as WSDL/XSD is the
-				primary contract between client and server. A client SDK provides
-				integration of the eID Trust Service and SOA applications. Both a
-				Java client SDK as a .NET v2.0 (C#) client SDK are provided.
+				El cliente SDK provee integración de el eID Trust Service y aplicaciones SOA. Un cliente Java – SDK y un cliente .net v2.0(C#)-SDK son provistos.
 			</para>
 			<para>
-				The JAX-WS runtime runs within the servlet container. Acquiring
-				an EJB3 reference to the service facade session EJB3 beans is kept
-				as generic as possible. A Java EE ServletContextListener is used
-				where, using standard EJB3 injection, references to the necessary
-				services is acquired. Subsequently a custom JAX-WS RI
-				InstancResolver is used to inject these service references into the
-				JAX-WS endpoints. This setup makes us indepdendent of the used
-				application server.
+				El  entorno JAX-WS se ejecuta dentro del contenedor del servlet. Se utiliza un Java EE ServletContext Listener, en conjunto con inyección EJB3 estándar , subsecuentemente, un JAX-WX RI InstanceResolver se utiliza para inyectar estas referencias al servicio dentro de los JAX-WS endpoints. Esta configuración permite la independencia del servidor de aplicaciones utilizado.
 			</para>
 			<para>
-				The optional XKMS2 response WS-Security signature is added
-				using a JAX-WS SOAPHandler that is configured in the JAX-WS handler
-				chain of the endpoints.
+				La firma WS-Security opcional a la respuesta XKMS2 es agregada utilizando un JAX-WS SOAPHandler que es configurado dentro de la cadena de endpoints del JAX-WS handler.  
 			</para>
 			<para>
-				Despite JAX-WS RI having an integration API for Java EE
-				containers, we chose to not (yet) use this. We also chose not to
-				implement the XKMS2 web service as an EJB3 JAX-WS endpoint but as a
-				POJO JAX-WS endpoint. This to prevent a stronger dependence on used
-				Java EE application server ( for example when using JBossWS).
+				A pesar que el JAX-WS tiene una API de integración para contenedores Java EE, se eligió no utilizar esta API. También se decidió implementar el web service XKMS2 como POJO JAX-WS endpoint en lugar de un EJB3 JA-WS endpoint. Esto para prevenir una dependencia mayor con el servidor de aplicaciones Java  EE (por ejemplo al utilizar JBossWS).
 			</para>
 		</section>
 		<section>
-			<title>Web Portals</title>
+			<title>Portales Web</title>
 			<para>
-				The web portals are using JSF as view-technology (as in MVC).
-				We use the JSF 1.2 RI. Templating is provided by Facelets. Richfaces
-				is used for its wide range of AJAX-aware JSF components.
+				Los portales web utilizan  JSF como tecnología para la vista (como en un modelo MVC). Se utiliza JSF 1.2 RI. Las plantillas son provistas por Facelets. Richfaces son utilizados por sus características AJAX para componentes JSF.
 			</para>
 			<para>
-				Binding with back-end components is achieved using the JBoss
-				Seam component-lifecycle-technology. For testing the web-UI,
-				Selenium is used.
+				El enlace con los componentes del back-end se logra utilizando tecnología JBoss-Seam. 
 			</para>
 		</section>
 		<section>
-			<title>Java EE Application Aspects</title>
+			<title>Aspectos de Aplicación Java EE </title>
 			<section>
-				<title>Security</title>
+				<title>Seguridad</title>
 				<para>
-					As security model in the eID Trust Service Admin Portal, a
-					two-trap security model is used. Besides the servlet-container
-					knowing about login/logout, the model components use the standard
-					EJB3 security framework. A JAAS login module assigns the necessary
-					roles to a Principal, so the EJB3 authorization interceptor can do
-					its job.
+					Como modelo de seguridad en el eID Trust Service Admin Portal, se utiliza un modelo de dos-trampas. A parte de que el contenedor del servlet conoce sobre el login/logout, los componentes del modelo utilizan el framework de seguridad EJB3. Un módulo de login  JAAS asigna los roles necesarios a un Director, así de esta manera, el interceptor de autorización EJB3 puede realizar su trabajo.
 				</para>
-				<para>Such a security model has the benefit that penetration of the
-					front-end does not implicate penetration of the service component
-					as they are seperated because of the independent role assignment by
-					the JAAS login module.</para>
+				<para>Este modelo de seguridad tiene el beneficio de que la penetración en el front-end no implica la penetración de el componente de servicio puesto que está separado debido a la asignación independiente de roles que el módulo de login JAAS realiza.</para>
 			</section>
 			<section>
-				<title>Persistence</title>
+				<title>Persistencia</title>
 				<para>
-					Persistence mapping is done by the Java EE JPA 1.0 API.
-					Benefit of this is the maintainebility of the database schema. All
-					necessary meta-data ( e.g. indexes ) is expressed using Java 5
-					annotations. The underlying JPA-engine ( e.g. Hibernate ) must be
-					able to interprete this meta-data correctly for database schema
-					generation. This is important to keep the JPA entities as authentic
-					souce for the database schema.
+					El mapeo necesario para lograr persistencia esta realizado utilizando Java EE JPA 1.0 API. El beneficio de esto es la mantenibilidad del esquema de base de datos. Todos los metadatos  (ej. índices) son expresados  usando anotaciones de Java 5. El motor de JPA (Hibérnate) tiene que ser capaz de interpretar estos metadatos correctamente para la generación del esquema de base de datos. Esto es importante para mantener las entidades JPA como una fuente autentica para el esquema de base de datos.
 				</para>
 				<para>
-					Besides the ability of running on top of a standard HSQL JBoss
-					distribution, a custom MySQL and Oracle distribution if provided.
+					Se provee de distribuciones personalizadas para MySQL y Oracle, además de la habilidad de ejecutarse encima una distribución HSQL-Jboss estándar.
 				</para>
 			</section>
 			<section>
-				<title>Build system</title>
+				<title>Sistema de Compilación</title>
 				<para>
-					As build-system, Apache Maven v2.0 or v2.2 is used. To deploy the
-					Java EE application to a locally running Application Server, simply
-					execute:
+					Apache Maven v2 es utilizado como sistema de compilación.  Para el despliegue de la aplicación Java EE en un servidor de aplicaciones local, simplemente de debe ejecutar:
 					<code>mvn jboss:deploy</code>
 					.
 				</para>
 				<para>
-					The build system is split up so different Java EE modules are
-					produces as individual artifacts as is shown in
+					El sistema de compilación está dividido de manera que módulos Java EE diferentes son producidos como artefactos individuales, como se muestra en
 					<xref linkend="eid-trust-service-build-system" />
 				</para>
 				<figure id="eid-trust-service-build-system">
@@ -665,31 +437,17 @@
 					</screenshot>
 				</figure>
 				<para>
-					Via the top-level pom.xml we group the different artifacts in
-					build-profiles and manage de software dependencies' versions of the
-					project.
+					A través del archivo pom.xml que se encuentra en la raíz, se agrupan diferentes artefactos en perfiles de compilación, se administran las dependencias de software y las versiones del proyecto.
 				</para>
 			</section>
 			<section>
-				<title>Build configurations</title>
+				<title>Configuraciones de compilación</title>
 				<para>
-					Different Maven-profiles, activate different configurations.
-					By
-					default the development configuration is active. Other profiles are
-					for example
+					Diferentes perfiles de Maven activan diferentes configuraciones. Por defecto se activa la configuración de desarrollo. Otros perfiles son por ejemplo:
 					<code>prod-mysql</code>
-					and
+					y
 					<code>prod-oracle</code>
-					which will on top of the default artifacts, build an artifact
-					containing a custom JBoss MySQL respectively Oracle distribution.
-					Another profile named
-					<code>sdk</code>
-					will trigger generate of an SDK zip, containing the SDK, the
-					javadocs, a directory with all necessary dependencies and this
-					development guide.
-				</para>
-				<para>
-					The profiles can be triggered via:
+					los cuales permiten crear un artefacto que contiene una distribución JBoss MySQL u Oracle personalizada. Otro perfil llamado SDK disparara la generación de un archivo ZIP comprimido que contiene el SDK, los javadocs, un directorio con todas las dependencias necesarias y una guía de desarrollo. Este perfil puede ser disparado vía:
 					<code>mvn -Denv=sdk clean install</code>
 					.
 				</para>
@@ -697,120 +455,75 @@
 		</section>
 	</section>
 	<section>
-		<title>Web Service Specifications</title>
+		<title>Especificaciones del Web Service</title>
 		<para>
-			This section gives an overview of the eID Trust Service XKMS2 web
-			service. For a detailed overview of the XKMS v2.0 specification
-			please go to:
+			Esta sección presenta un vistazo de el eID Trust Service-XKMS2 web service. Para una especificación detallada de XKMS v2.0 dirigirse a:
 			<ulink url="http://www.w3.org/TR/xkms2/">XKMS v2.0</ulink>
-			. The eID Trust Service covers only a portion of the XKMS v2.0
-			specification as it only supports validation requests.
+			. El eID Trust Service solamente cubre una porción de la especificación XKMS v2.0 ya que solamente soporta peticiones de validación.
 		</para>
 		<para>
-			In its most minimal configuration, a client can specify a
-			certificate
-			path for validation. The eID Trust Service will then
-			perform a
-			PKI-validation against the configuration default Trust
-			Domain. The
-			XKMS2-request will then be
+			Es su configuración mas reducida, un cliente puede especificar una ruta de certificados para validación. El eID Trust Service realizara una validación-PKI en contra del dominio de confianza que se encuentra configurado por defecto. La petición XKMS2 será:
 			<programlisting role="text"><![CDATA[
 soap:Envelope/soap:Body/xkms2:ValidateRequest/xkms2:QueryKeyBinding/ds:KeyInfo/ds:X509Data/ds:X509Certificate
 			]]></programlisting>
-			where the client adds the X509 certificate elements in the
-			certificate path to be validated. After validation, the eID Trust
-			Service XKMS2 web service answers with following XKMS2 response:
+			donde el cliente agrega los elementos X509-Certificate en la ruta de certificados a ser validada. Después de la validación, el eID Trust Service XKMS web Service responde con la siguiente respuesta XKMS2:
 			<programlisting role="text"><![CDATA[
 soap:Envelope/soap:Body/xkms2:ValidateResult/xkms2:KeyBinding/xkms2:Status/@StatusValue=http://www.w3.org/2002/03/xkms#Valid
 			]]></programlisting>
 			.
-			In case the validation was invalid, a similar response but with
-			StatusValue
+			En caso de que la validación fuera invalida, una respuesta similar conteniendo el elemento StatusValue:
 			<code>Invalid</code>
-			will be returned. Additionally the Status will element will contain 1
-			or more XKMS2 Reason URI's why the validation has failed. Check out
-			the
+			será retornada. Adicionalmente el elemento Status contendrá 1 o más razones URIs XKMS2 indicando el porqué de que la validación a hallado. Revise el link para as detalles del elemento Status 
 			<ulink url="http://www.w3.org/TR/xkms2/#XKMS_2_0_Section_5_1">XKMS2 Key Binding Specification</ulink>
-			for more details on the Status element.
+			.
 		</para>
 		<para>
-			Please take not that we take on the assumption that the client
-			allways provides the full certificate path and the eID Trust Service
-			does not handle construction of certificate paths.
+			Es importante resaltar que se asume que el cliente siempre provee de la ruta de certificados completa y que el eID Trust Service no manea la construcción de rutas de certificados.
 		</para>
 		<para>
-			If the client wishes to validate its certificate path against a
-			Trust
-			Domain not equal to the configured default Trust Domain, it has
-			the
-			option to specify the name of that Trust Domain. The client will
-			in
-			that case add, as the XKMS2 specficiation dictates, following
-			element
-			to the request:
+			Si el cliente desea validad sus certificados en contra de un Dominio de Confianza distinto al dominio de confianza configurado por defecto, se tiene la opción de especificar el nombre de ese dominio de confianza. El cliente, en ese caso, deberá agregar a la petición, el siguiente elemento (como indica la especificación XKMS2):
 			<programlisting role="text"><![CDATA[
 xkms2:ValidateRequest/xkms2:QueryKeyBinding/xkms2:UseKeyWith@Application=urn:be:fedict:trust:trust-domain@Identifier=<trust-domain-name>
 			]]></programlisting>
 			.
 		</para>
 		<section>
-			<title>Service Authentication</title>
+			<title>Autenticación de Servicio</title>
 			<para>
-				Service authentication for the web service client has 3 different
-				options:
+				La autenticación de Servicio para el cliente del web service tiene 3 opciones diferentes:
 				<orderedlist>
 					<listitem>
 						<para>
-							The client software does not require any service
-							authentication. This is the case when the client software has a
-							dedicated connection with the eID Trust Service.
+							El software cliente no requiere ningún servicio de autenticación. Este es el caso en el que el software cliente tiene una conexión dedicada con el eID Trust Service.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							Service authentication using unilateral TLS authentication.
-							The client has this option by specifying the eID Trust Service
-							server certfifcate for validation.
+							El software cliente utiliza autenticación TLS unilateral. El cliente tiene esta opción al especificar el certificado del servidor eID Trust Service para validación.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							Service authentication using signed XKMS2 responses. This
-							option has to be explicitly configured within the eID Trust
-							Service Admin Portal as adding the WS-Security signature adds a
-							significant performance impact.
+							Autenticación de servicio utilizando respuestas XKMS2. Esta opción tiene que ser configurada explícitamente dentro del eID Trust Service Admin portal, puesto que al agregar la firma WS-Security tiene un impacto significativo en el performance del servicio.
 						</para>
 					</listitem>
 				</orderedlist>
 			</para>
 		</section>
 		<section>
-			<title>Revocation Data</title>
+			<title>Revocación de Datos</title>
 			<para>
-				It is possible to instruct the eID Trust Service XKMS2 web
-				service to
-				return the used revocation data (OCSP respones and/or
-				CRL's) during
-				the PKI-validation. This can be usefull for
-				non-repudiation
-				certificate paths where this data will be used to
-				finalize a XAdES
-				signature. An
+				Es posible instruir al eID Trust Service  XKMS2 web Service que devuelva los datos de revocación (repuesta OCSP y/o CRLs) durante la validación PKI. Esto puede ser útil para rutas de certificados de no-repudio donde estos datos serán utilizados para finalizar una firma XAdES. Un elemento
 				<code>xkms2:MessageExtension</code>
-				element is therefor introduced containing the ETSI XAdES v1.3.2
+				es introducido conteniendo el elemento ETSI XAdES v1.3.2 que contendrá estos datos en 
 				<code>RevocationValues</code>
-				element that will hold this data if requested.
+				si así es requerido.
 			</para>
 			<para>
-				If revocation data is requested, the eID Trust Service will not
-				use locally cached certificate revocation data, but will perform an
-				onliny PKI-validation (OCSP/CRL) as recent certificate revocation
-				data is required in the response. This is important for XAdES
-				signatures.
+				Si los datos de revocación son requeridos, el eID Trust Service  no utilizara datos de revocación almacenados en la cache local, pero realizara una validación -PKI en línea (OCSP/CRL)  puesto que se requiere datos de revocación recientes para la respuesta. Esto es importante para firmas XAdES.
 			</para>
 			<para>
-				To specify a request to return the used revocation data, following
-				element will be added to the request:
+				Para especificar que una petición retorne los datos de revocación utilizados, el siguiente elemento tiene que ser añadido a la petición:
 				<programlisting role="text"><![CDATA[
 xkms2:ValidateRequest/xkms2:RespondWith/urn:be:fedict:trust:revocation-data
 				]]></programlisting>
@@ -818,68 +531,44 @@ xkms2:ValidateRequest/xkms2:RespondWith/urn:be:fedict:trust:revocation-data
 			</para>
 		</section>
 		<section>
-			<title>Historical Validation</title>
+			<title>Validación Histórica</title>
 			<para>
-				It is possible to perform historical validations on certificate
-				paths. To do so the
+				Es posible realizar una validación histórica en rutas de certificados. Para esto se debe agregar el elemento 
 				<programlisting role="text"><![CDATA[
 xkms2:ValidateRequest/xkms2:QueryKeyBinding/xkms2:TimeInstant
 				]]></programlisting>
-				element containing the time at which to validate the given
-				certificate path, will be added. The necessary revocation data (OCSP
-				responses and/or CRL's) will off course be required to be added by
-				the client itself in the XKMS2 request. To do so the same
-				<code>xkms2:MessageExtension</code>
-				used to return used revocation data will be used, being the ETSI
-				XAdES v1.3.2
+				que contiene el tiempo en el cual se desea validar una ruta de certificados dada. Los datos de revocación (respuestas OCSP y/o CRLs) deberán ser añadidos por el mismo cliente en la petición XKMS2. Para esto, la misma extensión utilizada para devolver datos de revocación será usada, siendo este un elemento ETSI XAdES v1.3.2. 
 				<code>RevocationValues</code>
-				element.
+				.
 			</para>
 			<para>
-				Historical validations are usefull in the context of
-				verification of ETSI XAdES v.1.3.2 digital signatures, focussed on
-				XAdES-X-L signatures. XAdES-A signatures are not taken into account.
+				Las validaciones históricas son útiles  en el contexto de la verificación de firmas digitales ETSI XAdES v1.3.2, enfocados en firmas XAdES-X-L. Las firmas XAdES-A no se toman en cuenta.
 			</para>
 		</section>
 		<section>
-			<title>TSA certificates</title>
+			<title>Certificados TSA</title>
 			<para>
-				It is possible the validate TSA certificates using the eID
-				Trust Service XKMS2 web service. This is important for XAdES-T
-				signatures.
+				Es posible validar certificados TSA utilizando el eID Trust Service XKMS2 web service. Esto es importante para firmas XAdES-T.
 			</para>
 			<para>
-				To do so, another
+				Para esto, otra extensión
 				<code>xkms2:MessageExtension</code>
-				has been introduced, namely the
+				ha sido introducida, nombrada
 				<code>TSAMessageExtension</code>
-				. This extension contains an element of type
+				. Esta extensión contiene un elemento de tipo
 				<code>xades:EncapsulatedPKIDataType</code>
-				containing the encoded Timestamp Token returned by a timestamp
-				request. Off course this token will have to contain the certificate
-				path of the used TSA certificate.
+				que contiene el toquen de sellado de tiempo codificado retirado por una petición de sellado de tiempo. Este toquen tendrá que contener la ruta de certificado del certificado TSA utilizado.
 			</para>
 			<para>
-				The eID Trust Service will perform a PKI validation of the
-				contained
-				certificate path against the TSA Trust Domain configured
-				in the eID
-				Trust Service and specified with
+				El eID Trust Service ejecutara una validación-PKI de la ruta de certificado contenida, contra el dominio de confianza de sellado de tiempo que está configurado en el eID Trust Service y especificado con:
 				<programlisting role="text"><![CDATA[
 xkms2:ValidateRequest/xkms2:QueryKeyBinding/xkms2:UseKeyWith@Application=urn:be:fedict:trust:tsa@Identifier=<tsa-trust-domain-name>
 				]]></programlisting>
-				. Additionally it will verify that the TSA certificate contains the
+				. Adicionalmente se verificara que el certificado TSA contiene la extensión
 				<code>ExtendedKeyUsage</code>
-				extension with key purpose identifier
+				con identificador de propósito de la clave
 				<code>id-kp-timeStamping</code>
 				.
-			</para>
-		</section>
-		<section>
-			<title>Attribute certificates</title>
-			<para>
-				It is possible to validate Attribute certificates using the eID
-				Trust Service XKMS2 web service.
 			</para>
 		</section>
 	</section>
@@ -973,6 +662,11 @@ xkms2:ValidateRequest/xkms2:QueryKeyBinding/xkms2:UseKeyWith@Application=urn:be:
 						<entry>Wim Vandenhaute</entry>
 						<entry>Initial version.</entry>
 					</row>
+					<row>
+						<entry>13 May 2014</entry>
+						<entry>Rolosa S.A.</entry>
+						<entry>Spanish Translation</entry>
+					</row>                                          
 				</tbody>
 			</tgroup>
 		</table>

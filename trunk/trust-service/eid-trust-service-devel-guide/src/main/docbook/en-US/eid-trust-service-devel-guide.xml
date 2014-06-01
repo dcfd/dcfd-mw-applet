@@ -2,9 +2,9 @@
 <!DOCTYPE article PUBLIC 
 	"-//OASIS//DTD DocBook XML V4.5//EN"
 	"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<article lang="en">
+<article lang="es">
 	<articleinfo>
-		<title>Fedict eID Trust Service Developer Guide</title>
+		<title>Guía de Desarrollo eID Trust Service</title>
 		<subtitle>
 			Version &project.version;
 		</subtitle>
@@ -20,238 +20,201 @@
 			</author>
 		</authorgroup>
 		<abstract>
-			<para>This manual serves as an entry point for integrating the eID
-				Trust Service into your web application.
+			<para>Este manual sirve de punto de entrada para 
+                            integrar el eID Trust Service en su aplicación web.
 			</para>
 		</abstract>
 	</articleinfo>
 	<section>
-		<title>Introduction</title>
+		<title>Introducción</title>
 		<para>
-			The key words "MUST", "MUST NOT", "REQUIRED", "SHOULD", "SHOULD NOT",
-			"RECOMMENDED", "MAY", and "OPTIONAL" in this document (in uppercase,
-			as shown) are to be interpreted as described in
-			<ulink url="http://www.ietf.org/rfc/rfc2119.txt">[RFC2119]</ulink>
-			.
-		</para>
-		<para>
-			The eID Trust Service provides a web service based on the
-			<ulink url="http://www.w3.org/TR/xkms2/">W3C XKMS v.2.0 standard</ulink>
+			El eID Trust Service provee un web service basado en el 
+			<ulink url="http://www.w3.org/TR/xkms2/">estándar W3C XKMS v.2.0</ulink>
 			for validation of a certificate chain against a certain trust domain.
-			The web service also allows for historical validation of a
-			certificate chain,
-			where you can provide the necessary revocation data
-			using or a list of
-			OCSP response and/or CRLs or using the
+			 para validación de una cadena de certificados contra un cierto dominio 
+                        de confianza. Este web service también permite validación histórica 
+                        de una cadena de certificados, donde se puede proveer de los datos 
+                        necesarios de revocación utilizando o una lista de respuestas 
+                        OCSP  y/o CRLs o utilizando el elemento
 			<ulink
 				url="http://www.w3.org/TR/XAdES/#Syntax_for_XAdES-L_form_The_RevocationValues_element">
-				XAdES revocation values element.
+				XAdES revocation values
 			</ulink>
 			.
-			Besides that the web service also allows for validation of attribute
-			certificates
-			and timestamp tokens.
+			Además del web service, también permite la validación 
+                        de atributos de los certificados y tokens de sellado de tiempo.
 		</para>
 		<para>
-			For more technical detail on the XKMS 2 web service, please see
-			the
-			architecture guide
-			provided in the SDK package.
+			Para más detalles técnicos sobre el web service XKMS2, 
+                        refiérase a la guía de Arquitectura provista en el paquete SDK.
 		</para>
 	</section>
 	<section>
-		<title>XKMS 2 web service client</title>
+		<title>Cliente del web service XKMS 2 </title>
 		<para>
-			To access the Fedict eID Trust Service XKMS v2.0 web service the SDK
-			provides an
-			XKMS2Client component.
-			Initializing this component takes a
-			String location argument which expects to be
-			the full path of the
-			XKMS2 web service,
-			e.g.
+			Para acceder al web service XKMS v.2.0, el SDK provee 
+                    un componente XKMS2Client . Para inicializar este componente, 
+                    se toma un argumento de ubicación en forma de String, 
+                    el cual espera ser la ruta completa del XKMS2 
+                    web service, ej.
 			<code>http://www.e-contract.be/eid-trust-service-ws/xkms2</code>
 			.
 		</para>
 		<section>
-			<title>Debugging</title>
+			<title>Depuración</title>
 			<para>
-				During the development process, you might want some more debugging
-				info on the
-				sent and received SOAP messages. You can turn this
-				feature on using the
-				<code>setLogging(boolean)</code>
-				method.
+                            Durante el proceso de desarrollo, se puede requerir 
+                            mayor información en el envío y la recepción de mensajes
+                            SOAP. Se puede habilitar esta característica utilizando el método
+				<code>setLogging(boolean)</code>.
 			</para>
 		</section>
 		<section>
 			<title>Proxy</title>
 			<para>
-				If you are behind a proxy, you can configure this in the XKMS2Client
-				using the
-				<code>setProxy(String proxyHost, int proxyPort)</code>
-				method.
+				Si se está trabajando detrás de un proxy, 
+                            se puede configurar esto en el XKMS2Client utilizando el método
+				<code>setProxy(String proxyHost, int proxyPort)</code>.
 			</para>
 		</section>
 		<section>
 			<title>WS-Security</title>
 			<para>
-				The Trust Service you are connecting might be configured to use
-				WS-Security for signing the outgoing
-				message. The XKMS2 client will
-				in this case automatically verify the
-				incoming message signature
-				using the embedded certificate in the WS-Security element.
-				You can
-				optionally add extra verification for this certificate by
-				specifying
-				manually the certificate
-				you expect it to be using the
-				<code>setServerCertificate(X509Certificate)</code>
-				method.
-				By default the WS-Security timestamp present will be verified
-				to not
-				have an offset bigger then
-				5 minutes. You can optionally
-				configure this offset using the
+                            El Trust Service al que se esté conectando puede estar 
+                            configurado para utilizar WS-Security para firmar los 
+                            mensajes de salida. En este caso, el cliente XKMS2 
+                            verificara automáticamente la firma del mensaje de 
+                            entrada utilizando el certificado incrustado en el 
+                            elemento WS-Security. Opcionalmente se puede agregar 
+                            mayor verificación para este certificado especificando 
+                            manualmente el certificado que se espera, 
+                            utilizando el método
+				<code>setServerCertificate(X509Certificate)</code>.
+				Por defecto el tiempo (timestamp) actual del WS-Security 
+                                será verificado que no tenga una diferencia mayor a 5 minutos. 
+                                Se puede configurar este parámetro utilizando el método 
 				<code>setMaxWSSecurityTimestampOffset(long)</code>
-				( in seconds ).
+				(en segundos).
 			</para>
 		</section>
 		<section>
-			<title>Unilateral TLS authentication</title>
+			<title>Autenticación TLS Unilateral</title>
 			<para>
-				When accessing the trust service over SSL, you can optionally
-				specify the Public Key
-				to be used for verification of the SSL
-				certificate using the method
+				Cuando se accede al Trust Service a través de SSL, 
+                            se puede especificar opcionalmente la Clave Publica 
+                            a ser usada para la verificación del certificado
+                            SSL utilizando el método 
 				<code>setServicePublicKey(PublicKey)</code>
 				.
 			</para>
 		</section>
 	</section>
 	<section>
-		<title>Certificate chain validation</title>
+		<title>Validación de cadena de certificados</title>
 		<para>
-			In its most minimal configuration, a client can specify a
-			certificate
-			path for validation. The trust service
-			will then perform a
-			PKI-validation against the configured default trust
-			domain.
-			It is
-			expected for the certificate path to be ordered, holding the root
-			certificate as last in the list.
+                    En su mínima configuración, un cliente puede especificar 
+                    una ruta de certificados para su validación. El Trust 
+                    service realizara una validación-PKI en contra de el 
+                    dominio de confianza configurado por
+                    que la ruta de certificados contenga el certificado 
+                    raíz como el último elemento de la lista.
 		</para>
 		<para>
-			Case the validation was not successful, a
+			En el caso de que la validación no fuera exitosa, una 
 			<code>ValidationFailedException</code>
-			will be thrown,
-			containing the list of
+			será lanzada,
+			conteniendo la lista de
 			<ulink url="http://www.w3.org/TR/xkms2/#XKMS_2_0_Section_5_1">XKMS2 reason URIs</ulink>
-			what caused the PKI-validation to fail. These reason URIs can also be
-			found using the method
-			<code>getInvalidReasons()</code>
-			method.
+			que causaron que la validación-PKI  falle. Estas 
+                        razones-URI pueden también ser obtenidas 
+                        utilizando el método
+			<code>getInvalidReasons()</code>.
 		</para>
 		<para>
-			Case you want to validate against a specific trust domain off course
-			the XKMS2 client's API lets you specify this.
-			You can also optionally
-			request for the trust service to return the used
-			revocation data
-			( OCSP
-			responses and/or CRL data ). This revocation data can
-			afterwards be
-			retrieved using
-			<code>getRevocationValues</code>
-			which returns a
+			En el caso de que se requiera validar contra  un 
+                    dominio de confianza especifico, el API del cliente XKMS2 
+                    permite especificar esto. Opcionalmente se puede requerir 
+                    que el Trust Service retorne los datos de revocación 
+                    (respuestas OCSP y/o datos CRL). Estos datos de revocación 
+                    pueden ser obtenidos después, utilizando el método el 
+                    cual retorna un elemento
 			<ulink
 				url="http://www.w3.org/TR/XAdES/#Syntax_for_XAdES-L_form_The_RevocationValues_element">
-				XAdES revocation values element
+				XAdES revocation values
 			</ulink>
 			.
 		</para>
 	</section>
 	<section>
-		<title>Historical validation</title>
+		<title>Validación Histórica</title>
 		<para>
-			It is possible to perform historical validation on certificate paths.
-			The XKMS2Client provides 3 means of providing
-			the necessary revocation
-			data for the trust service. Either by explictly
-			specifying the list of
+			Es posible realizar validación histórica en rutas de 
+                    certificados. El cliente XKMS2 provee 3 formas de proveer 
+                    los datos necesarios de revocación para el Trust Service, 
+                    ya sea especificando la lista de 
 			<code>OCSPResp</code>
-			and
+			y
 			<code>X509CRL</code>
-			, or by specifying the list of encoded OCSP responses and CRL data,
-			or alternatively by specifying the
+			, o especificando la lista de respuestas OCSP codificadas 
+                        y datos CRL, o alternativamente especificando 
+                        explícitamente el elemento  
 			<ulink
 				url="http://www.w3.org/TR/XAdES/#Syntax_for_XAdES-L_form_The_RevocationValues_element">
-				XAdES revocation values element
-			</ulink>
-			explicitly.
+				XAdES revocation values
+			</ulink>.
 		</para>
 		<para>
-			Historical validations are usefull in the context of
-			verification of
-			ETSI XAdES v.1.3.2 digital signatures, focussed on
-			XAdES-X-L signatures.
+			Validaciones históricas son útiles en el con
+                    verificación de firmas digitales 
+			ETSI XAdES v.1.3.2  enfocadas en las formas XAdES-X-L.
 		</para>
 	</section>
 	<section>
-		<title>Attribute certificate validation</title>
+		<title>Validación de atributos de los certificados</title>
 		<para>
-			It is possible to validate Attribute certificates using the
-			XKMS2 web
-			service. To do so you will have to
-			provide the certificate
-			path for PKI-validation of these attribute
-			certificates.
+			Es posible validas los atributos de los certificados 
+                    utilizando el web service XKMS2. Para esto se tendrá que 
+                    proveer una ruta de certificados para validación-PKI de 
+                    los atributos de estos certificados.
 		</para>
 		<para>
-			You can specify the attribute certificate using the
+			Se puede especificar el atributo del certificado, utilizando el elemento
 			<ulink
 				url="http://www.w3.org/TR/XAdES/#Syntax_for_XAdES_The_SignerRole_element">
-				XAdES CertifiedRolesListType element
+				XAdES CertifiedRolesListType
 			</ulink>
 			.
 		</para>
 	</section>
 	<section>
-		<title>TSA certificates</title>
+		<title>Certificados TSA</title>
 		<para>
-			It is possible to validate TSA certificates using the XKMS2 web
-			service.
-			The encoded timestamp token will then off course need to
-			contain the
-			certificate path of the
-			the TSA certificate for the trust
-			service be able to perform
-			PKI-validation.
+			Es posible validar certificados TSA utilizando el 
+                    web service XKMS2. El toquen de sellado de tiempo 
+                    necesitara contener la ruta de certificados del 
+                    certificado TSA para que el Trust Service pueda 
+                    realizar la validación-PKI.
 		</para>
 		<para>
-			You can specifiy the timestamp token using the BouncyCastle
-			<code>TimeStampToken</code>
-			class.
+			Se puede especificar el token de sellado de tiempo 
+                    utilizando la clase de BouncyCastle: 
+			<code>TimeStampToken</code>.
 		</para>
 	</section>
 	<section>
-		<title>High Availability XKMS2 client</title>
+		<title>Cliente de Alta disponibilidad XKMS2</title>
 		<para>
-			The
+			El
 			<code>HAXKMS2Client</code>
-			component is a high availability component providing the same
-			features
-			as the
+			es un componente de alta disponibilidad que provee las 
+                        mismas características que el 
 			<code>XKMS2Client</code>
-			but lets you specify a custom jTrust
+			pero permite especificar un validador jTurst personalizado
 			<code>TrustValidator</code>
-			to be used in case the validation request to the XKMS2 web service
-			failed unexpectedly due to connection
-			issues.
-			In that case it will
-			fallback to your specified TrustValidator.
+			para ser utilizado en  caso  que la solicitud de 
+                        validación que se realiza al web service XKMS 
+                        falle inesperadamente debido a problemas de conectividad. 
+                        En ese caso se utilizara el TrustValidator especificado.
 		</para>
 	</section>
 	<appendix>
@@ -346,7 +309,13 @@
 						<entry>Wim Vandenhaute</entry>
 						<entry>Initial version.</entry>
 					</row>
+					<row>
+						<entry>13 May 2014</entry>
+						<entry>Rolosa S.A.</entry>
+						<entry>Spanish Translation</entry>
+					</row>                                        
 				</tbody>
+                                
 			</tgroup>
 		</table>
 	</appendix>
