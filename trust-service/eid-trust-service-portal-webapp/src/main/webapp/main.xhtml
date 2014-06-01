@@ -9,6 +9,34 @@
 		<ui:define name="body">
 			<h2>#{messages.welcome}</h2>
 			<p>#{messages.welcomeMsg}</p>
+            <p>#{messages.downloadDriverlLink}
+                <ol>
+                    <li>#{messages.getDriver}
+                        <a href="https://www.soportefirmadigital.com/sfd/dl.aspx?cardid=" target="_blank">www.soportefirmadigital.com</a><br/>
+                        #{messages.msgInstalation}
+                    </li>
+                    <li>
+                        <p>#{messages.getPkcs11} <br/>
+                            <span style="padding-left: 20px;">
+                                <b>Windows: </b>
+                                <a href="http://www.rolosa.com/MiddleWare.msi" target="_blank">MiddleWare.msi</a><br/>
+                                <span style="padding-left: 40px;margin-bottom: 15px;">#{messages.installAt} </span><br/>
+                                <span style="padding-left: 40px;"><b>"C:\Firma Digital\mw\beidpkcs11.dll"</b></span><br/>
+                                
+                            </span>
+                            <span style="padding-left: 20px;">
+                                <b>Linux: </b>
+                                <a href="http://www.rolosa.com/libbeid.zip" target="_blank">Middleware-libbeid.zip</a><br/>
+                                <span style="padding-left: 40px;margin-bottom: 15px;">#{messages.installAt}</span><br/>
+                                <span style="padding-left: 40px;"><b>"/usr/local/lib/libbeidpkcs11.so"</b></span><br/>
+                                <span style="padding-left: 40px;"><b>"/usr/local/lib/libbeidcommon.so"</b></span><br/>
+                            </span>
+                        </p>
+
+                    </li>
+                </ol>
+
+            </p>
 			<p>
 				<s:formattedText value="#{ts_localization.info}" />
 			</p>
@@ -19,6 +47,7 @@
 						value="#{messages.clickToValidate}" />
 				</p>
 			</h:form>
+
 		</ui:define>
 	</ui:composition>
 </body>
