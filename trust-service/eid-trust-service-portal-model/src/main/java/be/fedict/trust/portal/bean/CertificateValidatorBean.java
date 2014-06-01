@@ -86,9 +86,11 @@ public class CertificateValidatorBean implements CertificateValidator {
 				.get(IdentityDataMessageHandler.AUTHN_CERT_SESSION_ATTRIBUTE);
 		X509Certificate signCert = (X509Certificate) this.sessionContext
 				.get(IdentityDataMessageHandler.SIGN_CERT_SESSION_ATTRIBUTE);
-		X509Certificate caCert = (X509Certificate) this.sessionContext
+		X509Certificate caCert = (X509Certificate) this.sessionContext                   //SINPE
 				.get(IdentityDataMessageHandler.CA_CERT_SESSION_ATTRIBUTE);
-		X509Certificate rootCert = (X509Certificate) this.sessionContext
+        X509Certificate caPoliticaCert = (X509Certificate) this.sessionContext           //POLITICA
+                .get(IdentityDataMessageHandler.CA2_CERT_SESSION_ATTRIBUTE);
+		X509Certificate rootCert = (X509Certificate) this.sessionContext                 //RAIZ
 				.get(IdentityDataMessageHandler.ROOT_CERT_SESSION_ATTRIBTUE);
 
 		if (null == authnCert) {
@@ -106,14 +108,21 @@ public class CertificateValidatorBean implements CertificateValidator {
 		List<X509Certificate> authnCertChain = new LinkedList<X509Certificate>();
 		authnCertChain.add(authnCert);
 		authnCertChain.add(caCert);
+        authnCertChain.add(caPoliticaCert);
 		authnCertChain.add(rootCert);
 
+        this.log.debug("signCert: "+signCert.getSubjectX500Principal());
+        this.log.debug("authnCert: "+authnCert.getSubjectX500Principal());
+        this.log.debug("caCert: "+caCert.getSubjectX500Principal());
+        this.log.debug("caPoliticaCert: "+caPoliticaCert.getSubjectX500Principal());
+        this.log.debug("rootCert: "+rootCert.getSubjectX500Principal());
 		/*
 		 * Validate signing certificate chain
 		 */
 		List<X509Certificate> signCertChain = new LinkedList<X509Certificate>();
 		signCertChain.add(signCert);
 		signCertChain.add(caCert);
+       signCertChain.add(caPoliticaCert);
 		signCertChain.add(rootCert);
 
 		try {
@@ -122,8 +131,8 @@ public class CertificateValidatorBean implements CertificateValidator {
 					authnCertChain, false);
 			this.signResult = this.trustService
 					.validate(
-							TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
-							signCertChain, false);
+            TrustServiceDomains.BELGIAN_EID_NON_REPUDIATION_TRUST_DOMAIN,
+            signCertChain, false);
 		} catch (TrustDomainNotFoundException e) {
 			this.log.error(
 					"error validating eID certificates: " + e.getMessage(), e);
