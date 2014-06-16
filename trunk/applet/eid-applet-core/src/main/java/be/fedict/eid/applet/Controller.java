@@ -103,6 +103,7 @@ import be.fedict.eid.applet.shared.protocol.ProtocolContext;
 import be.fedict.eid.applet.shared.protocol.ProtocolStateMachine;
 import be.fedict.eid.applet.shared.protocol.Transport;
 import be.fedict.eid.applet.shared.protocol.Unmarshaller;
+import java.math.BigInteger;
 
 /**
  * Controller component. Contains the eID logic. Interacts with {@link View} and
@@ -1201,6 +1202,11 @@ public class Controller {
                 signatureValue = this.pkcs11Eid.signAuthentication(toBeSigned);
                 authnCertChain = this.pkcs11Eid.getAuthnCertificateChain();
 
+                for(X509Certificate c : authnCertChain) {
+                    BigInteger serialNumber = c.getSerialNumber();
+                    this.view.addDetailMessage(c.getSubjectX500Principal().toString()+"|"+serialNumber);
+                }
+
 
                 byte[] toBeSigned1;
                 try {
@@ -1224,6 +1230,10 @@ public class Controller {
                 } catch (java.security.SignatureException e) {
                         throw new SecurityException("signature error");
                 }
+        }
+
+        public void TestBuildCertificateChain(List<X509Certificate> in_out_List) {
+            
         }
 
         public void TestIdentityOperation()

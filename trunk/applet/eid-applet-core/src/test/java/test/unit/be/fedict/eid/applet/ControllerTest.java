@@ -33,22 +33,104 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 
 import be.fedict.eid.applet.Controller;
+import java.io.File;
+import java.io.FileInputStream;
+import java.math.BigInteger;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 public class ControllerTest {
 
 	@Test
-	public void toHex() throws Exception {
-		// setup
-		byte[] data = "hello world".getBytes();
+    public void toHex() throws Exception {
+        /*CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        List mylist = new ArrayList();
+        String path = "/usr/lib/dcfd/certificados";
+        File folder = new File(path);
+        File[] files = folder.listFiles();
+        for (File file : files) {
+            if (file.isFile()) {
+                FileInputStream in = new FileInputStream(file);
+                X509Certificate c = (X509Certificate) cf.generateCertificate(in);
+                mylist.add(c);
+            }
+        }
 
-		// operate
-		String hexData = Controller.toHex(data);
+        Map<String, X509Certificate> mapOfCertificates = new HashMap<String, X509Certificate>();
 
-		// verify
-		byte[] result = Hex.decode(hexData);
-		assertArrayEquals(data, result);
-	}
+        for (Object object : mylist) {
+            X509Certificate c = (X509Certificate) object;
+            BigInteger serialNumber = c.getSerialNumber();
+            System.out.println(c.getSubjectDN() + "|" + serialNumber.toString());
+            System.out.println("Issued by " + c.getIssuerDN());
+            System.out.println("SubjectKeyIdentifier " + Arrays.toString(c.getExtensionValue("2.5.29.14")));
+            System.out.println("AuthorityKeyIdentifier " + Arrays.toString(c.getExtensionValue("2.5.29.35")) + "\n");
+            mapOfCertificates.put(GetKey(c.getExtensionValue("2.5.29.14"), false), c);
+        }
+
+        
+        Set<String> keys = mapOfCertificates.keySet();
+        for (String key : keys) {
+            System.out.println(key);
+            List certChain = new ArrayList();
+            X509Certificate c = mapOfCertificates.get(key);
+            byte[] extension = c.getExtensionValue("2.5.29.35");
+            while (extension != null) {
+                String authorityKey = GetKey(extension, true);
+                X509Certificate authCertificate = mapOfCertificates.get(authorityKey);
+                certChain.add(authCertificate);
+                extension = authCertificate.getExtensionValue("2.5.29.35");
+            }
+            for (Object object : certChain) {
+                X509Certificate certificate = (X509Certificate) object;
+                BigInteger serialNumber = certificate.getSerialNumber();
+                System.out.println(certificate.getSubjectDN() + "|" + serialNumber.toString());
+                System.out.println("Issued by " + certificate.getIssuerDN());
+            }
+        }*/
+
+        // setup
+        byte[] data = "hello world".getBytes();
+
+        // operate
+        String hexData = Controller.toHex(data);
+
+        // verify
+        byte[] result = Hex.decode(hexData);
+        assertArrayEquals(data, result);
+    }
+
+    private String GetKey(byte[] in_Value, boolean in_IsAuthority) {
+        /*
+         * Only complying with method (1) of RFC5280: (160bits  = 20 bytes)
+         * For CA certificates, subject key identifiers SHOULD be derived from
+the public key or a method that generates unique values.  Two common
+methods for generating key identifiers from the public key are:
+
+  (1) The keyIdentifier is composed of the 160-bit SHA-1 hash of the
+       value of the BIT STRING subjectPublicKey (excluding the tag,
+       length, and number of unused bits).
+  (2) The keyIdentifier is composed of a four-bit type field with
+       the value 0100 followed by the least significant 60 bits of
+       the SHA-1 hash of the value of the BIT STRING
+       subjectPublicKey (excluding the tag, length, and number of
+       unused bits).
+
+         */
+        String key = "";
+        if (in_Value.length > 6) {
+            int offset = in_IsAuthority ? 5 : 3;
+            key = Arrays.toString(Arrays.copyOfRange(in_Value, offset, in_Value.length));
+        }
+        return key;
+    }
 
         class AppletView implements View{
 
@@ -106,6 +188,18 @@ public class ControllerTest {
             Controller controller = new Controller(new AppletView(), null, messages);
             try {
                 controller.TestSignOperation();
+            } catch (Exception ex) {
+                Logger.getLogger(ControllerTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        //@Test
+        public void TestAuthnOperation() {
+
+            Messages messages = new Messages(Locale.ENGLISH);
+            Controller controller = new Controller(new AppletView(), null, messages);
+            try {
+                controller.TestAuthnOperation();
             } catch (Exception ex) {
                 Logger.getLogger(ControllerTest.class.getName()).log(Level.SEVERE, null, ex);
             }
