@@ -21,6 +21,7 @@ package be.fedict.trust.service.entity;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -98,7 +99,11 @@ public class CertificateAuthorityEntity implements Serializable {
 	 */
 	public CertificateAuthorityEntity(String crlUrl, X509Certificate certificate)
 			throws CertificateEncodingException {
-		this.name = certificate.getSubjectX500Principal().toString();
+                BigInteger serialNumber = certificate.getSerialNumber();
+                String key = new String();
+                key += certificate.getSubjectX500Principal().toString()+"|"+serialNumber.toString();
+		//this.name = certificate.getSubjectX500Principal().toString();
+                this.name = key;
 		this.crlUrl = crlUrl;
 		this.status = Status.INACTIVE;
 		this.encodedCertificate = certificate.getEncoded();

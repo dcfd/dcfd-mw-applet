@@ -607,6 +607,7 @@ public class TrustServiceBean implements TrustService {
 			for (X509Certificate certificate : certificateChain) {
 				String issuerName = certificate.getIssuerX500Principal()
 						.toString();
+                                LOG.debug("harvest - Don't have Issuer's Serial Number??");
 				CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
 						.findCertificateAuthority(issuerName);
 				if (null != certificateAuthority

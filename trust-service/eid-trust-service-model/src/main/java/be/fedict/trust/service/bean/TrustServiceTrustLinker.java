@@ -66,13 +66,23 @@ public class TrustServiceTrustLinker implements TrustLinker {
 			RevocationData revocationData) {
 
 		LOG.debug("certificate: " + childCertificate.getSubjectX500Principal());
+                LOG.debug("certificate Issuer: " + childCertificate.getIssuerX500Principal().toString());
+
+                LOG.debug("Issuer: " + certificate.getSubjectX500Principal());
+
+                BigInteger issuerSerialNumber = certificate.getSerialNumber();
+                String key = new String();
+                key += certificate.getSubjectX500Principal().toString()+"|"+issuerSerialNumber.toString();
 
 		String issuerName = childCertificate.getIssuerX500Principal()
 				.toString();
+
+                
 		CertificateAuthorityEntity certificateAuthority = this.entityManager
-				.find(CertificateAuthorityEntity.class, issuerName);
+				//.find(CertificateAuthorityEntity.class, issuerName);
+                                .find(CertificateAuthorityEntity.class, key);
 		if (null == certificateAuthority) {
-			LOG.debug("no data cache entry for CA: " + issuerName);
+			LOG.debug("no data cache entry for CA: " + issuerName+ " - Serial Number: "+issuerSerialNumber.toString());
 			/*
 			 * Cache Miss
 			 */
