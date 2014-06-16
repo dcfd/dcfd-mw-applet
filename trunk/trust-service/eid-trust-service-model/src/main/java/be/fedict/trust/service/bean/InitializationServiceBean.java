@@ -220,15 +220,13 @@ public class InitializationServiceBean implements InitializationService {
 		}
 		trustPoints.add(rootCa2.getTrustPoint());
 
-        //X509Certificate rootCa3Certificate = loadCertificate("be/fedict/trust/CA SINPE - PERSONA FISICA.cer");
-        X509Certificate rootCa3Certificate = loadCertificate("be/fedict/trust/CA SINPE - PERSONA FISICA(1).crt");
+                X509Certificate rootCa3Certificate = loadCertificate("be/fedict/trust/CA SINPE - PERSONA FISICA.crt");
 		CertificateAuthorityEntity rootCa3 = this.certificateAuthorityDAO
 				.findCertificateAuthority(rootCa3Certificate);
 		if (null == rootCa3) {
 			rootCa3 = this.certificateAuthorityDAO.addCertificateAuthority(
 					rootCa3Certificate,
-					//"http://fdi.sinpe.fi.cr/repositorio/CA%20SINPE%20-%20PERSONA%20FISICA.crl");
-                                        "http://fdi.sinpe.fi.cr/repositorio/CA%20SINPE%20-%20PERSONA%20FISICA(1).crl");
+					"http://fdi.sinpe.fi.cr/repositorio/CA%20SINPE%20-%20PERSONA%20FISICA.crl");
 		}
 
 		if (null == rootCa3.getTrustPoint()) {
@@ -239,6 +237,24 @@ public class InitializationServiceBean implements InitializationService {
 			rootCa3.setTrustPoint(rootCa3TrustPoint);
 		}
 		trustPoints.add(rootCa3.getTrustPoint());
+
+                X509Certificate rootCa4Certificate = loadCertificate("be/fedict/trust/CA SINPE - PERSONA FISICA(1).crt");
+		CertificateAuthorityEntity rootCa4 = this.certificateAuthorityDAO
+				.findCertificateAuthority(rootCa4Certificate);
+		if (null == rootCa4) {
+			rootCa4 = this.certificateAuthorityDAO.addCertificateAuthority(
+					rootCa4Certificate,
+                                        "http://fdi.sinpe.fi.cr/repositorio/CA%20SINPE%20-%20PERSONA%20FISICA(1).crl");
+		}
+
+		if (null == rootCa4.getTrustPoint()) {
+			TrustPointEntity rootCa4TrustPoint = this.trustDomainDAO
+					.addTrustPoint(
+							TrustServiceConstants.DEFAULT_CRON_EXPRESSION,
+							rootCa4);
+			rootCa4.setTrustPoint(rootCa4TrustPoint);
+		}
+		trustPoints.add(rootCa4.getTrustPoint());
 
 		return trustPoints;
 	}

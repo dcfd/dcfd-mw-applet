@@ -130,6 +130,7 @@ public class HarvesterMDB implements MessageListener {
 			return;
 		}
 		String issuerName = removeCAMessage.getCAName();
+                LOG.debug("processRemoveCAMessage - Don't have Issuer's Serial Number??");
 		LOG.debug("remove CA: " + issuerName);
 		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
 				.findCertificateAuthority(issuerName);
@@ -153,6 +154,7 @@ public class HarvesterMDB implements MessageListener {
 		String crlFilePath = harvestMessage.getCrlFile();
 		File crlFile = new File(crlFilePath);
 
+                LOG.debug("processHarvestMessage - Don't have CA's Serial Number??");
 		LOG.debug("issuer: " + caName);
 		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
 				.findCertificateAuthority(caName);

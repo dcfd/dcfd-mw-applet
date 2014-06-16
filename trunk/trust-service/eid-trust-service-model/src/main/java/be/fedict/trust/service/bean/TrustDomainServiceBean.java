@@ -543,6 +543,7 @@ public class TrustDomainServiceBean implements TrustDomainService {
 	public void removeCACache(CertificateAuthorityEntity ca)
 			throws JMSException {
 		String caName = ca.getName();
+                LOG.debug("removeCACache - Don't have CA's Serial Number??");
 		LOG.debug("remove CA cache: " + caName);
 		/*
 		 * We first disable the cache for this CA.

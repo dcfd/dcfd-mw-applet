@@ -203,6 +203,7 @@ public class DownloaderMDB implements MessageListener {
 		/*
 		 * Lookup Root CA's trust point via parent certificates' CA entity.
 		 */
+                LOG.debug("Lookup Root CA's trust point via parent certificates' CA entity - Don't have Issuer's Serial Number??");
 		String parentIssuerName = certificate.getIssuerX500Principal()
 				.toString();
 		CertificateAuthorityEntity parentCertificateAuthority = this.certificateAuthorityDAO
@@ -274,6 +275,7 @@ public class DownloaderMDB implements MessageListener {
 		String caName = downloadMessage.getCaName();
 		boolean update = downloadMessage.isUpdate();
 
+                LOG.debug("processDownloadMessage - Don't have certificate Serial Number??");
 		LOG.debug("issuer: " + caName);
 		CertificateAuthorityEntity certificateAuthority = this.certificateAuthorityDAO
 				.findCertificateAuthority(caName);

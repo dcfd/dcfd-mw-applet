@@ -60,16 +60,20 @@ public class CertificateAuthorityDAOBean implements CertificateAuthorityDAO {
 	private EntityManager entityManager;
 
 	public CertificateAuthorityEntity findCertificateAuthority(String name) {
-		LOG.debug("find CA: " + name);
+		LOG.debug("find (1) CA: " + name);
 		return this.entityManager.find(CertificateAuthorityEntity.class, name);
 	}
 
 	public CertificateAuthorityEntity findCertificateAuthority(
 			X509Certificate certificate) {
-		LOG.debug("find CA: "
-				+ certificate.getSubjectX500Principal().toString());
+                BigInteger serialNumber = certificate.getSerialNumber();
+                String key = new String();
+                key += certificate.getSubjectX500Principal().toString()+"|"+serialNumber.toString();
+		LOG.debug("find (2) CA: " + key );
+
 		return this.entityManager.find(CertificateAuthorityEntity.class,
-				certificate.getSubjectX500Principal().toString());
+				//certificate.getSubjectX500Principal().toString());
+                            key);
 	}
 
 	public CertificateAuthorityEntity addCertificateAuthority(
