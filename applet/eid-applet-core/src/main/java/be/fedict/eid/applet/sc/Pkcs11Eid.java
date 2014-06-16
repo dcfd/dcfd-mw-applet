@@ -15,6 +15,8 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -36,6 +38,9 @@ import be.fedict.eid.applet.Dialogs;
 import be.fedict.eid.applet.Messages;
 import be.fedict.eid.applet.View;
 import java.io.FileInputStream;
+import java.security.cert.CertificateFactory;
+import java.util.AbstractList;
+import java.util.ArrayList;
 import sun.security.x509.X509CertImpl;
 
 public class Pkcs11Eid {
@@ -49,11 +54,97 @@ public class Pkcs11Eid {
 	private String slotDescription;
 
 	private Messages messages;
+        
+        private String authenticationLabel;
+        
+        private String signatureLabel;
+        
+	private List<X509Certificate> authnCertificateChain;
+
+        private List<X509Certificate> signCertificateChain;
+
+        private Map<String, X509Certificate> mapOfCertificates;
 
 	public Pkcs11Eid(View view, Messages messages) {
 		this.view = view;
 		this.messages = messages;
+
+                mapOfCertificates = new HashMap<String, X509Certificate>();
+                authnCertificateChain = new ArrayList<X509Certificate>();
+                signCertificateChain = new ArrayList<X509Certificate>();
+
+
+                String path = "";
+
+                FileInputStream stream = null;
+
+                String osName = System.getProperty("os.name");
+
+		if (osName.startsWith("Linux") || osName.startsWith("Mac")) {
+                    path = "/usr/lib/dcfd/certificados";
+
+                } else { //Windows
+                    path = "C:\\Firma Digital\\certificados\\";
+                }
+
+                
+                try {
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                    List mylist = new ArrayList();
+                    
+                    File folder = new File(path);
+                    File[] files = folder.listFiles();
+                    for (File file : files) {
+                        if (file.isFile()) {
+                            stream = new FileInputStream(file);
+                            X509Certificate c = (X509Certificate) cf.generateCertificate(stream);
+                            mylist.add(c);
+                        }
+                    }
+                    for (Object object : mylist) {
+                        X509Certificate c = (X509Certificate) object;
+                        mapOfCertificates.put(GetKey(c.getExtensionValue("2.5.29.14"), false), c);
+                    }
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                }   catch (IOException ex) {
+                    Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (java.security.cert.CertificateException ex) {
+                    Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                finally {
+                    try {
+                        stream.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(Pkcs11Eid.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
 	}
+
+        private String GetKey(byte[] in_Value, boolean in_IsAuthority) {
+            /*
+             * Only complying with method (1) of RFC5280: (160bits  = 20 bytes)
+             * For CA certificates, subject key identifiers SHOULD be derived from
+            the public key or a method that generates unique values.  Two common
+            methods for generating key identifiers from the public key are:
+
+            (1) The keyIdentifier is composed of the 160-bit SHA-1 hash of the
+            value of the BIT STRING subjectPublicKey (excluding the tag,
+            length, and number of unused bits).
+            (2) The keyIdentifier is composed of a four-bit type field with
+            the value 0100 followed by the least significant 60 bits of
+            the SHA-1 hash of the value of the BIT STRING
+            subjectPublicKey (excluding the tag, length, and number of
+            unused bits).
+
+             */
+            String key = "";
+            if (in_Value.length > 6) {
+                int offset = in_IsAuthority ? 5 : 3;
+                key = Arrays.toString(Arrays.copyOfRange(in_Value, offset, in_Value.length));
+            }
+            return key;
+        }
 
 	/**
 	 * Gives back the PKCS11 wrapper. This is just for debugging purposes.
@@ -63,6 +154,27 @@ public class Pkcs11Eid {
 	public PKCS11 getPkcs11() {
 		return this.pkcs11;
 	}
+
+        private void buildCertificatePath(List<X509Certificate> in_out_List, X509Certificate in_Seed) {
+            in_out_List.clear();
+            in_out_List.add(in_Seed);
+            //System.out.println(key);
+            byte[] seedExtension = in_Seed.getExtensionValue("2.5.29.35");
+            X509Certificate c = mapOfCertificates.get(GetKey(seedExtension, true));
+            if(c != null) {
+                in_out_List.add(c);
+                byte[] extension = c.getExtensionValue("2.5.29.35");
+                while (extension != null) {
+                    String authorityKey = GetKey(extension, true);
+                    X509Certificate authCertificate = mapOfCertificates.get(authorityKey);
+                    in_out_List.add(authCertificate);
+                    extension = authCertificate.getExtensionValue("2.5.29.35");
+                }
+            }
+            if(in_out_List.size() != 4) {
+                throw new RuntimeException("No es posible crear la cadena de confianza. No estan presentes todos los certificados de firma digital en el Equipo del Usuario Final");
+            }
+        }
 
         public final int rootCACertificate = 0;
         public final int childCACertificate = 1;
@@ -422,7 +534,7 @@ public class Pkcs11Eid {
             }
             return result;
         }
-        private  List<X509Certificate> signCertificateChain;
+
         
         public  X509Certificate[]  getSignatureCertificateChain()  throws IOException,
 			KeyStoreException, NoSuchAlgorithmException, CertificateException,
@@ -485,7 +597,7 @@ public class Pkcs11Eid {
                                 this.pkcs11.C_FindObjectsFinal(session);
                         }
                         if(certificate != null) {
-                                this.signCertificateChain = new LinkedList<X509Certificate>();
+                                /*this.signCertificateChain = new LinkedList<X509Certificate>();
                                 this.signCertificateChain.add(certificate);
                                 //this.view.addDetailMessage("X509Certificate certificate : " + certificate.toString());
                                 X509Certificate certificateSINPE =  getIssuerCert(child_childCACertificate) ;
@@ -496,7 +608,8 @@ public class Pkcs11Eid {
                                 //this.view.addDetailMessage("X509Certificate certificatePOLITICA : " + certificatePOLITICA.toString());
                                 X509Certificate rootCerti =  getIssuerCert(rootCACertificate) ;
                                 this.signCertificateChain.add(rootCerti);
-                                //this.view.addDetailMessage("X509Certificate ROOT : " + rootCerti.toString());
+                                //this.view.addDetailMessage("X509Certificate ROOT : " + rootCerti.toString());*/
+                                buildCertificatePath(this.signCertificateChain, certificate);
                   }
 
                 } catch (PKCS11Exception ex) {
@@ -517,7 +630,7 @@ public class Pkcs11Eid {
                     this.pkcs11.C_CloseSession(session);
                 }
             }
-             X509Certificate[] resultChain = new X509Certificate[4];
+             X509Certificate[] resultChain = new X509Certificate[signCertificateChain.size()];
             signCertificateChain.toArray(resultChain);
             return resultChain;
 
@@ -586,6 +699,7 @@ public class Pkcs11Eid {
                                 this.pkcs11.C_FindObjectsFinal(session);
                         }
                         if(certificate != null) {
+                            /*
                                 this.authnCertificateChain = new LinkedList<X509Certificate>();
                                 this.authnCertificateChain.add(certificate);
                                 X509Certificate certificateSINPE =  getIssuerCert(child_childCACertificate) ;
@@ -596,6 +710,9 @@ public class Pkcs11Eid {
                                 X509Certificate rootCerti =  getIssuerCert(rootCACertificate) ;
                                 this.authnCertificateChain.add(rootCerti);
                                 //this.view.addDetailMessage("X509Certificate ROOT : " + rootCerti.toString());
+                                */
+
+                                buildCertificatePath(this.authnCertificateChain, certificate);
 
                                 attributes = new CK_ATTRIBUTE[2];
                                 attributes[0] = new CK_ATTRIBUTE();
@@ -654,8 +771,6 @@ public class Pkcs11Eid {
             return null;
 	}
 
-        private String authenticationLabel;
-
         public String getAuthenticationLabel() {
             return authenticationLabel;
         }
@@ -671,9 +786,6 @@ public class Pkcs11Eid {
         public void setSignatureLabel(String signatureLabel) {
             this.signatureLabel = signatureLabel;
         }
-        private String signatureLabel;
-        
-	private List<X509Certificate> authnCertificateChain;
 
 	public List<X509Certificate> getAuthnCertificateChain() {
 		return this.authnCertificateChain;
