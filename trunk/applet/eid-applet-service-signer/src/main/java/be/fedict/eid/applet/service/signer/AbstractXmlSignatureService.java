@@ -293,6 +293,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 				.item(0);
 		signatureValueElement.setTextContent(Base64.encode(signatureValue));
 
+                //LOG.debug("signatureValue: "+Base64.encode(signatureValue));
 		/*
 		 * Allow signature facets to inject their own stuff.
 		 */
