@@ -742,9 +742,9 @@ public class Pkcs11Eid {
                                     mechanism.mechanism = PKCS11Constants.CKM_SHA1_RSA_PKCS;
                                     mechanism.pParameter = null;
                                     this.pkcs11.C_SignInit(session, mechanism, keyHandle);
-                                    ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
+                                    /*ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
                                     digestInfo.write(Constants.SHA1_DIGEST_INFO_PREFIX);
-                                    digestInfo.write(toBeSigned);
+                                    digestInfo.write(toBeSigned);*/
                                     byte[] signatureValue = pkcs11.C_Sign(session, toBeSigned);
                                     return signatureValue;
                                 }
@@ -865,13 +865,13 @@ public class Pkcs11Eid {
 
                         if(keyHandle != -1) {
                             CK_MECHANISM mechanism = new CK_MECHANISM();
-                            mechanism.mechanism = PKCS11Constants.CKM_SHA1_RSA_PKCS;
+                            mechanism.mechanism = PKCS11Constants.CKM_RSA_PKCS;
                             mechanism.pParameter = null;
                             this.pkcs11.C_SignInit(session, mechanism, keyHandle);
                             ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
                             digestInfo.write(Constants.SHA1_DIGEST_INFO_PREFIX);
                             digestInfo.write(digestValue);
-                            signatureValue = pkcs11.C_Sign(session, digestValue);
+                            signatureValue = pkcs11.C_Sign(session, digestInfo.toByteArray());
 
                         }
 

@@ -159,9 +159,8 @@ public class SignatureDataMessageHandler implements
 			}
 		} else {
 			try {
-//				Signature signature = Signature.getInstance("RawRSA",
-//						BouncyCastleProvider.PROVIDER_NAME);
-                                Signature signature = Signature.getInstance("SHA1withRSA");
+				Signature signature = Signature.getInstance("RawRSA",
+						BouncyCastleProvider.PROVIDER_NAME);
 				signature.initVerify(signingPublicKey);
 				ByteArrayOutputStream digestInfo = new ByteArrayOutputStream();
 				if ("SHA-1".equals(digestAlgo) || "SHA1".equals(digestAlgo)) {
@@ -182,8 +181,7 @@ public class SignatureDataMessageHandler implements
 					digestInfo.write(RIPEMD256_DIGEST_INFO_PREFIX);
 				}
 				digestInfo.write(expectedDigestValue);
-				//signature.update(digestInfo.toByteArray());
-                                signature.update(expectedDigestValue);
+				signature.update(digestInfo.toByteArray());
 				boolean result = signature.verify(signatureValue);
 				if (false == result) {
 					AuditService auditService = this.auditServiceLocator
