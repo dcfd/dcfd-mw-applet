@@ -440,6 +440,10 @@ public class XAdESValidationTest {
 		public String getFilesDigestAlgorithm() {
 			return null;
 		}
+
+                public void setHttpSessionObject(Object sessionObject){
+
+                }
 	}
 
 	private class TestTimeStampService implements TimeStampService {

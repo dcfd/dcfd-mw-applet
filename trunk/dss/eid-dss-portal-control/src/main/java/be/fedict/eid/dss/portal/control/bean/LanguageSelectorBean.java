@@ -83,6 +83,14 @@ public class LanguageSelectorBean implements LanguageSelector {
     }
 
     @Override
+    public String spanish() {
+
+        this.localeSelector.setLocaleString("es");
+        this.localeSelector.select();
+        return null;
+    }
+
+    @Override
     public String german() {
 
         this.localeSelector.setLocaleString("de");
@@ -104,6 +112,11 @@ public class LanguageSelectorBean implements LanguageSelector {
     @Override
     public boolean isEnglishActive() {
         return this.localeSelector.getLocale().getLanguage().equals("en");
+    }
+
+    @Override
+    public boolean isSpanishActive() {
+        return this.localeSelector.getLocale().getLanguage().equals("es");
     }
 
     @Override

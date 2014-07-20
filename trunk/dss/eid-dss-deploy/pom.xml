@@ -21,8 +21,8 @@
 				<configuration>
 					<modules>
 						<jarModule>
-							<groupId>be.fedict</groupId>
-							<artifactId>jtrust</artifactId>
+							<groupId>be.fedict.jtrust</groupId>
+                                                        <artifactId>jtrust-lib</artifactId>
 							<includeInApplicationXml>true</includeInApplicationXml>
 							<bundleDir>lib</bundleDir>
 						</jarModule>
@@ -355,8 +355,8 @@
 			<artifactId>eid-trust-service-xkms2-ws</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>be.fedict</groupId>
-			<artifactId>jtrust</artifactId>
+			<groupId>be.fedict.jtrust</groupId>
+			<artifactId>jtrust-lib</artifactId>
 		</dependency>
 		<!-- The following dependencies are all provided by the Java EE runtime. -->
 		<dependency>
