@@ -98,8 +98,8 @@
 			<artifactId>bcprov-jdk16</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>be.fedict</groupId>
-			<artifactId>jtrust</artifactId>
+			<groupId>be.fedict.jtrust</groupId>
+			<artifactId>jtrust-lib</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.mail</groupId>

@@ -58,6 +58,10 @@ public class TrustServiceRevocationDataService implements RevocationDataService 
 			List<X509Certificate> certificateChain) {
 		LOG.debug("retrieving revocation data for: "
 				+ certificateChain.get(0).getSubjectX500Principal());
+                for(X509Certificate xCert : certificateChain){
+                    LOG.debug("Cert chain: "
+				+ xCert.getSubjectX500Principal());
+                }
 		try {
 			this.xkms2Client.validate(this.trustDomain, certificateChain, true);
 		} catch (ValidationFailedException e) {

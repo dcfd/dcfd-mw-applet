@@ -28,7 +28,7 @@ import be.fedict.eid.applet.service.signer.DigestAlgo;
  */
 public enum ConfigProperty {
 
-	TSP_URL("tsp-url", String.class, "http://tsa.belgium.be/connect"), TSP_POLICY_OID(
+	TSP_URL("tsp-url", String.class, "http://tsa.sinpe.fi.cr/tsaHttp/"), TSP_POLICY_OID(
 			"tsp-policy-oid", String.class), TSP_DIGEST_ALGO("tsp-digest-algo",
 			TSPDigestAlgo.class),
 
@@ -37,7 +37,7 @@ public enum ConfigProperty {
 			"http-proxy-port", Integer.class),
 
 	XKMS_URL("xkms-url", String.class,
-			"https://www.e-contract.be/eid-trust-service-ws/xkms2"),
+			"http://localhost:8080/eid-trust-service-ws/xkms2"),
 
 	ACTIVE_IDENTITY("active-identity", String.class), KEY_STORE_TYPE(
 			"key-store-type", KeyStoreType.class), KEY_STORE_PATH(
@@ -46,13 +46,13 @@ public enum ConfigProperty {
 			"key-entry-secret", String.class), KEY_ENTRY_ALIAS(
 			"key-entry-alias", String.class),
 
-	SIGN_TRUST_DOMAIN("sign-trust-domain", String.class, "BE"), VERIFY_TRUST_DOMAIN(
-			"verify-trust-domain", String.class, "BE"), IDENTITY_TRUST_DOMAIN(
-			"identity-trust-domain", String.class, "BE-NAT-REG"), TSA_TRUST_DOMAIN(
-			"tsa-trust-domain", String.class, "BE-TSA"),
+	SIGN_TRUST_DOMAIN("sign-trust-domain", String.class, "CR"), VERIFY_TRUST_DOMAIN(
+			"verify-trust-domain", String.class, "CR"), IDENTITY_TRUST_DOMAIN(
+			"identity-trust-domain", String.class, "CR-NAT-REG"), TSA_TRUST_DOMAIN(
+			"tsa-trust-domain", String.class, "CR-TSA"),
 
 	SIGNATURE_DIGEST_ALGO("signature-digest-algo", DigestAlgo.class,
-			DigestAlgo.SHA512),
+			DigestAlgo.SHA1),
 
 	DOCUMENT_STORAGE_EXPIRATION("document-storage-expiration", Integer.class, 5), DOCUMENT_CLEANUP_TASK_SCHEDULE(
 			"document-cleanup-task-schedule", String.class, "0 0/15 * * * *"),

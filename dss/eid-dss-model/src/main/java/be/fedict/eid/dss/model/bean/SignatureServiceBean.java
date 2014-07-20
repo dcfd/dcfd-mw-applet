@@ -176,4 +176,8 @@ public class SignatureServiceBean implements SignatureServiceEx {
 		return signatureService.preSign(digestInfos, signingCertificateChain,
 				identity, address, photo);
 	}
+
+        public void setHttpSessionObject(Object sessionObject){
+
+        }
 }
