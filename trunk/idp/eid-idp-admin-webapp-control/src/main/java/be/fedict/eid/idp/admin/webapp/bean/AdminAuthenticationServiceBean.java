@@ -52,4 +52,8 @@ public class AdminAuthenticationServiceBean implements AuthenticationService {
 				+ certificateChain.get(0).getSubjectX500Principal());
 		// nothing to do here as we accept all certificates
 	}
+        public void setHttpSessionObject(Object sessionObject){
+
+        }
+
 }
