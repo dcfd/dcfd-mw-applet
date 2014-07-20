@@ -2,10 +2,10 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-<title>eID DSS - Test Service Provider (SP)</title>
+<title>eID DSS - Proveedor de Servicio de Prueba (SP)</title>
 </head>
 <body>
-	<h1>eID DSS - Test Service Provider (SP)</h1>
+	<h1>eID DSS - Proveedor de Servicio de Prueba (SP)</h1>
 
 	<h2>HTTP Post Binding</h2>
 
@@ -13,9 +13,9 @@
 
 		<table border="1">
 			<tr>
-				<td><b>Choose the file To Upload:</b></td>
+				<td><b>Elija el archivo a subir:</b></td>
 				<td><input name="upload" type="file" /></td>
-				<td align="right"><input type="submit" value="Sign" /></td>
+				<td align="right"><input type="submit" value="Firmar" /></td>
 			</tr>
 		</table>
 
@@ -28,9 +28,9 @@
 
 		<table border="1">
 			<tr>
-				<td><b>Choose the file To Upload:</b></td>
+				<td><b>Elija el archivo a subir:</b></td>
 				<td><input name="upload" type="file" /></td>
-				<td align="right"><input type="submit" value="Sign" /></td>
+				<td align="right"><input type="submit" value="Firmar" /></td>
 			</tr>
 		</table>
 
@@ -42,9 +42,9 @@
 
 		<table border="1">
 			<tr>
-				<td><b>Choose the file To Upload:</b></td>
+				<td><b>Elija el archivo a subir:</b></td>
 				<td><input name="upload" type="file" /></td>
-				<td align="right"><input type="submit" value="Sign" /></td>
+				<td align="right"><input type="submit" value="Firmar" /></td>
 			</tr>
 		</table>
 
@@ -57,17 +57,17 @@
 
 		<table border="1">
 			<tr>
-				<td><b>Choose the file To Upload:</b></td>
+				<td><b>Elija el archivo a subir:</b></td>
 				<td><input name="upload" type="file" /></td>
-				<td align="right"><input type="submit" value="Sign" /></td>
+				<td align="right"><input type="submit" value="Firmar" /></td>
 			</tr>
 		</table>
 
 	</form>
 
-	<h2>SP Identity</h2>
+	<h2>Identida del SP </h2>
 
-	Download the Test Service Provider's Certificate
+	Descargar el Certificado del Proveedor de Servicios de Prueba
 	<a href="./pki">here</a>
 
 </body>

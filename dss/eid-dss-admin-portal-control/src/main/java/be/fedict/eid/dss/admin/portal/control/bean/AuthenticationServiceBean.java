@@ -55,4 +55,7 @@ public class AuthenticationServiceBean implements AuthenticationService {
 		 */
 		LOG.debug("validateCertificateChain");
 	}
+        public void setHttpSessionObject(Object sessionObject){
+
+        }
 }

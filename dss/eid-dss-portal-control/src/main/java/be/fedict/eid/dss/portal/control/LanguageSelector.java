@@ -40,6 +40,8 @@ public interface LanguageSelector {
 
     String english();
 
+    String spanish();
+
     String german();
 
     boolean isDutchActive();
@@ -47,6 +49,8 @@ public interface LanguageSelector {
     boolean isFrenchActive();
 
     boolean isEnglishActive();
+
+    boolean isSpanishActive();
 
     boolean isGermanActive();
 
