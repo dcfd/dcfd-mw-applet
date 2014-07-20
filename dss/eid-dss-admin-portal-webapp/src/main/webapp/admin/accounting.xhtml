@@ -18,8 +18,8 @@
 					<h:outputLabel value="No accounting info yet."
 						rendered="#{dssAccountingList.rowCount == 0}" />
 					<a
-						href="#{facesContext.externalContext.requestContextPath}/accounting.csv">Export
-						as CSV file</a>
+						href="#{facesContext.externalContext.requestContextPath}/accounting.csv">Exportar
+						como archivo CSV</a>
 				</h:panelGrid>
 
 				<rich:dataTable id="data" var="item" value="#{dssAccountingList}"
@@ -43,18 +43,18 @@
 				</rich:dataTable>
 
 				<h:column>
-					<f:facet name="header">Reset</f:facet>
-					<a4j:commandLink immediate="true" id="remove" value="Reset..."
+					<f:facet name="header">Reestablecer</f:facet>
+					<a4j:commandLink immediate="true" id="remove" value="Reestablecer..."
 						rendered="#{dssAccountingList.rowCount > 0}"
 						onclick="Richfaces.showModalPanel('resetConfirm',{width:400, top:200})" />
 				</h:column>
 				<rich:modalPanel id="resetConfirm">
 					<div class="center">
-						<h:outputText value="Sure you want to reset all accounting info?" />
+						<h:outputText value="Esta seguro de reestablecer toda la informacion de cuentas?" />
 						<p>
 							<h:panelGrid id="confirmPanel" columns="2" border="0"
 								styleClass="center">
-								<a4j:commandButton id="reset2" value="Reset"
+								<a4j:commandButton id="reset2" value="Reestablecer"
 									action="#{dssAccounting.reset}" immediate="true"
 									oncomplete="#{facesContext.maximumSeverity == null ?
                                     'Richfaces.hideModalPanel(\'resetConfirm\');' :

@@ -18,10 +18,10 @@
                     <rich:tabPanel switchType="client"
                                    selectedTab="#{dssRP.selectedTab}">
 
-                        <rich:tab name="tab_config" label="Configuration">
+                        <rich:tab name="tab_config" label="Configuracion">
                             <h:panelGrid columns="2" border="0">
 
-                                <h:outputLabel for="name" value="Name"/>
+                                <h:outputLabel for="name" value="Nombre"/>
                                 <s:decorate>
                                     <h:inputText id="name"
                                                  value="#{selectedRP.name}"
@@ -30,7 +30,7 @@
                                 </s:decorate>
 
                                 <h:outputLabel for="domain"
-                                               value="Domain"/>
+                                               value="Dominio"/>
                                 <s:decorate>
                                     <h:inputText id="domain"
                                                  value="#{selectedRP.domain}"
@@ -70,11 +70,11 @@
                         </rich:tab>
 
 
-                        <rich:tab name="tab_signing" label="Signing">
+                        <rich:tab name="tab_signing" label="Firmado">
                             <h:panelGrid columns="2" border="0">
 
                                 <h:outputText
-                                        value="Requires request signing?"/>
+                                        value="Requiere firmado de peticiones?"/>
                                 <h:selectBooleanCheckbox
                                         value="#{selectedRP.requestSigningRequired}"/>
 
@@ -84,7 +84,7 @@
                                         value="#{selectedRP.certificateSubject}"/>
 
                                 <h:outputLabel for="upload"
-                                               value="Certificate"/>
+                                               value="Certificado"/>
                                 <rich:fileUpload
                                         fileUploadListener="#{dssRP.uploadListener}"
                                         maxFilesQuantity="1" id="upload"
@@ -95,7 +95,7 @@
                                 <h:message for="upload"
                                            styleClass="error"/>
 
-                                <h:commandButton value="Remove certificate"
+                                <h:commandButton value="Remover certificado"
                                                  action="#{dssRP.removeCertificate}"
                                                  rendered="#{selectedRP.certificate != null}"/>
 
@@ -105,7 +105,7 @@
                                 <rich:simpleTogglePanel id="cert_panel"
                                                         switchType="client"
                                                         opened="true"
-                                                        label="Certificate">
+                                                        label="Certificado">
                                     <h:outputText id="cert_view"
                                                   styleClass="text block"
                                                   escape="false"
@@ -120,9 +120,9 @@
                     <h:panelGrid columns="2" border="0">
 
                         <h:commandButton action="#{dssRP.save}" id="save"
-                                         value="Save"/>
+                                         value="Guardar"/>
                         <h:commandButton action="#{dssRP.back}" id="back"
-                                         value="Back"
+                                         value="Atras"
                                          immediate="true"/>
                     </h:panelGrid>
 

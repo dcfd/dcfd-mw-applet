@@ -11,7 +11,7 @@
         <ui:composition template="/WEB-INF/template.xhtml">
             <ui:define name="body">
 
-                <h2>XML Schemas</h2>
+                <h2>Esquemas XML</h2>
                 <h:form>
                     <rich:dataTable var="row" value="#{dssXmlSchemaList}"
                                     rows="10"
@@ -30,23 +30,23 @@
                         </rich:column>
                         <rich:column>
                             <f:facet name="header">
-                                <h:outputText value="actions"/>
+                                <h:outputText value="acciones"/>
                             </f:facet>
-                            <h:commandLink value="Delete"
+                            <h:commandLink value="Borrar"
                                            action="#{dssXmlSchema.delete}"
                                            onclick="return askDeleteQuestion()"/>
                             <h:outputText value=" "/>
-                            <h:commandLink value="View" action="#{dssXmlSchema.view}"/>
+                            <h:commandLink value="Ver" action="#{dssXmlSchema.view}"/>
                         </rich:column>
                         <f:facet name="footer">
                             <rich:datascroller/>
                         </f:facet>
                     </rich:dataTable>
-                    <h:outputText value="No XML schemas available."
+                    <h:outputText value="No hay esquemas XML disponibles."
                                   rendered="#{dssXmlSchemaList.rowCount == 0}"/>
                     <script type="text/javascript">
                        function askDeleteQuestion() {
-                            var agree = confirm("Remove XML schema?");
+                            var agree = confirm("Remover esquema XML?");
                             if (agree) {
                                 return true;
                             } else {
@@ -60,7 +60,7 @@
 
                 <h:form enctype="multipart/form-data">
                     <fieldset>
-                        <legend>Add XML Schema</legend>
+                        <legend>Agregar Esquema XML</legend>
                         <h:panelGrid columns="2">
                             <h:outputText value="Revision:"/>
                             <h:inputText value="#{dssXmlSchema.revision}"
@@ -69,7 +69,7 @@
                             <h:message for="revision" styleClass="error"/>
                         </h:panelGrid>
                         <h:panelGrid columns="2">
-                            <h:outputText value="XSD file:"/>
+                            <h:outputText value="Archivo XSD:"/>
                             <s:fileUpload data="#{dssXmlSchema.uploadedFile}"
                                           size="60"
                                           required="true" id="file"/>
@@ -80,12 +80,12 @@
                         </h:panelGrid>
 
                         <h:commandButton action="#{dssXmlSchema.add}"
-                                         value="Add"/>
+                                         value="Agregar"/>
                     </fieldset>
                 </h:form>
                 <h:messages globalOnly="true" styleClass="error"/>
 
-                <h2>XML Style Sheets</h2>
+                <h2>Hojas de Estilo XML</h2>
                 <h:form>
                     <rich:dataTable var="row" value="#{dssXmlStyleSheetList}"
                                     rows="10"
@@ -104,23 +104,23 @@
                         </rich:column>
                         <rich:column>
                             <f:facet name="header">
-                                <h:outputText value="actions"/>
+                                <h:outputText value="acciones"/>
                             </f:facet>
-                            <h:commandLink value="Delete"
+                            <h:commandLink value="Borrar"
                                            action="#{dssXmlStyleSheet.delete}"
                                            onclick="return askDeleteQuestion()"/>
                             <h:outputText value=" "/>
-                            <h:commandLink value="View" action="#{dssXmlStyleSheet.view}"/>
+                            <h:commandLink value="Ver" action="#{dssXmlStyleSheet.view}"/>
                         </rich:column>
                         <f:facet name="footer">
                             <rich:datascroller/>
                         </f:facet>
                     </rich:dataTable>
-                    <h:outputText value="No XML style sheets available."
+                    <h:outputText value="No hay hojas de estilo XML disponibles."
                                   rendered="#{dssXmlStyleSheetList.rowCount == 0}"/>
                     <script type="text/javascript">
                         function askDeleteQuestion() {
-                            var agree = confirm("Remove XML style sheet?");
+                            var agree = confirm("Borrar hoja de estilo XML?");
                             if (agree) {
                                 return true;
                             } else {
@@ -134,7 +134,7 @@
 
                 <h:form enctype="multipart/form-data">
                     <fieldset>
-                        <legend>Add XML Style Sheet</legend>
+                        <legend>Agregar Hoja de Estilo XML</legend>
                         <h:panelGrid columns="3">
                             <h:outputText value="Namespace:"/>
                             <h:inputText value="#{dssXmlStyleSheet.namespace}"
@@ -149,7 +149,7 @@
                             <h:message for="revision" styleClass="error"/>
                         </h:panelGrid>
                         <h:panelGrid columns="3">
-                            <h:outputText value="XSL file:"/>
+                            <h:outputText value="Archivo XSL:"/>
                             <s:fileUpload
                                     data="#{dssXmlStyleSheet.uploadedFile}"
                                     size="60"
@@ -161,7 +161,7 @@
                         </h:panelGrid>
 
                         <h:commandButton action="#{dssXmlStyleSheet.add}"
-                                         value="Add"/>
+                                         value="Agregar"/>
                     </fieldset>
                 </h:form>
                 <h:messages globalOnly="true" styleClass="error"/>

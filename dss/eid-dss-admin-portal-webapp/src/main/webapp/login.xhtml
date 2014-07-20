@@ -5,9 +5,9 @@
 <body>
 	<ui:composition template="/WEB-INF/template.xhtml">
 		<ui:define name="body">
-			<h2>Login</h2>
-			<p>Login using your eID card. If you are not yet known as
-				administrator, you will be registered for admin approval.</p>
+			<h2>Inicio de Sesion</h2>
+			<p>Inicio de Sesion utilizando la Tarjeta Inteligente de Firma Digital. Si usted no esta registrado aun como administrador,
+                            su registro estara pendiente de aprobacion por un administrador.</p>
 			<script type="text/javascript" src="./deployJava.js"></script>
 			<script type="text/javascript" src="./deploy-eid-applet.js"></script>
 			<script type="text/javascript">
@@ -19,7 +19,8 @@
 				};
 				var parameters = {
 					TargetPage : 'postLogin.seam?conversationId=#{conversation.id}',
-					AppletService : 'applet-service-authentication;jsessionid=#{facesContext.externalContext.getSession(false).id}'
+					AppletService : 'applet-service-authentication;jsessionid=#{facesContext.externalContext.getSession(false).id}',
+                                        Language : 'es'
 				};
 				deployJavaEIDApplet.runApplet(attributes, parameters);
 			</script>

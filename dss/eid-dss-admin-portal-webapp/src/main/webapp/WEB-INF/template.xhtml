@@ -34,25 +34,25 @@
 			<div id="menuPanel">
 				<h:form>
 					<rich:panelMenu value="#{dssMenuController.selectedChild}">
-						<rich:panelMenuItem label="Home" action="/main.xhtml"
+						<rich:panelMenuItem label="Inicio" action="/main.xhtml"
 							rendered="#{!identity.isLoggedIn()}" />
-						<rich:panelMenuItem label="Login" action="/admin/main.xhtml"
+						<rich:panelMenuItem label="Inicio de Sesion" action="/admin/main.xhtml"
 							rendered="#{!identity.isLoggedIn()}" />
-						<rich:panelMenuItem label="Home" action="/admin/main.xhtml"
+						<rich:panelMenuItem label="Inicio" action="/admin/main.xhtml"
 							rendered="#{identity.isLoggedIn()}" />
-						<rich:panelMenuItem label="Configuration"
+						<rich:panelMenuItem label="Configuracion"
 							action="/admin/config.xhtml" rendered="#{s:hasRole('admin')}" />
-						<rich:panelMenuItem label="Service Identity"
+						<rich:panelMenuItem label="Identidad del Servicio"
 							action="/admin/identity.xhtml" rendered="#{s:hasRole('admin')}" />
 						<rich:panelMenuItem label="Relying Parties"
 							action="/admin/rps.xhtml" rendered="#{s:hasRole('admin')}" />
 						<rich:panelMenuItem label="XML" action="/admin/xml.xhtml"
 							rendered="#{s:hasRole('admin')}" />
-						<rich:panelMenuItem label="Privileges"
+						<rich:panelMenuItem label="Privilegios"
 							action="/admin/admins.xhtml" rendered="#{s:hasRole('admin')}" />
-						<rich:panelMenuItem label="Accounting"
+						<rich:panelMenuItem label="Cuentas"
 							action="/admin/accounting.xhtml" rendered="#{s:hasRole('admin')}" />
-						<rich:panelMenuItem label="About" action="/admin/about.xhtml"
+						<rich:panelMenuItem label="Acerca de" action="/admin/about.xhtml"
 							rendered="#{s:hasRole('admin')}" />
 					</rich:panelMenu>
 				</h:form>
@@ -61,7 +61,7 @@
 
 		<div id="login">
 			<s:div rendered="#{identity.isLoggedIn()}" id="loginPanel">
-				<h:panelGrid columns="2">
+<!--				<h:panelGrid columns="2">
 					<s:graphicImage value="#{eid.photo}" />
 					<h:panelGroup>
 						<h:panelGrid columns="1">
@@ -73,7 +73,7 @@
 							</h:outputText>
 						</h:panelGrid>
 					</h:panelGroup>
-				</h:panelGrid>
+				</h:panelGrid>-->
 				<h:form>
 					<h:commandButton value="Logout" action="#{identity.logout()}" />
 				</h:form>
