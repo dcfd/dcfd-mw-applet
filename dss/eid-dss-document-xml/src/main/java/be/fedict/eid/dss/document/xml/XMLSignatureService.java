@@ -130,4 +130,8 @@ public class XMLSignatureService extends AbstractXmlSignatureService implements
 			throws NoSuchAlgorithmException {
 		return super.preSign(digestInfos, signingCertificateChain);
 	}
+
+        public void setHttpSessionObject(Object sessionObject){
+
+        }
 }
