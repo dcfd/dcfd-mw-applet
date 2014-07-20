@@ -134,6 +134,9 @@ public class ODFDSSDocumentService implements DSSDocumentService {
 				for (int idx = 0; idx < signatureNodeList.getLength(); idx++) {
 					Element signatureElement = (Element) signatureNodeList
 							.item(idx);
+
+                    //LOG.debug("signatureValue: "+signatureElement.getTextContent());
+
 					xadesValidation.prepareDocument(signatureElement);
 					KeyInfoKeySelector keySelector = new KeyInfoKeySelector();
 					DOMValidateContext domValidateContext = new DOMValidateContext(
