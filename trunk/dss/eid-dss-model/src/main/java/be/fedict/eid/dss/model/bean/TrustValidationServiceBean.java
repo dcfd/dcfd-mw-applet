@@ -27,6 +27,8 @@ import java.security.NoSuchProviderException;
 import java.security.cert.CertStore;
 import java.security.cert.CertStoreException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -190,7 +192,7 @@ public class TrustValidationServiceBean implements TrustValidationService {
                                 "TSP response token has no signer certificate");
         }
         List<X509Certificate> tspCertificateChain = new LinkedList<X509Certificate>();
-        X509Certificate certificate = signerCert;
+        /*X509Certificate certificate = signerCert;
         do {
                 LOG.debug("adding to certificate chain: "
                                 + certificate.getSubjectX500Principal());
@@ -203,15 +205,50 @@ public class TrustValidationServiceBean implements TrustValidationService {
                 certificate = certificateMap.get(aki);
         } while (null != certificate);
 		     
-		if (false == signerCert.equals(tspCertificateChain.get(0))) {
-			throw new SecurityException("TST signing certificate mismatch");
-		}
+        if (false == signerCert.equals(tspCertificateChain.get(0))) {
+                throw new SecurityException("TST signing certificate mismatch");
+        }*/
+        
+        
+
+                X509Certificate tsaIssuer = loadCertificate("be/fedict/eid/dss/CA POLITICA SELLADO DE TIEMPO - COSTA RICA.crt");
+                X509Certificate rootCA = loadCertificate("be/fedict/eid/dss/CA RAIZ NACIONAL COSTA RICA.cer");
+                LOG.debug("adding to certificate chain: "
+                                + signerCert.getSubjectX500Principal());
+                tspCertificateChain.add(signerCert);
+                LOG.debug("adding to certificate chain: "
+                                + tsaIssuer.getSubjectX500Principal());
+                tspCertificateChain.add(tsaIssuer);
+                LOG.debug("adding to certificate chain: "
+                                + rootCA.getSubjectX500Principal());
+                tspCertificateChain.add(rootCA);
+
 
 		/*
 		 * Perform PKI validation via eID Trust Service.
 		 */
 		getXkms2Client().validate(tsaTrustDomain, tspCertificateChain,
 				validationDate, ocspResponses, crls);
+	}
+
+	private static X509Certificate loadCertificate(String resourceName) {
+		LOG.debug("loading certificate: " + resourceName);
+		Thread currentThread = Thread.currentThread();
+		ClassLoader classLoader = currentThread.getContextClassLoader();
+		InputStream certificateInputStream = classLoader
+				.getResourceAsStream(resourceName);
+		if (null == certificateInputStream) {
+			throw new IllegalArgumentException("resource not found: "
+					+ resourceName);
+		}
+		try {
+			CertificateFactory certificateFactory = CertificateFactory
+					.getInstance("X.509");
+			return (X509Certificate) certificateFactory
+					.generateCertificate(certificateInputStream);
+		} catch (CertificateException e) {
+			throw new RuntimeException("X509 error: " + e.getMessage(), e);
+		}
 	}
         
 
