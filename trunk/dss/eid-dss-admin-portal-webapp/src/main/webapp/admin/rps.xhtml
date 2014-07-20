@@ -14,7 +14,7 @@
 
                 <h:form>
 
-                    <h:outputLabel value="No relying parties configured."
+                    <h:outputLabel value="No hay configurado ningun relying party."
                                    rendered="#{dssRPList.rowCount == 0}"/>
 
                     <rich:dataTable id="data" var="item"
@@ -24,11 +24,11 @@
                                     rendered="#{dssRPList.rowCount > 0}">
 
                         <h:column>
-                            <f:facet name="header">Name</f:facet>
+                            <f:facet name="header">Nombre</f:facet>
                             <h:outputText value="#{item.name}"/>
                         </h:column>
                         <h:column>
-                            <f:facet name="header">Domain</f:facet>
+                            <f:facet name="header">Dominio</f:facet>
                             <h:outputText value="#{item.domain}"/>
                         </h:column>
                         <h:column>
@@ -36,14 +36,14 @@
                             <h:outputText value="#{item.certificateSubject}"/>
                         </h:column>
                         <h:column>
-                            <f:facet name="header">Modify</f:facet>
+                            <f:facet name="header">Modificar</f:facet>
                             <h:commandLink action="#{dssRP.modify}"
                                            id="modify"
-                                           value="Modify"/>
+                                           value="Modificar"/>
                         </h:column>
                         <h:column>
-                            <f:facet name="header">Remove</f:facet>
-                            <h:commandLink value="Delete" action="#{dssRP.remove}"
+                            <f:facet name="header">Remover</f:facet>
+                            <h:commandLink value="Remover" action="#{dssRP.remove}"
                                 onclick="return askDeleteQuestion()" />
                         </h:column>
 
@@ -59,7 +59,7 @@
 
                     <script type="text/javascript">
                         function askDeleteQuestion() {
-                            var agree = confirm("Sure you want to remove this Relying Party ?");
+                            var agree = confirm("Esta seguro de remover este Relying Party ?");
                             if (agree) {
                                 return true;
                             } else {
@@ -71,7 +71,7 @@
                     <p/>
 
                     <h:commandButton action="#{dssRP.add}" id="add"
-                                     value="Add"/>
+                                     value="Agregar"/>
 
                 </h:form>
 

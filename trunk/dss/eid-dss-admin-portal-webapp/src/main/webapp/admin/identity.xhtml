@@ -9,7 +9,7 @@
     <body>
         <ui:composition template="/WEB-INF/template.xhtml">
             <ui:define name="body">
-                <h2>DSS Identity</h2>
+                <h2>Identidad DSS</h2>
 
                 <h:form>
 
@@ -32,7 +32,7 @@
 
                     <h:panelGrid columns="2">
                         <h:outputLabel
-                                value="Name (*)"
+                                value="Nombre (*)"
                                 for="identity_name"/>
                         <s:decorate>
                             <h:inputText id="identity_name"
@@ -44,7 +44,7 @@
                         </s:decorate>
 
 
-                        <h:outputLabel value="Keystore Type (*)"
+                        <h:outputLabel value="Tipo de Keystore (*)"
                                        for="keystore_type"/>
                         <s:decorate>
                             <h:selectOneMenu id="keystore_type"
@@ -56,7 +56,7 @@
                             </h:selectOneMenu>
                         </s:decorate>
                         <h:outputLabel
-                                value="Keystore Path (*)"
+                                value="Ruta de Keystore (*)"
                                 for="keystore_path"/>
                         <s:decorate>
                             <h:inputText id="keystore_path"
@@ -67,7 +67,7 @@
                         </s:decorate>
 
                         <h:outputLabel
-                                value="Keystore Password (*)"
+                                value="Password de Keystore (*)"
                                 for="keystore_pw"/>
                         <s:decorate>
                             <h:inputText id="keystore_pw"
@@ -78,7 +78,7 @@
                         </s:decorate>
 
                         <h:outputLabel
-                                value="Key Entry Password (*)"
+                                value="Password de Key Entry (*)"
                                 for="keyentry_pw"/>
                         <s:decorate>
                             <h:inputText id="keyentry_pw"
@@ -88,7 +88,7 @@
                         </s:decorate>
 
                         <h:outputLabel
-                                value="Key Entry Alias"
+                                value="Alias de Key Entry"
                                 for="keyentry_alias"/>
                         <h:inputText id="keyentry_alias"
                                      value="#{dssIdentity.keyEntryAlias}">
@@ -98,14 +98,14 @@
 
 
                     <h:panelGrid columns="4">
-                        <h:commandButton id="identity_activate" value="Activate"
+                        <h:commandButton id="identity_activate" value="Activar"
                                          action="#{dssIdentity.activate}"
                                          rendered="#{!dssIdentity.active}"/>
-                        <h:commandButton id="identity_test" value="Test"
+                        <h:commandButton id="identity_test" value="Prueba"
                                          action="#{dssIdentity.test}"/>
-                        <h:commandButton id="identity_save" value="Save"
+                        <h:commandButton id="identity_save" value="Guardar"
                                          action="#{dssIdentity.save}"/>
-                        <h:commandButton id="identity_remove" value="Remove"
+                        <h:commandButton id="identity_remove" value="Remover"
                                          action="#{dssIdentity.remove}"/>
                     </h:panelGrid>
 
