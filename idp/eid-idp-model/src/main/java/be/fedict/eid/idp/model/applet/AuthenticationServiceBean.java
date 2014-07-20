@@ -135,4 +135,8 @@ public class AuthenticationServiceBean implements AuthenticationService {
 			throw new SecurityException("eID Trust Service error");
 		}
 	}
+        public void setHttpSessionObject(Object sessionObject){
+
+        }
+
 }
