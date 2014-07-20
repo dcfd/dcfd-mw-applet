@@ -119,4 +119,8 @@ public class OOXMLSignatureService extends AbstractOOXMLSignatureService
 			throws NoSuchAlgorithmException {
 		return super.preSign(digestInfos, signingCertificateChain);
 	}
+        
+        public void setHttpSessionObject(Object sessionObject){
+
+        }
 }
