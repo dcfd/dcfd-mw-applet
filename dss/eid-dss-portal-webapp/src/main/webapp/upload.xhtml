@@ -46,7 +46,7 @@
                     <rich:fileUpload autoclear="true" maxFilesQuantity="1"
                                      fileUploadListener="#{dssUpload.listener}"
                                      addControlLabel="#{messages.uploadChooseLabel}" immediateUpload="true"
-                                     allowFlash="false">
+                                     allowFlash="false" noDuplicate="true">
                         <a4j:support event="onuploadcomplete" action="#{dssUpload.done}"/>
                         <f:facet name="label">
                             <h:outputText value="{_KB}KB from {KB}KB uploaded --- {mm}:{ss}"/>
