@@ -195,7 +195,7 @@ public class TrustServiceBean implements TrustService {
 			throws TrustDomainNotFoundException, CertificateException,
 			NoSuchProviderException, CRLException, IOException {
 
-		LOG.debug("isValid: "
+		LOG.debug("isValid CRLs: "
 				+ certificateChain.get(0).getSubjectX500Principal());
 
 		TrustLinkerResult lastResult = null;
@@ -401,13 +401,13 @@ public class TrustServiceBean implements TrustService {
 		}
 
 		FallbackTrustLinker fallbackTrustLinker = new FallbackTrustLinker();
-		if (null != trustLinker) {
-			fallbackTrustLinker.addTrustLinker(trustLinker);
-		}
 		fallbackTrustLinker.addTrustLinker(new OcspTrustLinker(ocspRepository));
 		fallbackTrustLinker.addTrustLinker(new CrlTrustLinker(
 				cachedCrlRepository));
 
+		if (null != trustLinker) {
+			fallbackTrustLinker.addTrustLinker(trustLinker);
+		}
 		trustValidator.addTrustLinker(fallbackTrustLinker);
 
 		addConstraints(trustValidator, trustDomain);
