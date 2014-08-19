@@ -9,7 +9,7 @@
 <body>
 	<ui:composition template="/WEB-INF/template.xhtml">
 		<ui:define name="body">
-			<h2>Service Identity</h2>
+			<h2>Identidad del Servicio</h2>
 
 			<h:form>
 
@@ -28,7 +28,7 @@
 			<h:form>
 
 				<h:panelGrid columns="2">
-					<h:outputLabel value="Name (*)" for="identity_name" />
+					<h:outputLabel value="Nombre (*)" for="identity_name" />
 					<s:decorate>
 						<h:inputText id="identity_name" value="#{idpIdentity.name}"
 							required="true" readonly="#{idpIdentity.isNameReadOnly()}">
@@ -37,7 +37,7 @@
 					</s:decorate>
 
 
-					<h:outputLabel value="Keystore Type (*)" for="keystore_type" />
+					<h:outputLabel value="Tipo de Keystore (*)" for="keystore_type" />
 					<s:decorate>
 						<h:selectOneMenu id="keystore_type"
 							value="#{idpIdentity.keyStoreType}" required="true">
@@ -45,7 +45,7 @@
 							<h:message for="keystore_type" styleClass="error" />
 						</h:selectOneMenu>
 					</s:decorate>
-					<h:outputLabel value="Keystore Path (*)" for="keystore_path" />
+					<h:outputLabel value="Ruta del Keystore (*)" for="keystore_path" />
 					<s:decorate>
 						<h:inputText id="keystore_path"
 							value="#{idpIdentity.keyStorePath}" required="true" size="50">
@@ -53,7 +53,7 @@
 						<h:message for="keystore_path" styleClass="error" />
 					</s:decorate>
 
-					<h:outputLabel value="Keystore Password (*)" for="keystore_pw" />
+					<h:outputLabel value="Password del Keystore (*)" for="keystore_pw" />
 					<s:decorate>
 						<h:inputText id="keystore_pw"
 							value="#{idpIdentity.keyStorePassword}" required="true">
@@ -61,14 +61,14 @@
 						<h:message for="keystore_pw" styleClass="error" />
 					</s:decorate>
 
-					<h:outputLabel value="Key Entry Password (*)" for="keyentry_pw" />
+					<h:outputLabel value="Password del Registro de Clave - Key Entry Password (*)" for="keyentry_pw" />
 					<s:decorate>
 						<h:inputText id="keyentry_pw"
 							value="#{idpIdentity.keyEntryPassword}" required="true">
 						</h:inputText>
 					</s:decorate>
 
-					<h:outputLabel value="Key Entry Alias" for="keyentry_alias" />
+					<h:outputLabel value="Alias del Registro de Clave - Key Entry Alias" for="keyentry_alias" />
 					<h:inputText id="keyentry_alias"
 						value="#{idpIdentity.keyEntryAlias}">
 					</h:inputText>
@@ -77,13 +77,13 @@
 
 
 				<h:panelGrid columns="4">
-					<h:commandButton id="identity_activate" value="Activate"
+					<h:commandButton id="identity_activate" value="Activar"
 						action="#{idpIdentity.activate}" rendered="#{!idpIdentity.active}" />
-					<h:commandButton id="identity_test" value="Test"
+					<h:commandButton id="identity_test" value="Probar"
 						action="#{idpIdentity.test}" />
-					<h:commandButton id="identity_save" value="Save"
+					<h:commandButton id="identity_save" value="Guardar"
 						action="#{idpIdentity.save}" />
-					<h:commandButton id="identity_remove" value="Remove"
+					<h:commandButton id="identity_remove" value="Remover"
 						action="#{idpIdentity.remove}" />
 				</h:panelGrid>
 
