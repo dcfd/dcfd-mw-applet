@@ -82,7 +82,7 @@ public class AuthenticationRequestServiceBean implements
 
 	@Override
 	public String getLanguage() {
-		return "nl";
+		return "es";
 	}
 
 	public String getIdPEntryPoint() {

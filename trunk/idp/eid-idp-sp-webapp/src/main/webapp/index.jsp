@@ -2,69 +2,57 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-<title>eID Identity Provider (IdP) - Test Service Provider (SP)</title>
+<title>eID Identity Provider (IdP) - Proveedor de Servicios de Prueba (SP)</title>
 </head>
 <body>
-	<h1>eID Identity Provider (IdP) - Test Service Provider (SP)</h1>
-	<p>This test Service Provider (SP) demos the different
-		identification/authentication protocols towards the eID IdP.</p>
+	<h1>eID Identity Provider (IdP) - Proveedor de Servicios de Prueba (SP)</h1>
+	<p>Este Proveedor de Servicios de Prueba (SP) muestra los diferentes protocolos de
+		identificación/autenticación hacia el eID IdP.</p>
 	<ul>
 		<li><a
 			href="https://<%=request.getServerName()%>:<%=request.getServerPort()%>/eid-idp/protocol/foobar">
-				Unsupported Protocol </a></li>
+				Protocolo no soportado </a></li>
 	</ul>
 
 	<h2>SAML v2.0 Browser Post</h2>
 	<ul>
-		<li><a href="saml2/post/ident.jsp">Identification</a></li>
-		<li><a href="saml2/post/auth.jsp">Authentication</a></li>
-		<li><a href="saml2/post/auth-ident.jsp">Authentication +
-				Identification </a></li>
+		<li><a href="saml2/post/auth.jsp">Autenticación</a></li>
 	</ul>
 
-	<h2>SAML v2.0 Browser POST with Artifact Binding on Response</h2>
+	<h2>SAML v2.0 Browser POST con Enlace de Artefactos en la Repuesta (Artifact Binding on Response)</h2>
 	<ul>
 
-		<li><a href="saml2/artifact/ident.jsp">Identification</a></li>
-		<li><a href="saml2/artifact/auth.jsp">Authentication</a></li>
-		<li><a href="saml2/artifact/auth-ident.jsp">Authentication +
-				Identification </a></li>
+		<li><a href="saml2/artifact/auth.jsp">Autenticación</a></li>
 	</ul>
 
 	<h2>WS-Federation</h2>
 	<ul>
-		<li><a href="ws-federation/ident.jsp">Identification</a></li>
-		<li><a href="ws-federation/auth.jsp">Authentication</a></li>
-		<li><a href="ws-federation/auth-ident.jsp">Authentication +
-				Identification (validation via STS)</a></li>
+		<li><a href="ws-federation/auth.jsp">Autenticación</a></li>
 	</ul>
 
 	<h2>OpenID v2.0</h2>
 
 	<ul>
 
-		<li><a href="openid/ident.jsp">Identification</a></li>
-		<li><a href="openid/auth.jsp">Authentication</a></li>
-		<li><a href="openid/auth-ident.jsp">Authentication +
-				Identification </a></li>
+		<li><a href="openid/auth.jsp">Autenticación</a></li>
 	</ul>
 
-	<h2>SP Configuration</h2>
+	<h2>Configuración del SP</h2>
 
 	<p>
-		<a href="./configuration">Configure Test SP...</a>
+		<a href="./configuration">Configurar SP...</a>
 	</p>
 
-	<h2>SP Identity</h2>
+	<h2>Identidad del SP</h2>
 
-	Download the Test Service Provider's Certificate
-	<a href="./pki">here</a>
-	<br /> Download the Test Service Provider's Public Key
-	<a href="./public">here</a>
+	Descargar el Certificado del Proveedor de Servicio de Prueba
+	<a href="./pki">aqui</a>
+	<br /> Descargar la clave Publica del Proveedor de Servicio de Prueba
+	<a href="./public">aqui</a>
 	<br />
 	<jsp:useBean id="sp" scope="request"
 		class="be.fedict.eid.idp.sp.SPBean" />
-	AES-128 secret:
+	Secreto AES-128:
 	<jsp:getProperty name="sp" property="aes128SecretKey" />
 </body>
 </html>

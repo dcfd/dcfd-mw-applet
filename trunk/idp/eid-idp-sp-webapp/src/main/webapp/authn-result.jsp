@@ -7,7 +7,7 @@
 
 <html>
 <head>
-<title>eID Identity Provider (IdP) - Test Service Provider (SP)</title>
+<title>eID Identity Provider (IdP) - Proveedor de Servicios de Prueba (SP)</title>
 </head>
 <body>
 
@@ -17,9 +17,9 @@
 	<jsp:setProperty name="auth_response" property="session"
 		value="<%= request.getSession() %>" />
 
-	<h1>Authentication Results</h1>
+	<h1>Resultados de la Autenticación</h1>
 
-	<p>Authentication Policy: ${auth_response.policy}</p>
+	<p>Politica de Autenticación: ${auth_response.policy}</p>
 
 	<c:if test="${sessionScope.Photo != null}">
 		<img src="photo.jpg" />
@@ -28,7 +28,7 @@
 
 	<table>
 		<tr>
-			<th>Identifier</th>
+			<th>Identificador</th>
 			<td>${auth_response.identifier}</td>
 		</tr>
 		<c:forEach var="entry" items="${auth_response.attributeMap}">
@@ -38,6 +38,6 @@
 			</tr>
 		</c:forEach>
 	</table>
-	<a href="index.jsp">Back</a>
+	<a href="index.jsp">Atrás</a>
 </body>
 </html>
