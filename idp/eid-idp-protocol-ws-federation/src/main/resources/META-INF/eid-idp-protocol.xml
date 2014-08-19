@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <IdentityProviderProtocols xmlns="urn:be:fedict:eid:idp:spi:protocol">
-    <IdentityProviderProtocol>
-        <Name>WS-Federation Protocol Service Identification</Name>
+<!--    <IdentityProviderProtocol>
+            <Name>WS-Federation Protocol Service Identification</Name>
         <Description>This eID IdP Protocol Service provides an WS-Federation
             protocol for eID identification purposes.
         </Description>
@@ -14,7 +14,7 @@
                 <ContextPath>/ws-federation/metadata/ident-metadata.xml</ContextPath>
             </Endpoint>
         </Endpoints>
-    </IdentityProviderProtocol>
+    </IdentityProviderProtocol>-->
     <IdentityProviderProtocol>
         <Name>WS-Federation Protocol Service Authentication</Name>
         <Description>This eID IdP Protocol Service provides an WS-Federation
@@ -30,7 +30,7 @@
             </Endpoint>
         </Endpoints>
     </IdentityProviderProtocol>
-    <IdentityProviderProtocol>
+<!--    <IdentityProviderProtocol>
         <Name>WS-Federation Protocol Service Authentication and Identification</Name>
         <Description>This eID IdP Protocol Service provides an WS-Federation
             protocol for eID authentication and identification purposes.
@@ -51,5 +51,5 @@
                 <ContextPath>/sts</ContextPath>
             </WSEndpoint>
         </WSEndpoints>
-    </IdentityProviderProtocol>
+    </IdentityProviderProtocol>-->
 </IdentityProviderProtocols>

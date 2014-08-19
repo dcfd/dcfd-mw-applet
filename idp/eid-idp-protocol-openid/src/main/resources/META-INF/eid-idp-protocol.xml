@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <IdentityProviderProtocols xmlns="urn:be:fedict:eid:idp:spi:protocol">
-    <IdentityProviderProtocol>
+<!--    <IdentityProviderProtocol>
         <Name>OpenID Protocol Service Identification</Name>
         <Description>This eID IdP Protocol Service provides an OpenID protocol
             for eID identification purposes.
@@ -19,7 +19,7 @@
                 <ContextPath>/openid/ident/xrds</ContextPath>
             </Endpoint>
         </Endpoints>
-    </IdentityProviderProtocol>
+    </IdentityProviderProtocol>-->
     <IdentityProviderProtocol>
         <Name>OpenID Protocol Service Authentication</Name>
         <Description>This eID IdP Protocol Service provides an OpenID protocol
@@ -40,7 +40,7 @@
             </Endpoint>
         </Endpoints>
     </IdentityProviderProtocol>
-    <IdentityProviderProtocol>
+<!--    <IdentityProviderProtocol>
         <Name>OpenID Protocol Service Authentication and Identification</Name>
         <Description>This eID IdP Protocol Service provides an OpenID protocol
             for eID authentication and identification purposes.
@@ -59,5 +59,5 @@
                 <ContextPath>/openid/auth-ident/xrds</ContextPath>
             </Endpoint>
         </Endpoints>
-    </IdentityProviderProtocol>
+    </IdentityProviderProtocol>-->
 </IdentityProviderProtocols>

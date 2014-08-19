@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <IdentityProviderProtocols xmlns="urn:be:fedict:eid:idp:spi:protocol">
-    <IdentityProviderProtocol>
+<!--    <IdentityProviderProtocol>
         <Name>SAML2 Browser Post Protocol Service Identification</Name>
         <Description>This eID IdP Protocol Service provides a SAML2 Browser POST
             Profile protocol for eID identification purposes.
@@ -14,7 +14,7 @@
                 <ContextPath>/saml2/post/metadata/ident-metadata.xml</ContextPath>
             </Endpoint>
         </Endpoints>
-    </IdentityProviderProtocol>
+    </IdentityProviderProtocol>-->
     <IdentityProviderProtocol>
         <Name>SAML2 Browser Post Protocol Service Authentication</Name>
         <Description>This eID IdP Protocol Service provides a SAML2 Browser POST
@@ -30,7 +30,7 @@
             </Endpoint>
         </Endpoints>
     </IdentityProviderProtocol>
-    <IdentityProviderProtocol>
+<!--    <IdentityProviderProtocol>
         <Name>SAML2 Browser Post Protocol Service Authentication and Identification</Name>
         <Description>This eID IdP Protocol Service provides a SAML2 Browser POST
             Profile protocol for eID authentication and identification purposes.
@@ -44,8 +44,8 @@
                 <ContextPath>/saml2/post/metadata/auth-ident-metadata.xml</ContextPath>
             </Endpoint>
         </Endpoints>
-    </IdentityProviderProtocol>
-    <IdentityProviderProtocol>
+    </IdentityProviderProtocol>-->
+<!--    <IdentityProviderProtocol>
         <Name>SAML2 Browser Redirect Protocol Service Identification</Name>
         <Description>This eID IdP Protocol Service provides a SAML2 Browser Redirect
             Profile protocol for eID identification purposes.
@@ -59,7 +59,7 @@
                 <ContextPath>/saml2/redirect/metadata/ident-metadata.xml</ContextPath>
             </Endpoint>
         </Endpoints>
-    </IdentityProviderProtocol>
+    </IdentityProviderProtocol>-->
     <IdentityProviderProtocol>
         <Name>SAML2 Browser Redirect Protocol Service Authentication</Name>
         <Description>This eID IdP Protocol Service provides a SAML2 Browser Redirect
@@ -75,7 +75,7 @@
             </Endpoint>
         </Endpoints>
     </IdentityProviderProtocol>
-    <IdentityProviderProtocol>
+<!--    <IdentityProviderProtocol>
         <Name>SAML2 Browser Redirect Protocol Service Authentication and Identification</Name>
         <Description>This eID IdP Protocol Service provides a SAML2 Browser Redirect
             Profile protocol for eID authentication and identification purposes.
@@ -89,8 +89,8 @@
                 <ContextPath>/saml2/redirect/metadata/auth-ident-metadata.xml</ContextPath>
             </Endpoint>
         </Endpoints>
-    </IdentityProviderProtocol>
-    <IdentityProviderProtocol>
+    </IdentityProviderProtocol>-->
+<!--    <IdentityProviderProtocol>
         <Name>SAML2 Artifact Binding Protocol Service Identification</Name>
         <Description>This eID IdP Protocol Service provides a SAML2 Artifact Binding
             Profile protocol for eID identification purposes.
@@ -111,7 +111,7 @@
                 <ContextPath>/saml2/artifact</ContextPath>
             </WSEndpoint>
         </WSEndpoints>
-    </IdentityProviderProtocol>
+    </IdentityProviderProtocol>-->
     <IdentityProviderProtocol>
         <Name>SAML2 Artifact Binding Protocol Service Authentication</Name>
         <Description>This eID IdP Protocol Service provides a SAML2 Artifact Binding
@@ -134,7 +134,7 @@
             </WSEndpoint>
         </WSEndpoints>
     </IdentityProviderProtocol>
-    <IdentityProviderProtocol>
+<!--    <IdentityProviderProtocol>
         <Name>SAML2 Artifact Binding Protocol Service Authentication and Identification</Name>
         <Description>This eID IdP Protocol Service provides a SAML2 Artifact Binding
             Profile protocol for eID authentication and identification purposes.
@@ -155,5 +155,5 @@
                 <ContextPath>/saml2/artifact</ContextPath>
             </WSEndpoint>
         </WSEndpoints>
-    </IdentityProviderProtocol>
+    </IdentityProviderProtocol>-->
 </IdentityProviderProtocols>
