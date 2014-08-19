@@ -14,7 +14,7 @@
 
 			<h:form>
 
-				<h:outputLabel value="No relying parties configured."
+				<h:outputLabel value="No se tiene configurada ninguna relying party."
 					rendered="#{idpRPList.rowCount == 0}" />
 
 				<rich:dataTable id="data" var="item" value="#{idpRPList}" rows="10"
@@ -22,25 +22,25 @@
 					rendered="#{idpRPList.rowCount > 0}">
 
 					<h:column>
-						<f:facet name="header">Name</f:facet>
+						<f:facet name="header">Nombre</f:facet>
 						<h:outputText value="#{item.name}" />
 					</h:column>
 					<h:column>
-						<f:facet name="header">Domain</f:facet>
+						<f:facet name="header">Dominio</f:facet>
 						<h:outputText value="#{item.domain}" />
 					</h:column>
 					<h:column>
-						<f:facet name="header">Certificate Subject</f:facet>
+						<f:facet name="header">Subject del Certificado</f:facet>
 						<h:outputText value="#{item.certificateSubject}" />
 					</h:column>
 					<h:column>
-						<f:facet name="header">Modify</f:facet>
-						<h:commandLink action="#{idpRP.modify}" id="modify" value="Modify" />
+						<f:facet name="header">Modificar</f:facet>
+						<h:commandLink action="#{idpRP.modify}" id="modify" value="Modificar" />
 					</h:column>
 					<h:column>
-						<f:facet name="header">Remove</f:facet>
+						<f:facet name="header">Remover</f:facet>
 						<a4j:commandLink action="#{idpRP.select}" immediate="true"
-							id="remove" value="Remove"
+							id="remove" value="Remover"
 							onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
 					</h:column>
 
@@ -54,21 +54,21 @@
 
 				<p />
 
-				<h:commandButton action="#{idpRP.add}" id="add" value="Add" />
+				<h:commandButton action="#{idpRP.add}" id="add" value="Agregar" />
 
 
 				<rich:modalPanel id="removeConfirm">
 					<div class="center">
-						<h:outputText value="Sure you want to remove this Relying Party ?" />
+						<h:outputText value="Esta seguro de remover este Relying Party ?" />
 						<p>
 							<h:panelGrid id="confirmPanel" columns="2" border="0"
 								styleClass="center">
-								<a4j:commandButton id="remove2" value="Remove"
+								<a4j:commandButton id="remove2" value="Remover"
 									action="#{idpRP.remove}" immediate="true"
 									oncomplete="#{facesContext.maximumSeverity == null ?
                                     'Richfaces.hideModalPanel(\'removeConfirm\');' :
                                     'Richfaces.showModalPanel(\'removeConfirm\');'}" />
-								<a4j:commandButton id="cancel" value="Cancel"
+								<a4j:commandButton id="cancel" value="Cancelar"
 									onclick="Richfaces.hideModalPanel('removeConfirm');" />
 							</h:panelGrid>
 						</p>

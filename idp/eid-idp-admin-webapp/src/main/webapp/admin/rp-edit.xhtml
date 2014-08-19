@@ -21,19 +21,19 @@
 					<rich:tab name="tab_config" label="Configuration">
 						<h:panelGrid columns="2" border="0">
 
-							<h:outputLabel for="name" value="Name" />
+							<h:outputLabel for="name" value="Nombre" />
 							<s:decorate>
 								<h:inputText id="name" value="#{selectedRP.name}" size="50" />
 								<h:message for="name" styleClass="error" />
 							</s:decorate>
 
-							<h:outputLabel for="domain" value="Domain" />
+							<h:outputLabel for="domain" value="Dominio" />
 							<s:decorate>
 								<h:inputText id="domain" value="#{selectedRP.domain}" size="50" />
 								<h:message for="domain" styleClass="error" />
 							</s:decorate>
 
-							<h:outputLabel for="targetURL" value="Target URL" />
+							<h:outputLabel for="targetURL" value="URL de Destino" />
 							<s:decorate>
 								<h:inputText id="targetURL" value="#{selectedRP.targetURL}"
 									size="50" />
@@ -68,32 +68,32 @@
 						<h:panelGrid columns="2" border="0">
 
 							<h:outputText
-								value="eID Trust Service Authentication Trust Domain:" />
+								value="Dominio de Confianza de Autenticacion del eID Trust Service:" />
 							<h:inputText value="#{selectedRP.authnTrustDomain}" />
 
 							<h:outputText
-								value="eID Trust Service Identification (National Registry) Trust Domain:" />
+								value="Dominio de Confianza de Identificacion (Registro Nacional) del eID Trust Service:" />
 							<h:inputText value="#{selectedRP.identityTrustDomain}" />
 
 						</h:panelGrid>
 					</rich:tab>
 
-					<rich:tab name="tab_secret" label="Secrets">
+					<rich:tab name="tab_secret" label="Secretos">
 						<h:panelGrid columns="2" border="0">
 
-							<h:outputText value="HMAC-SHA1 Identifier Secret (hexadecimal)" />
+							<h:outputText value="Identificador HMAC-SHA1 Secreto (hexadecimal)" />
 							<s:decorate>
 								<h:inputText value="#{selectedRP.identifierSecretKey}"
 									id="identifier_secret" size="50" />
 								<h:message for="identifier_secret" styleClass="error" />
 							</s:decorate>
 
-							<h:outputText value="Attribute Secret Algorithm" />
+							<h:outputText value="Atributo Secreto del Algoritmo" />
 							<h:selectOneMenu value="#{selectedRP.attributeSecretAlgorithm}">
 								<f:selectItems value="#{secretAlgorithms}" />
 							</h:selectOneMenu>
 
-							<h:outputText value="Attribute Secret (hexadecimal)" />
+							<h:outputText value="Atributo Secreto (hexadecimal)" />
 							<s:decorate>
 								<h:inputText value="#{selectedRP.attributeSecretKey}"
 									id="attr_secret" size="50" />
@@ -101,14 +101,14 @@
 							</s:decorate>
 
 							<h:outputLabel for="upload_public"
-								value="Attribute Public Key (RSA)" />
+								value="Atributo Clave Publica (RSA)" />
 							<rich:fileUpload
 								fileUploadListener="#{idpRP.uploadListenerPublic}"
 								id="upload_public" immediateUpload="true">
 							</rich:fileUpload>
 							<h:message for="upload_public" styleClass="error" />
 
-							<h:commandButton value="Remove attribute public key"
+							<h:commandButton value="Remover atributo clave publica"
 								action="#{idpRP.removeAttributePublic}"
 								rendered="#{idpRP.attributePublicKey != null}" />
 
@@ -116,7 +116,7 @@
 						<p>
 							<rich:simpleTogglePanel switchType="client" opened="false"
 								rendered="#{idpRP.attributePublicKey != null}"
-								label="Attribute Public Key">
+								label="Atributo Clave Publica">
 								<h:outputText styleClass="text block"
 									value="#{idpRP.attributePublicKey}" />
 							</rich:simpleTogglePanel>
@@ -124,25 +124,25 @@
 
 					</rich:tab>
 
-					<rich:tab name="tab_signing" label="Signing">
+					<rich:tab name="tab_signing" label="Firmar">
 						<h:panelGrid columns="2" border="0">
 
-							<h:outputText value="Requires request signing?" />
+							<h:outputText value="Requerir firma de solicitudes?" />
 							<h:selectBooleanCheckbox
 								value="#{selectedRP.requestSigningRequired}" />
 
 
-							<h:outputLabel value="Certificate Subject" />
+							<h:outputLabel value="Subject del Certificado" />
 							<h:outputLabel value="#{selectedRP.certificateSubject}" />
 
-							<h:outputLabel for="upload" value="Certificate" />
+							<h:outputLabel for="upload" value="Certificado" />
 							<rich:fileUpload fileUploadListener="#{idpRP.uploadListener}"
 								maxFilesQuantity="1" id="upload" immediateUpload="true">
 								<a4j:support event="onuploadcomplete" reRender="cert_panel" />
 							</rich:fileUpload>
 							<h:message for="upload" styleClass="error" />
 
-							<h:commandButton value="Remove certificate"
+							<h:commandButton value="Remover certificado"
 								action="#{idpRP.removeCertificate}"
 								rendered="#{idpRP.attributePublicKey != null}" />
 
@@ -150,7 +150,7 @@
 
 						<p>
 							<rich:simpleTogglePanel id="cert_panel" switchType="client"
-								opened="true" label="Certificate">
+								opened="true" label="Certificado">
 								<h:outputText id="cert_view" styleClass="text block"
 									escape="false" value="#{selectedRP.certificateString}" />
 							</rich:simpleTogglePanel>
@@ -158,7 +158,7 @@
 
 					</rich:tab>
 
-					<rich:tab name="tab_attributes" label="Attributes">
+					<rich:tab name="tab_attributes" label="Atributos">
 
 						<rich:dataTable id="data" var="item"
 							value="#{selectedRP.attributes}"
@@ -166,38 +166,38 @@
 							rendered="#{selectedRP.attributes != null}">
 
 							<h:column>
-								<f:facet name="header">Attribute</f:facet>
+								<f:facet name="header">Atributo</f:facet>
 								<h:outputText value="#{item.attribute.uri}" />
 							</h:column>
 							<h:column>
-								<f:facet name="header">Encrypted?</f:facet>
+								<f:facet name="header">Encriptado?</f:facet>
 								<h:selectBooleanCheckbox value="#{item.encrypted}" />
 							</h:column>
 
 						</rich:dataTable>
 
 						<h:commandButton action="#{idpRP.selectAttributes}"
-							id="select_attributes" value="Select Attributes"
+							id="select_attributes" value="Seleccionar Atributos"
 							rendered="#{selectedRP.id != null}" />
 
 					</rich:tab>
 
 					<rich:tab name="tab_applet" label="eID Applet">
 						<h:panelGrid columns="2">
-							<h:outputText value="Override Remove eID Card" />
+							<h:outputText value="Sobreescribir Opcion de Remover tarjeta" />
 							<h:selectBooleanCheckbox value="#{idpRP.overrideRemoveCard}" />
 
-							<h:outputText value="Remove eID Card" />
+							<h:outputText value="Remover tarjeta" />
 							<h:selectBooleanCheckbox value="#{idpRP.removeCard}" />
 						</h:panelGrid>
 					</rich:tab>
 
-					<rich:tab name="tab_blocked" label="Block">
+					<rich:tab name="tab_blocked" label="Bloquear">
 						<h:panelGrid columns="2">
-							<h:outputText value="Blocked" />
+							<h:outputText value="Bloqueado" />
 							<h:selectBooleanCheckbox value="#{idpRP.blocked}" />
 
-							<h:outputText value="Message" />
+							<h:outputText value="Mensage" />
 							<h:inputTextarea value="#{idpRP.blockedMessage}" cols="50"
 								rows="5" />
 						</h:panelGrid>
@@ -207,8 +207,8 @@
 
 				<h:panelGrid columns="2" border="0">
 
-					<h:commandButton action="#{idpRP.save}" id="save" value="Save" />
-					<h:commandButton action="#{idpRP.back}" id="back" value="Back"
+					<h:commandButton action="#{idpRP.save}" id="save" value="Guardar" />
+					<h:commandButton action="#{idpRP.back}" id="back" value="Atras"
 						immediate="true" />
 				</h:panelGrid>
 

@@ -10,7 +10,7 @@
 <body>
 	<ui:composition template="/WEB-INF/template.xhtml">
 		<ui:define name="body">
-			<h2>Administrator Privileges</h2>
+			<h2>Privilegios de Administrador</h2>
 
 			<h:form>
 
@@ -18,34 +18,34 @@
 					rows="10" rowClasses="listingTable_Row1,listingTable_Row2">
 
 					<h:column>
-						<f:facet name="header">Name</f:facet>
+						<f:facet name="header">Nombre</f:facet>
 						<h:outputText value="#{item.name}" />
 					</h:column>
 					<h:column>
-						<f:facet name="header">Remove</f:facet>
+						<f:facet name="header">Remover</f:facet>
 						<a4j:commandLink action="#{idpAdmin.select}" immediate="true"
-							id="remove" value="Remove"
+							id="remove" value="Remover"
 							onclick="Richfaces.showModalPanel('removeConfirm',{width:400, top:200})" />
 					</h:column>
 					<h:column>
-						<f:facet name="header">Approve</f:facet>
-						<h:commandLink id="register" value="Approve"
+						<f:facet name="header">Aprobar</f:facet>
+						<h:commandLink id="register" value="Aprobar"
 							action="#{idpAdmin.registerPending}" rendered="#{item.pending}" />
 					</h:column>
 				</rich:dataTable>
 
 				<rich:modalPanel id="removeConfirm">
 					<div class="center">
-						<h:outputText value="Sure you want to remove this administrator?" />
+						<h:outputText value="Esta seguro de remover este administrador?" />
 						<p>
 							<h:panelGrid id="confirmPanel" columns="2" border="0"
 								styleClass="center">
-								<a4j:commandButton id="remove2" value="Remove"
+								<a4j:commandButton id="remove2" value="Remover"
 									action="#{idpAdmin.remove}" immediate="true"
 									oncomplete="#{facesContext.maximumSeverity == null ?
                                     'Richfaces.hideModalPanel(\'removeConfirm\');' :
                                     'Richfaces.showModalPanel(\'removeConfirm\');'}" />
-								<a4j:commandButton id="cancel" value="Cancel"
+								<a4j:commandButton id="cancel" value="Cancelar"
 									onclick="Richfaces.hideModalPanel('removeConfirm');" />
 							</h:panelGrid>
 						</p>
