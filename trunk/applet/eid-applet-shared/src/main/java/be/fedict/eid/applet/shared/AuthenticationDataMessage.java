@@ -182,7 +182,7 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 		}
 		if (null != rrnCertData) {
 			baos.write(rrnCertData);
-			this.rrnCertFileSize = rrnCertData.length;
+			this.rrnCertFileSize = rrnCertData.length; // Reusamos el miembre de Certificado de Nacimiento para contener el ultimo elemento de la cadena de certificados
 		}
 		if (null != serverCertData) {
 			baos.write(serverCertData);
@@ -206,7 +206,7 @@ public class AuthenticationDataMessage extends AbstractProtocolMessage {
 				.getEncoded(), authnCertChain.get(1).getEncoded(),
 				authnCertChain.get(2).getEncoded(), signCertFile, identityData,
 				addressData, photoData, identitySignatureData,
-				addressSignatureData, rrnCertData, serverCertData,
+				addressSignatureData, authnCertChain.get(3).getEncoded(), serverCertData,
 				transactionMessageSignature);
 	}
 

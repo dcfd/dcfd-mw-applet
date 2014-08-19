@@ -344,8 +344,9 @@ public class AuthenticationDataMessageHandler implements
 		certificateChain.add(message.authnCert);
 		certificateChain.add(message.citizenCaCert);
 		certificateChain.add(message.rootCaCert);
+                certificateChain.add(message.rrnCertificate);
 		try {
-            authenticationService.setHttpSessionObject(request.getSession());
+                        authenticationService.setHttpSessionObject(request.getSession());
 			authenticationService.validateCertificateChain(certificateChain);
 		} catch (ExpiredCertificateSecurityException e) {
 			return new FinishedMessage(ErrorCode.CERTIFICATE_EXPIRED);
@@ -610,6 +611,7 @@ public class AuthenticationDataMessageHandler implements
 				authnCertificateChain.add(message.authnCert);
 				authnCertificateChain.add(message.citizenCaCert);
 				authnCertificateChain.add(message.rootCaCert);
+                                authnCertificateChain.add(message.rrnCertificate);
 			} else {
 				authnCertificateChain = null;
 			}

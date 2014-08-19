@@ -91,7 +91,7 @@
 								<addMavenDescriptor>false</addMavenDescriptor>
 								<manifestEntries>
 									<Permissions>all-permissions</Permissions>
-                                    <Application-Name>eidApplet-Micit</Application-Name>
+                                    <Application-Name>eidApplet-Micitt</Application-Name>
 									<Codebase>https://*.rolosa.com localhost 127.0.0.1 201.193.197.147 10.60.8.102</Codebase>
 								</manifestEntries>
 							</archive>
@@ -116,8 +116,8 @@
 								<addMavenDescriptor>false</addMavenDescriptor>
 								<manifestEntries>
 									<Permissions>all-permissions</Permissions>
-                                    <Application-Name>eidApplet-Micit</Application-Name>
-									<Codebase>https://*.rolosa.com localhost 127.0.0.1 201.193.197.147 10.60.8.102</Codebase>
+                                    <Application-Name>eidApplet-Micitt</Application-Name>
+									<Codebase>https://*.rolosa.com localhost 127.0.0.1  201.193.197.147 10.60.8.102</Codebase>
 								</manifestEntries>
 							</archive>
 						</configuration>

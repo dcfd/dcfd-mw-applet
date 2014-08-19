@@ -302,7 +302,7 @@ public class AppletServiceServletTest {
 		assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, result);
 	}
 
-	//@Test
+	@Test
 	public void sslPostIdentityMessage() throws Exception {
 		// setup
 		byte[] idFile = IOUtils.toByteArray(AppletServiceServletTest.class
@@ -353,7 +353,7 @@ public class AppletServiceServletTest {
 		assertNull(address);
 	}
 
-	//@Test
+	@Test
 	public void sslPostIdentityMessageViaTransport() throws Exception {
 		// setup
 		byte[] idFile = IOUtils.toByteArray(AppletServiceServletTest.class
