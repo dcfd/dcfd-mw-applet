@@ -10,7 +10,7 @@
 	<core:init jndi-pattern="be/fedict/eid/idp/webapp/#{ejbName}" />
 
 	<international:locale-config
-		default-locale="en" supported-locales="en nl fr de" />
+		default-locale="es" supported-locales="es" />
 
 	<web:rewrite-filter view-mapping="*.seam" />
 
