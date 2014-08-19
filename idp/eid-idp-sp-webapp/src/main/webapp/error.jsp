@@ -5,14 +5,14 @@
 
 <html>
 <head>
-<title>eID Identity Provider (IdP) - Test Service Provider (SP)</title>
+<title>eID Identity Provider (IdP) - Proveedor de Servicios de Prueba (SP)</title>
 </head>
 <body>
 
-	<h1>Authentication Failed</h1>
+	<h1>Fallo en la Autentication</h1>
 	<p>
-		Reason:<%=session.getAttribute("ErrorMessage")%>
+		Motivo:<%=session.getAttribute("ErrorMessage")%>
 	</p>
-	<a href="index.jsp">Back</a>
+	<a href="index.jsp">Atras</a>
 </body>
 </html>

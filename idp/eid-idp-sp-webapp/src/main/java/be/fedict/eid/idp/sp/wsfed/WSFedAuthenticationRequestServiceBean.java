@@ -58,7 +58,7 @@ public class WSFedAuthenticationRequestServiceBean implements
 
 	@Override
 	public String getLanguage() {
-		return "fr";
+		return "es";
 	}
 
 	public String getIdPEntryPoint() {
