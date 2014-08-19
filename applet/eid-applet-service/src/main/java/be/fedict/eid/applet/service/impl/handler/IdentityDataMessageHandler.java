@@ -128,12 +128,13 @@ public class IdentityDataMessageHandler implements
 
 		LOG.debug("identity file size: " + message.idFile.length);
 		// parse the identity files
-		Identity identity = TlvParser.parse(message.idFile, Identity.class);
+		Identity identity = TlvParser.parse(message.idFile, Identity.class); // No hay Identity file en la tarjeta del Micitt
+                identity.gender = Gender.MALE; // Por defecto a MALE 
 
 		RequestContext requestContext = new RequestContext(session);
-		boolean includeAddress = requestContext.includeAddress();
+		boolean includeAddress = false;//requestContext.includeAddress();
 		boolean includeCertificates = requestContext.includeCertificates();
-		boolean includePhoto = requestContext.includePhoto();
+		//boolean includePhoto = false;requestContext.includePhoto();
 
 		/*
 		 * Check whether the answer is in-line with what we expected.
@@ -190,12 +191,12 @@ public class IdentityDataMessageHandler implements
 			rootCert = getCertificate(message.rootCertFile);
 		}
 
-		IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
+		/*IdentityIntegrityService identityIntegrityService = this.identityIntegrityServiceLocator
 				.locateService();
 		if (null != identityIntegrityService) {
-			/*
-			 * First check if all required identity data is available.
-			 */
+			
+			  //First check if all required identity data is available.
+			 
 			if (null == message.identitySignatureFile) {
 				throw new ServletException(
 						"identity signature data not included while request");
@@ -216,9 +217,9 @@ public class IdentityDataMessageHandler implements
 			}
 			LOG.debug("RRN certificate file size: "
 					+ message.rrnCertFile.length);
-			/*
-			 * Run identity integrity checks.
-			 */
+			
+			 //* Run identity integrity checks.
+			 
 			X509Certificate rrnCertificate = getCertificate(message.rrnCertFile);
 			PublicKey rrnPublicKey = rrnCertificate.getPublicKey();
 			verifySignature(rrnCertificate.getSigAlgName(),
@@ -298,9 +299,9 @@ public class IdentityDataMessageHandler implements
 			if (false == includePhoto) {
 				throw new ServletException("photo include while not requested");
 			}
-			/*
-			 * Photo integrity check.
-			 */
+			
+			 //* Photo integrity check.
+			
 			byte[] expectedPhotoDigest = identity.photoDigest;
 			byte[] actualPhotoDigest = digestPhoto(
 					getDigestAlgo(expectedPhotoDigest.length),
@@ -314,9 +315,9 @@ public class IdentityDataMessageHandler implements
 			}
 		}
 
-		/*
-		 * Check the validity of the identity data as good as possible.
-		 */
+		
+		 //* Check the validity of the identity data as good as possible.
+		 
 		GregorianCalendar cardValidityDateEndGregorianCalendar = identity
 				.getCardValidityDateEnd();
 		if (null != cardValidityDateEndGregorianCalendar) {
@@ -324,9 +325,10 @@ public class IdentityDataMessageHandler implements
 			Date cardValidityDateEndDate = cardValidityDateEndGregorianCalendar
 					.getTime();
 			if (now.after(cardValidityDateEndDate)) {
-				throw new SecurityException("eID card has expired");
+                            LOG.debug("eID card has expired - NOT IMPLEMENTED IDENTITY PROCESSING ");
+				//throw new SecurityException("eID card has expired");
 			}
-		}
+		}*/
 
 		// push the identity into the session
 		session.setAttribute(IDENTITY_SESSION_ATTRIBUTE, identity);
@@ -378,11 +380,11 @@ public class IdentityDataMessageHandler implements
 					message.addressFile);
 		}
 
-		AuditService auditService = this.auditServiceLocator.locateService();
+		/*AuditService auditService = this.auditServiceLocator.locateService();
 		if (null != auditService) {
 			String userId = identity.nationalNumber;
 			auditService.identified(userId);
-		}
+		}*/
 
 		return new FinishedMessage();
 	}
