@@ -311,6 +311,25 @@ public class ProtocolEntryServlet extends HttpServlet {
 			return;
 		}
 
+                /*
+                 Explicitamente deshabilitamos los protocolos relacionados con
+                 Identification debido a que la tarjeta del Banco Central
+                 no contiene informacion de identidad. El TLV parsing del
+                 archivo de identidad de Belgica esta estrictamente ligado
+                 a la disposicion fisica de la informacion en esa tarjeta y
+                 no se tiene ninguna analogia reutilizable en la tarjeta
+                 del Banco Central por el momento.*/
+                if(request.getPathInfo().equals("/openid/ident") || request.getPathInfo().equals("/openid/auth-ident") ||
+                        request.getPathInfo().equals("/saml2/post/ident") || request.getPathInfo().equals("/saml2/post/auth-ident") ||
+                        request.getPathInfo().equals("/saml2/redirect/ident") || request.getPathInfo().equals("/saml2/redirect/auth-ident") ||
+                        request.getPathInfo().equals("/saml2/artifact/ident") || request.getPathInfo().equals("/saml2/artifact/auth-ident") ||
+                        request.getPathInfo().equals("/saml2/ws-federation/ident") || request.getPathInfo().equals("/saml2/ws-federation/auth-ident") ) {
+                    LOG.warn("unsupported protocol: " + protocolServiceContextPath);
+			response.sendRedirect(request.getContextPath()
+					+ this.unknownProtocolPageInitParam);
+			return;
+                }
+
 		try {
 			IncomingRequest incomingRequest = protocolService
 					.handleIncomingRequest(request, response);

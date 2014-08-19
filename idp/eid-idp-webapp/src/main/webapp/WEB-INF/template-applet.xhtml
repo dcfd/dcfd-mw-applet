@@ -34,18 +34,6 @@
 				<p>Applet</p>
 			</ui:insert>
 
-			<rich:panel>
-				<f:facet name="header">
-        			#{messages.privacyDetails}
-        		</f:facet>
-				<p>#{messages.attributeInfo}</p>
-				<rich:dataTable id="data" var="item" value="#{idpRPAttributes}">
-					<h:column>
-						<h:outputText value="#{item.uri}" />
-					</h:column>
-				</rich:dataTable>
-			</rich:panel>
-
 		</ui:define>
 	</ui:composition>
 </body>
