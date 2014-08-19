@@ -131,7 +131,7 @@ public class ViewBean implements View {
 				httpSession);
 		documentRepository.setRole(this.role);
 		documentRepository.setEmail(this.email);
-		documentRepository.setIncludeIdentity(this.includeIdentity);
+		documentRepository.setIncludeIdentity(false);
 		return "sign";
 	}
 
