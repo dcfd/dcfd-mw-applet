@@ -4,17 +4,17 @@ body {
 }
 
 h1 {
-	color: gray;
+        color: #069;
 }
 
 h2 {
-	color: #FF9000;
+	color: gray;
 	font-size: large;
 	font-family: Arial;
 }
 
 h3 {
-	color: #FF9000;
+	color: #069;
 	font-size: medium;
 	font-family: Arial;
 	font-style: italic;
@@ -62,13 +62,13 @@ h3 {
 }
 
 #menu a:hover {
-	background: #FF9000;
+	background: #C0CD29;
 	text-decoration: none;
 	cursor: pointer;
 }
 
 .selected {
-	background: #FF9000;
+	background: #C0CD29;
 }
 
 #content {

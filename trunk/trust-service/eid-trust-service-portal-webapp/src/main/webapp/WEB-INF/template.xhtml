@@ -13,7 +13,7 @@
 <meta http-equiv="Expires" content="-1" />
 <meta http-equiv="Pragma" content="no-cache" />
 <title>#{messages.title}</title>
-<a4j:loadStyle src="/style.css" />
+<!--<a4j:loadStyle src="/style.css" />-->
 
 <script type="text/javascript">
 	function setClass(id, className) {
@@ -24,38 +24,68 @@
 	}
 </script>
 
+    <link rel="stylesheet" type="text/css" media="all"
+          href="#{facesContext.externalContext.requestContextPath}/css/belgium_header.css"/>
+    <link rel="stylesheet" type="text/css" media="all"
+          href="#{facesContext.externalContext.requestContextPath}/css/my-belgium.css"/>
+    <link rel="stylesheet" type="text/css" media="all"
+          href="#{facesContext.externalContext.requestContextPath}/css/style.css"/>
+    <link rel="stylesheet" type="text/css" media="all"
+          href="#{facesContext.externalContext.requestContextPath}/css/extra.css"/>
+    <link rel="stylesheet" type="text/css" media="print"
+          href="#{facesContext.externalContext.requestContextPath}/css/my-belgium-print.css"/>
+
+    <!--&lt;!&ndash;[if lt IE 9]>-->
+    <link rel="stylesheet" type="text/css" media="all"
+          href="#{facesContext.externalContext.requestContextPath}/css/ie.css"/>
+    <!--<![endif]&ndash;&gt;-->
+
+
+
 </head>
 
 
-<body onload="setClass('menu_item_#{activeMenu}', 'selected');">
-	<div id="header">
-        <div style="display: block; height: 100px;">
-            <div style="float: left">
-                <h:graphicImage url="images/logoMicitt.png" height="80px" width="108px" alt="Micitt"/>
-            </div>
-            <div style="float: left">
-                <h:graphicImage url="images/logoFirmadigital.png" height="90px" width="240px" alt="Firma Digital" style="margin-left:100px;"/>
-            </div>
-            <div style="float: right">
-                <h:graphicImage url="images/logoRolosa.png" height="99px" width="108px" alt="Rolosa"/>
+<body onload="setClass('menu_item_#{activeMenu}', 'selected');" id="home">
+
+<div id="allContainer">
+<div id="allWrap">
+
+    <div id="header">
+    <div id="headerWrap">
+        <div id="blgm_belgiumHeader">
+            <div class="blgm_wrapper">
+                <div id="blgm_beLogo">
+
+                </div>
+
+                        <div id="blgm_beLink">
+                            #{messages.otherServices}<a title="http://www.firmadigital.go.cr/" class="blgm_loglink" href="http://www.firmadigital.go.cr/">www.firmadigital.go.cr/</a>
+                        </div>
+                    </div>
+                </div>
+
+                <h1 class="siteLabel">
+                        <span class="siteLogo">
+                            <a href="#{facesContext.externalContext.requestContextPath}/main">
+                                <img alt="DNCD" src="img/logo_firmadigital.png" height="75px" style="margin-right: 20px;"/>
+                                <span class="siteName"><span>#{messages.title}</span></span>
+                                <span class="siteTag">#{messages.sitetag}<span></span></span>
+                            </a>
+                        </span>
+                </h1>
             </div>
         </div>
-        
-		<div id="language">
-			<h:form>
-				<h:selectOneMenu id="language"
-					value="#{ts_localization.localeString}" onchange="submit();">
-					<f:selectItems value="#{ts_localization.supportedLocales}" />
-				</h:selectOneMenu>
-			</h:form>
-		</div>
-
-		<h1>#{messages.title}</h1>
-	</div>
-
+        <div id="language" style="visibility: hidden;">
+                <h:form>
+                        <h:selectOneMenu id="language"
+                                value="#{ts_localization.localeString}" onchange="submit();">
+                                <f:selectItems value="#{ts_localization.supportedLocales}" />
+                        </h:selectOneMenu>
+                </h:form>
+        </div>
 	<!-- Seems to resolve deployJava.js/Chrome issue ... -->
 	<f:view contentType="text/html">
-		<h:form>
+<!--		<h:form>
 			<div id="menu">
 				<ul>
 					<li id="menu_item_main"><a
@@ -66,14 +96,35 @@
 					</li>
 				</ul>
 			</div>
-		</h:form>
+		</h:form>-->
 
 		<div id="content">
+                    <div id="contentWrap">
 			<ui:insert name="body">
 				<p>Default Body</p>
 			</ui:insert>
+                    </div>
 		</div>
+                <div id="footer">
+                    <div id="footerWrap">
+                        <div id="footerWrap2">
+                            <div class="copyright"><p>#{messages.copyright}</p>
+                            </div>
+                            <div class="rolosa-logo">
+                                <a href="http://www.rolosa.com" target="_blank" title="www.rolosa.com">Rolosa S.A.
+        <!--                            <img alt="www.rolosa.com" src="img/rolosa.png" height="40px"/>-->
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 	</f:view>
+
+
+    </div>
+</div>
+
+<script type="text/javascript" src="./js/global.js"></script>
 
 </body>
 

@@ -11,7 +11,7 @@
 	<core:init jndi-pattern="fedict/eid/trust/portal/#{ejbName}" />
 
 	<international:locale-config
-		default-locale="es" supported-locales="es en nl fr de" />
+		default-locale="es" supported-locales="es" />
 	<international:locale-selector
 		cookie-enabled="true" />
 
