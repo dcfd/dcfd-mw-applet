@@ -320,7 +320,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
 	protected String getCanonicalizationMethod() {
 		// CanonicalizationMethod.INCLUSIVE fails for OOo
-		return CanonicalizationMethod.EXCLUSIVE;
+		return CanonicalizationMethod.INCLUSIVE;
+        //return CanonicalizationMethod.EXCLUSIVE;
 	}
 
 	@SuppressWarnings("unchecked")

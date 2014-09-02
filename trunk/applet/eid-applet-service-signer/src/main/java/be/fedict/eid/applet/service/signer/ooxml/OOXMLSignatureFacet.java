@@ -406,11 +406,96 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		signatureInfoElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns",
 				OFFICE_DIGSIG_NS);
 
+                Element setupIDElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "SetupID");
+
+		signatureInfoElement.appendChild(setupIDElement);
+
+                Element signatureTextElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "SignatureText");
+
+		signatureInfoElement.appendChild(signatureTextElement);
+
+                Element signatureImageElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "SignatureImage");
+
+		signatureInfoElement.appendChild(signatureImageElement);
+
+
+                Element signatureCommentsElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "SignatureComments");
+
+		signatureInfoElement.appendChild(signatureCommentsElement);
+
+                Element windowsVersionElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "WindowsVersion");
+		windowsVersionElement
+				.setTextContent("6.1");
+		signatureInfoElement.appendChild(windowsVersionElement);
+
+                Element officeVersionElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "OfficeVersion");
+		officeVersionElement
+				.setTextContent("15.0");
+		signatureInfoElement.appendChild(officeVersionElement);
+
+                Element applicationVersionElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "ApplicationVersion");
+		applicationVersionElement
+				.setTextContent("15.0");
+		signatureInfoElement.appendChild(applicationVersionElement);
+
+                Element monitorsElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "Monitors");
+		monitorsElement
+				.setTextContent("1");
+		signatureInfoElement.appendChild(monitorsElement);
+
+                Element horizontalResolutionElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "HorizontalResolution");
+		horizontalResolutionElement
+				.setTextContent("1366");
+		signatureInfoElement.appendChild(horizontalResolutionElement);
+
+                Element verticalResolutionElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "VerticalResolution");
+		verticalResolutionElement
+				.setTextContent("768");
+		signatureInfoElement.appendChild(verticalResolutionElement);
+
+                Element colorDepthElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "ColorDepth");
+		colorDepthElement
+				.setTextContent("32");
+		signatureInfoElement.appendChild(colorDepthElement);
+
+                Element signatureProviderIdElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "SignatureProviderId");
+		signatureProviderIdElement
+				.setTextContent("{00000000-0000-0000-0000-000000000000}");
+		signatureInfoElement.appendChild(signatureProviderIdElement);
+
+                Element signatureProviderUrlElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "SignatureProviderUrl");
+		signatureInfoElement.appendChild(signatureProviderUrlElement);
+
+                Element signatureProviderDetailsElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "SignatureProviderDetails");
+		signatureProviderDetailsElement
+				.setTextContent("9");
+		signatureInfoElement.appendChild(signatureProviderDetailsElement);
+
 		Element manifestHashAlgorithmElement = document.createElementNS(
 				OFFICE_DIGSIG_NS, "ManifestHashAlgorithm");
 		manifestHashAlgorithmElement
 				.setTextContent("http://www.w3.org/2000/09/xmldsig#sha1");
 		signatureInfoElement.appendChild(manifestHashAlgorithmElement);
+
+                Element signatureTypeElement = document.createElementNS(
+				OFFICE_DIGSIG_NS, "SignatureType");
+		signatureTypeElement
+				.setTextContent("1");
+		signatureInfoElement.appendChild(signatureTypeElement);
 
 		List<XMLStructure> signatureInfoContent = new LinkedList<XMLStructure>();
 		signatureInfoContent.add(new DOMStructure(signatureInfoElement));
