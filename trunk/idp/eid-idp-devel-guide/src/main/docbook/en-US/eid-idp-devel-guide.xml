@@ -3,19 +3,19 @@
 	xsi:schemaLocation="http://docbook.org/ns/docbook http://www.docbook.org/xml/5.0/xsd/docbook.xsd"
 	xmlns="http://docbook.org/ns/docbook" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<articleinfo>
-		<title>eID Identity Provider Developer's Guide</title>
+		<title>Guía de Desarrolladores para el eID Identity Provider</title>
 		<subtitle>
-			Integrating your web applications with the eID Identity
+			Integrando su aplicación web con el eID Identity
 			Provider.
 		</subtitle>
 		<subtitle>
-			Version &project.version;
+			Versión &project.version;
 		</subtitle>
 		<copyright>
 			<year>2009-2013</year>
 			<holder>FedICT</holder>
 		</copyright>
-		<releaseinfo>17 Sep 2013</releaseinfo>
+		<releaseinfo>10 Aug 2014</releaseinfo>
 		<authorgroup>
 			<author>
 				<firstname>Wim</firstname>
@@ -28,86 +28,36 @@
 		</authorgroup>
 		<abstract>
 			<para>
-				This developer's guide serves as an entry point for integrating
-				the eID Identity Provider in your web applications. The
-				target
-				audience are web developers and web application
-				architects.
+				Esta guía de desarrollo sirve de punto de entrada para integrar el Proveedor de Identidad eID en aplicaciones web. La audiencia de destino son desarrolladores web y arquitectos de aplicaciones web.
 			</para>
 		</abstract>
 	</articleinfo>
 	<section>
-		<title>Introduction</title>
+		<title>Introdución</title>
 		<para>
-			The eID Identity Provider (eID IdP) is an identity
-			provider
-			which makes use of the eID Applet for authenticating
-			users.
-			The main goal of the eID Identity Provider is to ease the
-			integration
-			of eID in web applications of a Service Provider. It makes
-			use of
-			the eID Trust Service for validation of the eID
-			certificates.
+			El eID Identity Provider (eID IdP) es un proveedor de identidad que utiliza el eID Applet para autenticar usuarios. El principal objetivo del eID Identidy Provider es facilitar la integración del eID en aplicaciones Web de un Proveedor de Servicios. Este utiliza el eID trust service para la validación de  certificados digitales.
 		</para>
 		<para>
-			The eID Identity Provider is not a complete IAM solution.
-			Following
-			is out-of-scope:
-			<itemizedlist>
-				<listitem>
-					<para>
-						Delivery of attributes not present on the eID card.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						Delivery of role-attributes or role-attribute
-						certificates.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						Management of SSO domains.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						Management of the lifecycle of a digital identity.
-					</para>
-				</listitem>
-			</itemizedlist>
-		</para>
-		<para>
-			The eID Identity Provider supports different protocols, as
-			highlighted in following sections.
+			El eID Identity Provider soporta varios protocolos como se muestra en las siguientes secciones.
 		</para>
 		<tip>
-			<title>Clock synchronization</title>
+			<title>Sincronización de Reloj</title>
 			<para>
-				Most authentication token formats delivered by the eID IdP
-				contain some type of time-stamp. Because of this it is important to
-				have a correct clock synchronization between the eID IdP clock and
-				the clock of the relying party web application. Synchronizing the
-				clock of the relying party web application hosting machine using NTP
-				is the easiest way to achieve this.
+				La mayoría de los formatos de los tokens de autenticación provistos por el eID IdP contienen algún tipo de sellado de tiempo. Debido a esto, es importante tener una correcta sincronización del reloj entre el eID IdP y las aplicaciones web de los Proveedores de Servicios. La forma más simple es utilizar NTP.
 			</para>
 		</tip>
 	</section>
 	<section>
-		<title>SAML v2.0 Browser POST</title>
+		<title>SAML v2.0 POST del Navegador</title>
 		<section>
-			<title>Authentication Request</title>
+			<title>Solicitud de Autenticación</title>
 			<para>
-				The Service Provider (SP) web application sends the SAML v2.0
-				authentication request Base64 encoded using an HTTP Post via the web
-				browser of the client. The POST parameter used for that is
+				La aplicación web del Proveedor de Servicio (SP) envía una solicitud de autenticación SAML v2.0 codificada en Base64 utilizando HTTP Post a través del navegador del cliente. El parámetro POST utilizado para eso es  
 				<emphasis>SAMLRequest</emphasis>
 				.
 			</para>
 			<para>
-				Following is an example of such a SAML v2.0 authentication
-				request:
+				El siguiente es un ejemplo de dicha solicitud de autenticación SAML v2.0:
 				<programlisting language="XML"><![CDATA[<saml2p:AuthnRequest xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol"
     AssertionConsumerServiceURL="https://192.168.1.101:443/eid-idp-sp/saml2-landing"
     Destination="https://192.168.1.101:443/eid-idp/protocol/saml2"
@@ -126,85 +76,64 @@
 			<section>
 				<title>Java SDK</title>
 				<para>
-					The eID Identity Provider Java SDK provides a servlet
+					El SDK de Java del eID Identity Provider provee un servlet 
 					(
 					<code>
 						be.fedict.eid.idp.sp.protocol.saml2.AuthenticationRequestServlet
 					</code>
-					) which will generate and send out such a request. Configuration of
-					the servlet can be acheived either by providing:
+					) el que puede generar dicha solicitud. La configuración del servlet puede ser realizada proveyendo:
 					<itemizedlist>
 						<listitem>
 							<para>
 								<code>AuthenticationRequestService(Class)</code>
-								Optional JNDI location (or Class reference) of
-								an implementation
-								of the
-								AuthenticationRequestService interface. This
-								implementation can provide an optional SP
-								identity used for
-								signing the authentication
-								request, issuer of the authentication
-								request,
-								optional relay state, IdP destination,
-								SP destination and
-								optional language to display
-								the eID IdP webapp in.
+								Ubicación JNDI opcional (o referencia de clase) de una 
+                                                                implementación de la interfaz 
+                                                                AuthenticationRequestService.  
+                                                                Esta implementación puede proveer una identidad 
+                                                                opcional del Proveedor de Servicios utilizado 
+                                                                para la firma de la solicitud de autenticación, 
+                                                                emisor de la solicitud de autenticación,
+                                                                estado de relay (opcional), IdP de destino,
+                                                                destino del Proveedor de Servicios y opcionalmente el
+                                                                lenguaje a mostrar en la aplicación web del  eID IdP .
 							</para>
 						</listitem>
 					</itemizedlist>
 
-					or by providing following init parameters:
+					También proveyendo los siguientes parámetros:
 					<itemizedlist>
 						<listitem>
 							<para>
 								<code>IdPDestination</code>
-								The location of the eID IdP SAML v2.0
-								landing servlet.
+								La ubicación del servlet de destino eID IdP SAML v2.0
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>SPDestination</code>
-								The absolute location of the Service Providers's
-								SAML v2.0
-								landing servlet, which will handle the
-								incoming authentication
-								response.
+								La ubicación absoluta del servlet de destino SAML v2.0 del Proveedor de Servicio que manejara la respuesta de autenticación entrante.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>SPDestinationPage</code>
-								The location of the Service Providers's SAML
-								v2.0 landing
-								servlet, which will handle the
-								incoming authentication response.
-								Absolute path
-								will be constructed automatically from the
-								servlet's context.
+								La ubicación del proveedor de servicio  SAML
+								v2.0 qué manejará la respuesta de autenticación entrante. 
+                                                                La ruta absoluta será construida automáticamente desde el contexto del servlet.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>Language</code>
-								Optional language to display the eID IdP
-								webapp in.
-								Available locales are
-								<code>nl, fr,
-									en, de
-								</code>
-								. If an unsupported locale is used,
-								the browsers' default locale
-								will be used.
+								Lenguaje opcional para mostrar la aplicación web del IDP.
 							</para>
 						</listitem>
 					</itemizedlist>
 				</para>
 				<para>
-					Following is a snippet of the
+					El siguiente ejemplo muestra una sección del archivo 
 					<code>web.xml</code>
-					for configuring the servlet.
+					para configurar el servlet.
 				</para>
 				<programlisting language="XML"><![CDATA[<servlet>
 	<servlet-name>SAML2AuthenticationRequestServlet</servlet-name>
@@ -223,32 +152,27 @@
 	<url-pattern>/saml-request</url-pattern>
 </servlet-mapping>]]></programlisting>
 				<para>
-					The
+                                        La clase
 					<code>AuthenticationRequestUtil</code>
-					class is available for integration outside a servlet context
-					( e.g.
-					JSF lifecycle components). Note that it needs a
+					está disponible para la integración fuera del contexto del servlet 
+					( ej.
+					JSF lifecycle components). Nótese que esta  necesita de la clase 
 					<code>HttpServletResponse</code>
-					for submitting the authentication request using Browser
-					POST.
+					para enviar la solicitud de autenticación utilizando 
+					POST del navegador.
 				</para>
 			</section>
 		</section>
 		<section>
-			<title>Authentication Response</title>
+			<title>Respuesta de Autenticación</title>
 			<para>
-				The Identity Provider will return a (Base64 encoded)
-				SAML v2.0
-				authentication response using an HTTP Post
-				via the web browser of the
-				client. The POST parameter used for
-				that is
+				El Identity Provider retornara  una respuesta de autenticación SAML v2.0 codificada en Base64 utilizando un POST del navegador del cliente.
+                            El parámetro POST utilizado para esto es:
 				<emphasis>SAMLResponse</emphasis>
 				.
 			</para>
 			<para>
-				Following is an example of such a SAML v2.0 authentication
-				response:
+				El siguiente es un ejemplo de dicha respuesta de autenticación SAML v2.0:
 				<programlisting language="XML"><![CDATA[<saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol"
     Destination="https://192.168.1.101:443/eid-idp-sp/saml2-landing"
     ID="saml-response-eccaf61a-f8f1-4346-9c25-a83c1e8fa599"
@@ -313,91 +237,72 @@
 			<section>
 				<title>Java SDK</title>
 				<para>
-					The eID Identity Provider Java SDK provides a servlet
+					El SDK de Java del Identity Provider provee un servlet 
 					(
 					<code>
 						be.fedict.eid.idp.sp.protocol.saml2.post.AuthenticationResponseServlet
 					</code>
-					) which will handle the incoming SAML Authentication
-					Response. The
-					servlet takes following init parameters:
+					) el cual manejará la respuesta SAML de autenticación entrante.
+					Este servlet utiliza los siguientes parámetros:
+					
 					<itemizedlist>
 						<listitem>
 							<para>
 								<code>ResponseSessionAttribute</code>
-								HTTP Session attribute on which a returned
-								AuthenticationResponse object will be pushed
-								after a successfull
-								authentication. This object
-								contains the user identifier,
-								authentication
-								time, map of returned attributes, authentication
-								policy and relay state.
+								Atributo de HTTP Session en el cual un objeto 
+								AuthenticationResponse es retornado el cual es
+                                                                entregado después de una autenticación exitosa. 
+                                                                Este objeto contiene el identificador de 
+                                                                usuario, hora de autenticación, mapa de los atributos 
+                                                                retornados, política de autenticación y estado del relay.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>RequiresResponseSignature</code>
-								Optional flag indicating whether the SP expects
-								response to be
-								signed. Can also be specified
-								using the
-								<code>AuthenticationResponseService</code>
-								. If
-								neither specified defaults to false.
+								Bandera opcional que indica si el proveedor de servicio 
+                                                                espera que la respuesta esté firmada. El valor por defecto es falso.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>AuthenticationResponseService</code>
-								JNDI location of an implementation of the
-								AuthenticationResponseService interface.
-								Providing such an
-								implementation allows for
-								validation of the certificate chain in
-								signature
-								of the SAML v2.0 authentication response.
+								Ubicación JNDI de la implementación de la interfaz. 
+                                                                Tal implementación permite la validación de la cadena 
+                                                                de certificados en la respuesta de la autenticación SAML v2.0.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>RedirectPage</code>
-								Page to redirect to after a successfull
-								authentication.
+								Página a re direccionar luego de una autenticación exitosa.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>ErrorPage</code>
-								Page to redirect to if something went wrong
-								processing the
-								authentication response.
+								Página a re direccionar si algo salió mal en el procesamiento de la respuesta de la autenticación.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>ErrorMessageSessionAttribute</code>
-								HTTP Session attribute on which more info will
-								be pushed if
-								something went wrong processing the
-								authentication response.
+								Atributo de sesión HTTP en el cual se entrega más información si algo salió mal en el procesamiento de la respuesta de la autenticación.
 							</para>
 						</listitem>
 					</itemizedlist>
 				</para>
 				<para>
-					The default eID attributes can be queried from the map using
-					the
-					constants in helper class
+					
+                                        Los atributos por defecto pueden ser consultados del mapa 
+                                    utilizando las constantes en la clase de ayuda 
 					<code>be.fedict.eid.idp.common.AttributeConstants</code>
 					.
-					Beware that for the
+					Tenga en cuenta que para el flujo de 
 					<emphasis>authentication-only</emphasis>
-					flow not all of these attributes will be available.
-					Following is a
-					snippet of the
-					<code>web.xml</code>
-					for configuring the servlet.
+					no todos estos atributos están disponibles. El siguiente ejemplo muestra la configuración del servlet en el archivo 
+					<code>web.xml</code>.
+					
 				</para>
 				<programlisting language="XML"><![CDATA[<servlet>
 	<servlet-name>SAML2AuthenticationResponseServlet</servlet-name>
@@ -432,10 +337,9 @@
 	<url-pattern>/saml2-landing</url-pattern>
 </servlet-mapping>]]></programlisting>
 				<para>
-					For processing the SAML v2.0 Authentication response outside
-					a
-					servlet context ( e.g. JSF lifecycle components ) one can
-					use the
+					Para procesar la respuesta de la autenticación SAML v2.0  
+                                    fuera del contexto el servlet (por ejemplo componentes de ciclo de vida) 
+                                    se puede utilizar la clase:
 					<code>
 						be.fedict.eid.idp.sp.protocol.saml2.post.AuthenticationResponseProcessor
 					</code>
@@ -447,38 +351,35 @@
 	<section>
 		<title>SAML v2.0 Artifact Binding</title>
 		<para>
-			Support for the SAML v2.0 Artifact Binding is available but only
-			applicable to the Authentication Responses. Sending the SAML v2.0
-			Authentication Request can be done similar to the HTTP-POST or
-			HTTP-Redirect binding but to the eID IdP Artifact Binding protocol
-			entry point. Hence please refer to those bindings' sections for more
-			information on sending this authentication request.
+			Se tiene disponible soporte para enlaces de artefactos 
+                    pero sólo aplicable a las respuestas de autenticación. 
+                    Enviar solicitudes de autenticación SAML v2.0  es posible 
+                    de manera similar al protocolo HTTP-POST o HTTP-Redirect 
+                    pero al punto de entrada del protocolo de enlace de artefactos. 
 		</para>
 		<section>
-			<title>Authentication Response</title>
+			<title>Respuesta de Autenticación</title>
 			<para>
-				In the HTTP Artifact binding, the SAML Authentication Response
-				is
-				transmitted by reference using an
-				<code>Artifact</code>
-				. A
-				seperate synchronous binding, SOAP, is used to exchange the
-				artifact for the actual SAML v2.0 Authentication Response using
-				the
-				Artifact Resolution Web Service.
+				En el enlace de artefactos HTTP,  la respuesta de 
+                            la autenticación SAML  es transmitida por referencia
+                            utilizando un artefacto. Un enlace síncrono separado 
+                            es utilizado para intercambiar la respuesta de la 
+                            autenticación actual utilizando un web service de 
+                            resolución de artefactos.
 			</para>
 			<para>
-				Following is an example of a SAML v2.0 Artifact response:
+				El siguiente es un ejemplo de las respuestas de artefactos SAML v2.0.
 				<programlisting language="XML"><![CDATA[HTTP/1.1 302 Object Moved
 Date: 21 Jan 2004 07:00:49 GMT
 Location: https://www.rp.com/SAML?SAMLart=AAQAADWNEw5VT47wcO4z
 X%2FiEzMmFQvGknDfws2ZtqSGdkNSbsW1cmVR0bzU%
 3D&RelayState=0043bfc1bc45110dae17004005b13a2b
 Content-Type: text/html; charset=iso-8859-1]]></programlisting>
-				The Relying Party will response with an Artifact Resolve Request
-				sent to the eID IdP SAML v2.0 Artifact Resolution Web Service
-				over
-				SOAP. Following is an example of such a request:
+				El Proveedor de Servicios responderá con una 
+Solicitud de Resolución de Artefactos a ser enviada al Web Service de resolución 
+de artefactos SAML v2.0 mediante SOAP.
+                                El siguiente es un ejemplo de tal solicitud:
+
 				<programlisting language="XML"><![CDATA[POST /SAML/Artifact/Resolve HTTP/1.1
 Host: eid-idp.be
 Content-Type: text/xml
@@ -499,12 +400,7 @@ SOAPAction: http://www.oasis-open.org/committees/security
         </samlp:ArtifactResolve>
     </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>]]></programlisting>
-				The resolution service will response to this request (if valid)
-				with
-				an ArtifactResponse message, containing the SAML v2.0
-				Authentication
-				Response. Following is an example of such a
-				response:
+				El siguiente es un ejemplo de la respuesta del servicio de resolucion:
 				<programlisting language="XML"><![CDATA[HTTP/1.1 200 OK
 Date: 21 Jan 2004 07:00:49 GMT
 Content-Type: text/xml
@@ -533,26 +429,21 @@ Content-Length: nnnn
 			<section>
 				<title>Java SDK</title>
 				<para>
-					The eID Identity Provider Java SDK provides a servlet
+					El SDK del Proveedor de Identidad provee un servlet
 					(
 					<code>
 						be.fedict.eid.idp.sp.protocol.saml2.artifact.AuthenticationResponseServlet
 					</code>
-					) which will handle the incoming SAML Authentication
-					Response. The
-					servlet takes following init parameters:
+					) el cual manejara respuestas de autenticación SAML. El servlet recibe los siguientes parámetros:
 					<itemizedlist>
 						<listitem>
 							<para>
 								<code>ResponseSessionAttribute</code>
-								HTTP Session attribute on which a returned
-								AuthenticationResponse object will be pushed
-								after a successfull
-								authentication. This object
-								contains the user identifier,
-								authentication
-								time, map of returned attributes, authentication
-								policy and relay state.
+								Atributo de sesión HTTP en el cual un objeto de respuesta de 
+                                                                autenticación será enviado después de una autenticación exitosa. 
+                                                                Este objeto contiene el identificador de usuario, 
+                                                                hora de autenticación, mapa de los atributos retornados,
+                                                                política de autenticación y estado del relay.
 							</para>
 						</listitem>
 						<listitem>
@@ -560,43 +451,32 @@ Content-Length: nnnn
 								<code>
 									ArtifactAuthenticationResponseService(Class)
 								</code>
-								required JNDI location (or class reference )of
-								an implementation
-								of the
-								ArtifactAuthenticationResponseService interface.
-								This is
-								required to provide location of the eID
-								IdP Artifact Resolution
-								Web Service,
-								configuration of the WS Client (Proxy, SSL,
-								...),
-								validation of the certificate chain in signature
-								of the SAML v2.0
-								authentication response, ....
+								ubicación JNDI requerida de la implementación de la interface 
+								ArtifactAuthenticationResponseService.
+								Esta es requerida para proveer la ubicación del servicio web de
+                                                                resolución de artefactos del IDP , configuración del cliente del 
+                                                                web service, validación de la cadena de certificados en la firma de la respuesta de la autenticación.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>RedirectPage</code>
-								Page to redirect to after a successfull
-								authentication.
+								Página a direccionar después de una autenticación exitosa.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>ErrorPage</code>
-								Page to redirect to if something went wrong
-								processing the
-								authentication response.
+								Página a direccionar si algo salió mal en el 
+                                                                procesamiento de la respuesta de autenticación.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>ErrorMessageSessionAttribute</code>
-								HTTP Session attribute on which more info will
-								be pushed if
-								something went wrong processing the
-								authentication response.
+								Atributo de sesión HTTP en el cual se dispondrá más 
+                                                                información si algo salió mal en el procesamiento 
+                                                                de la respuesta de autenticación.
 							</para>
 						</listitem>
 					</itemizedlist>
@@ -607,45 +487,31 @@ Content-Length: nnnn
 	<section>
 		<title>SAML v2.0 Browser Redirect</title>
 		<para>
-			Support for the SAML v2.0 HTTP-Redirect binding is available for
-			incoming authentication requests. This has been added for support
-			for
-			libraries like
+			Se dispone de soporte para el enlace de re direccionamiento HTTP de solicitudes de autenticación entrantes esto se ha agregado para el soporte de librerías cómo 
 			<code>SimpleSAMLphp</code>
-			or
-			<code>mod_mellon</code>
-			. The SAML v2.0 Authentication Response will
-			be sent using the Browser
-			POST or Artifact Binding, according to the
-			used eID IdP protocol entry
-			point.
+			o
+			<code>mod_mellon.</code>
+			La respuesta de autenticación  SAML v2.0 será enviada utilizando el protocolo POST o el de enlace de Artefactos ,de acuerdo a lo que se está utilizando en el punto de entrada del protocolo del IdP.
 		</para>
 		<section>
 			<title>Java SDK</title>
 			<para>
-				The
+				El
 				<code>AuthenticationRequestServlet</code>
-				as described in the SAML v2.0 Browser Post binding can be used
-				for
-				this.
+				como fue descrito en el SAML v2.0 Browser Post binding, puede ser utilizado para este mismo protocolo.
 			</para>
 		</section>
 	</section>
 	<section>
 		<title>SAML v2.0 Metadata</title>
 		<para>
-			For each SAML v2.0 eID IdP protocol entry point, a SAML v2.0
-			Metadata
-			document is available to publish the SAML v2.0 services.
-			This is added
-			for libraries like
+			Para cada punto de entrada del protocolo SAML v2.0  del  IdP , se provee un documento de metadatos para publicar servicios SAML v2.0.Esto ha sido agregado para librerías 
 			<code>SimpleSAMLphp</code>
-			or
-			<code>mod_mellon</code>
-			which require this.
+			o
+			<code>mod_mellon</code>.
 		</para>
 		<para>
-			Following is an example of such a SAML v2.0 Metadata document:
+			El siguiente es un ejemplo el documento de metadatos SAML v2.0:
 			<programlisting language="XML"><![CDATA[<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
     entityID="https://eid-idp.be/eid-idp/protocol/saml2/post/auth">
 
@@ -681,38 +547,20 @@ Content-Length: nnnn
 	<section>
 		<title>OpenID v2.0</title>
 		<para>
-			OpenID support was added for seamless integration with popular
-			web
-			frameworks like Drupal. A dynamic YADIS identity document is used
-			to start an OpenID authentication. The eID Identity Provider
-			uses OP-driven selection. It supports OpenID Association and direct
-			verification via the eID Idp OP Provider.
+			Se ha agregado soporte para OpenID  para integración transparente en plataformas como Drupal. Un documento dinámico de identidad YADIS, se utiliza para iniciar una autenticación OpenID. El proveedor de identidad IdP utiliza selección OP.
 		</para>
 		<para>
-			The eID Identity Provider supports OpenID Attribute
-			Exchange
-			( OpenID AX ) as part of the OpenID Authentication request.
-			By default the name and firstname are returned. The SP can request
-			other eID attributes explicitly.
+			El proveedor de identidad soporta intercambio de atributos OpenID
+			( OpenID AX ) como parte de la solicitud de autenticación .
+			Por defecto se retornan el nombre completo y el primer nombre son retornados. El proveedor de servicios puede solicitar otros atributos explícitamente.
 		</para>
 		<para>
-			The eID Identity Provider supports OpenID Provider
-			Authentication Policy Extension 1.0 ( OpenID PAPE ) for
-			communicating
-			the authentication policy between the eID IdP and the
-			SP.
-		</para>
-		<para>
-			The eID Identity Provider supports the OpenID User
-			Interface
-			Extension 1.0 ( OpenID UI ) for communicating a list of
-			preferred
-			languages to display the IdP in.
+			El proveedor de identidad soporta la extensión  1.0 de la política de autenticación OpenID ( OpenID PAPE ) para comunicarse entre el proveedor de identidad y el proveedor de servicios intercambiar la política de autenticación.
 		</para>
 		<section>
 			<title>OpenID Protocol</title>
 			<para>
-				The OpenID URL delivers following file:
+				EL URL OpenID retorna el siguiente archivo:
 				<programlisting language="XML"><![CDATA[<HTML>
     <HEAD>
         <META http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -725,8 +573,8 @@ Content-Length: nnnn
 </HTML>]]></programlisting>
 			</para>
 			<para>
-				Following, the OpenID Consumer will download the YADIS document,
-				which contains:
+				A continuación, el consumidor OpenID descargara el documento YADIS,
+				que contiene:
 				<programlisting language="XML"><![CDATA[<xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">
     <XRD>
         <Service>
@@ -739,16 +587,12 @@ Content-Length: nnnn
         </Service>
     </XRD>
 </xrds:XRDS>]]></programlisting>
-				The first
+				El primer elemento 
 				<code>Service</code>
-				element specifies where to contact
-				the eID IdP for setting up an
-				association key.
-				All communication is done over unilateral SSL.
+				específica donde contactar al proveedor de identidad para establecer una clave de asociación toda la comunicación se realiza sobre SSL de manera unilateral.
 			</para>
 			<para>
-				The association request sent out using HTTP POST by the OpenID
-				Consumer to the eID IdP contais:
+				La solicitud de asociación se envía utilizando HTTP POST por el consumidor OpenID hacia el IdP:
 				<programlisting language="XML"><![CDATA[openid.ns:http://specs.openid.net/auth/2.0
 openid.mode:associate
 openid.session_type:DH-SHA256
@@ -756,8 +600,7 @@ openid.assoc_type:HMAC-SHA256
 openid.dh_consumer_public:...]]></programlisting>
 			</para>
 			<para>
-				The eID IdP reacts to this association request with following
-				message:
+				El eID IdP reacciona a esta solicitud de asociación on el siguiente mensaje:
 				<programlisting language="XML"><![CDATA[openid.ns:http://specs.openid.net/auth/2.0
 openid.session_type:DH-SHA256
 openid.assoc_type:HMAC-SHA256
@@ -767,12 +610,7 @@ openid.dh_server_public:...
 openid.enc_mac_key:...]]></programlisting>
 			</para>
 			<para>
-				Now that the association is setup between the OpenID Consumer
-				and the
-				eID IdP the consumer is ready to send out its
-				authentication request
-				using a browser redirect with following
-				arguments:
+				Luego de que la asociación es establecida entre el consumidor OpenID y el proveedor de identidad, el consumidor está listo para enviar la solicitud de autenticación utilizando una redirección del navegador con los siguientes argumentos:
 				<programlisting language="XML"><![CDATA[openid.ns.ext1:http://openid.net/srv/ax/1.0
 openid.ext1.type.name:http://schema.openid.net/namePerson/first
 openid.ns:http://specs.openid.net/auth/2.0
@@ -784,22 +622,18 @@ openid.ext1.required:name
 openid.realm:https://localhost:48745/consumer
 openid.assoc_handle:1273064471124-0
 openid.return_to:https://localhost:48745/consumer]]></programlisting>
-				The consumer makes the eID IdP select the identifiers, which is
-				specified using the
+				El consumidor  hace que el proveedor de identidad seleccione los identificadores los cuales se especifican utilizando los parámetros :
 				<code>openid.identity</code>
-				and
+				y
 				<code>openid.claimed_id</code>
-				parameters. The example also shows how an attribute is requested
-				as
-				part of the authentication request.
+				. El ejemplo también muestra cómo se solicita un atributo como parte de la solicitud de autenticación.
 			</para>
 			<para>
-				The eID IdP will, after handling the authentication
-				request,direct
-				the user via the browser to the eID Applet to authenticate
-				himself.
-				After this a response redirect will be sent back to the OpenID
-				Consumer containing following arguments:
+				Después de manejar la solicitud de autenticación el proveedor 
+                            de identidad direccionar a al usuario a través del navegador hacia 
+                            el Applet para que el usuario pueda autenticarse después de esto una 
+                            redirección de respuesta será enviada de vuelta al consumidor 
+                            conteniendo los siguientes argumentos:
 				<programlisting language="XML"><![CDATA[openid.op_endpoint:https://localhost:48745/producer
 openid.signed:op_endpoint,claimed_id,identity,return_to,response_nonce,
     assoc_handle,ns.ext1,ns.ext2,ext1.mode,ext1.type.name,ext1.value.name,
@@ -818,69 +652,50 @@ openid.identity:https://localhost:48745/identity/idp/123456789
 openid.ext1.mode:fetch_response
 openid.mode:id_res
 openid.return_to:https://localhost:48745/consumer]]></programlisting>
-				Notice that also the attribute and PAPE extension are signed by
-				the
-				eID IdP with the key agreed on during the association stage.
+				Obsérvese que el atributo y la extensión están firmados por el proveedor de identidad con la clave que ha sido intercambiada durante la etapa de asociación.
 			</para>
 			<para>
-				Finally, the OpenID Consumer will contact the eID IdP once more
-				to
-				validate if the OP selected identifier is allowed by the eID
-				IdP.
-				This is done via the second
+				Finalmente el consumidor OpenID contactara al proveedor de identidad una vez más para validar si el identificador seleccionado es permitido por el proveedor de identidad esto es realizado a través del segundo elemento
 				<code>Service</code>
-				element in the YADIS document.
+				en el documento YADIS.
 			</para>
 		</section>
 		<section>
 			<title>Java SDK</title>
 			<section>
-				<title>Authentication Request</title>
+				<title>Solicitud de Autenticación</title>
 				<para>
-					The eID Identity Provider Java SDK provides a
-					servlet which
-					will generate and send out such a request.
-					This servlet is also
-					responsible for reading out the
-					YADIS document and setting up an
-					association.
-					The servlet takes following init parameters:
+					El proveedor de identidad provee un java SDK servlet el 
+                                    cual generara y enviara la solicitud. Este servlet también
+                                    es responsable de leer el documento YADIS y establecer la asociación. 
+                                    El servlet recibe los siguientes parámetros:
 					<itemizedlist>
 						<listitem>
 							<para>
 								<code>SPDestination</code>
-								The location of the Service Providers's
-								OpenID landing servlet,
-								which will handle
-								the returned authentication response.
+								La ubicación del servlet de destino del proveedor de servicio el cual manejara la respuesta de autenticación.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>UserIdentifier</code>
-								The location of the eID IdP path publishing
-								the location of its
-								YADIS document.
+								La ubicación de la ruta del proveedor de identidad la quito pública la ubicación del documento YADIS.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>TrustServer</code>
-								Optional boolean parameter specifying
-								whether all SSL server
-								certificates can be
-								trusted.
+								Parámetro booleano opcional especificando si todos los certificados SSL del servidor son confiables.
 							</para>
 						</listitem>
 					</itemizedlist>
 				</para>
 				<para>
-					This servlet will later be extended for support of
-					requesting
-					specific eID attributes. Following is a
-					snippet of the
+					Este servlet será extendido para soportar la solicitud de atributos específicos. 
+                                    El siguiente archivo 
 					<code>web.xml</code>
-					for configuring the servlet.
+                                        es un ejemplo de la configuración del servlet
+					
 				</para>
 				<programlisting language="XML"><![CDATA[<servlet>
 	<servlet-name>OpenIDAuthenticationRequestServlet</servlet-name>
@@ -906,45 +721,34 @@ openid.return_to:https://localhost:48745/consumer]]></programlisting>
 </servlet-mapping>]]></programlisting>
 			</section>
 			<section>
-				<title>Authentication Response</title>
+				<title>Respuesta de Autenticación</title>
 				<para>
-					The eID Identity Provider Java SDK provides a
-					servlet which
-					will handle the returned OpenID
-					authentication response.
-					The servlet
-					takes following init parameters:
+					El proveedor de identidad provee un java SDK servlet el cual manejará la respuesta de autenticación OpenID.
+                                    El servlet recibe los siguientes parámetros:
 					<itemizedlist>
 						<listitem>
 							<para>
 								<code>ResponseSessionAttribute</code>
-								HTTP Session attribute on which a returned
-								OpenIDAuthenticationResponse object will be
-								pushed after a
-								successfull authentication. This
-								object contains the user
-								identifier,
-								authentication time, map of returned attributes
-								and
-								authentication policies.
+								Atributo de sesión HTTP en el cual un objeto 
+								OpenIDAuthenticationResponse es retornado y será enviado después de una autenticación exitosa. 
+                                                                Este objeto contiene el identificador de usuario,  la hora de autenticación y el
+                                                                mapa de atributos retornados junto a las políticas de autenticación.
 							</para>
 						</listitem>
 						<listitem>
 							<para>
 								<code>RedirectPage</code>
-								Page to redirect to after a successfull
-								authentication.
+								Página a re direccionar luego de una autenticación exitosa.
 							</para>
 						</listitem>
 					</itemizedlist>
 				</para>
 				<para>
-					This servlet will later be extended for support of
-					OpenID AX for
-					requesting specific eID attributes.
-					Following is a snippet of the
+					Este servlet sera configurado luego para extender el soporte de 
+					OpenID AX para solicitar atributos especificos.
+					El siguiente es un ejemplo de la configuración del archivo
 					<code>web.xml</code>
-					for configuring the servlet.
+					para ese servlet.
 				</para>
 				<programlisting language="XML"><![CDATA[<servlet>
 	<servlet-name>OpenIDAuthenticationResponseServlet</servlet-name>
@@ -970,17 +774,14 @@ openid.return_to:https://localhost:48745/consumer]]></programlisting>
 	<section>
 		<title>WS-Federation v1.1</title>
 		<para>
-			Support is added for the Web (Passive) Requestors model of
-			WS-Federation v1.1. This support provides a seamless integration
-			with
-			ASP.NET applications using the Windows Identity Foundation.
+			Se dispone de soporte para el modelo de solicitantes pasivos Web de WS-Federation. Este soporte provee integración transparente con aplicaciones ASP.net utilizando  Windows Identity Foundation.
 		</para>
 		<section>
 			<title>Metadata</title>
 			<para>
-				The eID IdP discovery for WS-Federation makes use of a
-				metadata document as described in OASIS SAML v2.0 Metadata.
-				Following is an example of such document:
+				EL IdP discovery para WS-Federation utiliza un documento de metadatos, como se decribe en 
+                            OASIS SAML v2.0 Metadata.
+				El siguiente es un ejemplo de dicho documento:
 				<programlisting language="XML"><![CDATA[<md:EntityDescriptor
     xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
     xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"
@@ -1103,26 +904,18 @@ openid.return_to:https://localhost:48745/consumer]]></programlisting>
 
     </md:RoleDescriptor>
 </md:EntityDescriptor>]]></programlisting>
-				Important are the location of the WS-Federation Passive
-				Requestor's
-				endpoint and the listing of available claim types by
-				the eID IdP.
-				It
-				also contains the digital identity of the eID IdP and an
-				indication
-				of the key used to sign the authentication response
-				tokens.
+				Son muy importantes las ubicaciones del endpoint del solicitante pasivo
+                            WS-Federation y el listado de todos los tipos disponibles por el proveedor de identidad.
+				Tambien contiene la identidad digital del IdP y una indicación de la clave utilizada para firmar tokens de autenticación  de respuesta.
+				
 			</para>
 		</section>
 		<section>
 			<title>
-				Authentication Request
+				Solicitud de Autenticación
 			</title>
 			<para>
-				Below is an example of the WS-Federation authentication request
-				parameters in the request string sent to the eID
-				Identity
-				Provider.
+				Abajo se muestra un ejemplo de los parametros de la solicitud de autenticación en la cadena de solicitud enviado al IdP.
 				<programlisting language="XML"><![CDATA[wa=wsignin1.0
 wtrealm=http://localhost:49267/EidIdpTest/
 wctx=rm=0
@@ -1133,13 +926,11 @@ wct=2011-01-05T08:14:31]]></programlisting>
 		</section>
 		<section>
 			<title>
-				Authentication Response
+				Respuesta de Autenticación
 			</title>
 			<para>
-				Below is an example of the WS-Trust Response message after a
-				successfull eID Authentication. A SAML v2.0 Assertion is
-				delivered as
-				token by the eID IdP.
+				Abajo se tiene un ejemplo del mensaje de respuesta WS-Trust despues de una autenticación exitosa.
+				Una aserción SAML v2.0 es entregada como un token por el IdP.
 				<programlisting language="XML"><![CDATA[<trust:RequestSecurityTokenResponseCollection
     xmlns:trust="http://docs.oasis-open.org/ws-sx/ws-trust/200512"
     xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
@@ -1206,17 +997,13 @@ wct=2011-01-05T08:14:31]]></programlisting>
 		<section>
 			<title>Sign out</title>
 			<para>
-				Some WS-Federation implementations automatically perform a sign-out
-				operation on their federated identity providers. Because of this
-				we've also implemented the
-				<code>wsignout1.0</code>
-				action.
+				Algunas implementaciones WS-Federation realizan un cierre de sesión automatico. Debido a este se tiene implementada la actión:
+				<code>wsignout1.0</code>.
+				
 			</para>
 			<para>
-				Below is an example of the WS-Federation sign-out request
-				parameters
-				in the request string send to the eID Identity
-				Provider.
+				Abajo se tiene un ejemplo de los parametros de solicitud de cierre de sesión WS-Federation sign-out en la 
+                            cadena que se envia al IdP.
 				<programlisting language="XML"><![CDATA[wa=wsignout1.0
 wreply=http://localhost:49267/EidIdpTest/]]></programlisting>
 			</para>
@@ -1224,46 +1011,43 @@ wreply=http://localhost:49267/EidIdpTest/]]></programlisting>
 		<section>
 			<title>WS-Trust STS validation web service</title>
 			<para>
-				The eID IdP offers a WS-Trust based STS validation web service.
-				Via this web service relying parties can validate SAML assertions
-				that have been acquired via the WS-Federation web passive profile.
+				El IdP ofrece un web service de validación WS-Trust basado en STS.
+				A través de este web service, los proveedores de servicio pueden validar las aserciones SAML 
+				que han sido adquiridas mediante un perfil web WS-Federation pasivo.
 			</para>
 			<para>
-				This feature gives relying parties more flexibility in choosing
-				a trust model for the verification of the incoming SAML assertions.
-				Thus the trust model can be based on:
+				Esta caracteristica otorga a los proveedores de servicio mayor flexibilidad al 
+                            elegir el modelo para la verificacion de aserciones SAML.
+				Así de este modo, el modelo de confianza puede ser basado en:
 			</para>
 			<itemizedlist>
 				<listitem>
 					<para>
-						The fingerprint of the SAML assertion signatory's certificate
-						or public key.
+						La huella del certificado de firma de la aserción SAML o la clave pública.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						A full PKI validation of the SAML assertion signatory's
-						certificate.
+						Una validación PKI completa del certificado de firma de la aserción SAML.
 					</para>
 				</listitem>
 				<listitem>
 					<para>
-						SSL based trust model in case the WS-Trust STS validation
-						service is used to validate the SAML assertion.
+						Modelo basado en SSL en el caso de que el servicio STS de validación WS-Trust 
+                                            esté utilizado para validar aserciones SAML.
 					</para>
 				</listitem>
 			</itemizedlist>
 			<para>
-				The Java SDK has been extended with a
+				El Java SDK ha sido extendido con una clase
 				<code>SecurityTokenServiceClient</code>
-				to perform STS based SAML assertion validations.
+				para ejecutar validaciones de aserciones SAML basadas en STS.
 			</para>
 			<section>
 				<title>Validation request</title>
 				<para>
-					After a WS-Federation web passive based authentication, the
-					relying party can use the eID IdP STS to validate the received SAML
-					assertion. The web service request looks as follows:
+					Luego de una autencicación basada en WS-Federation, el proveedor de servicio puede utilizar el STS para validar las aserciones SAML que ha recibido.
+                                    La solicitud del web service se ve a continuación:
 				</para>
 				<programlisting language="XML"><![CDATA[<soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
 	<soap12:Header>
@@ -1311,23 +1095,23 @@ wreply=http://localhost:49267/EidIdpTest/]]></programlisting>
 	</soap12:Body>
 </soap12:Envelope>]]></programlisting>
 				<para>
-					Notice that this web service is using SOAP 1.2. The SAML
-					assertion is passed using the WS-Security SOAP header to ensure
-					that certain web service stacks won't break the SAML assertion XML
-					signature during transportation from relying party to eID IdP.
+					Obsérvese que este web service esta utilizando SOAP 1.2.
+                                    La aserción SAML es pasada utilizando la cabecera WS-Security SOAP 
+                                    para asegurar que ciertas pilas de web service no rompan la firma XML de la aserción SAML durante el transporte desde el Proveedor
+                                    de Servicios hasta el IdP.
 				</para>
 				<para>
-					Via the
+					Via el elemento
 					<code>&lt;wsp:AppliesTo&gt;</code>
-					element the relying party can indicate the expected value for the
+					el proveedor de servicio puede indicar el valor esperado para el elemento
 					<code>&lt;saml2:Audience&gt;</code>
-					element within the SAML assertion.
+					dentro de la aserción SAML,
 				</para>
 			</section>
 			<section>
 				<title>Validation response</title>
 				<para>
-					The eID IdP STS web service can respond as follows:
+					EL web service STS del IdP puede responder como se muestra:
 				</para>
 				<programlisting language="XML"><![CDATA[<soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
 	<soap12:Header>
@@ -1360,168 +1144,100 @@ wreply=http://localhost:49267/EidIdpTest/]]></programlisting>
 		</section>
 	</section>
 	<section>
-		<title>JBoss Seam Integration</title>
+		<title>Integración con JBoss Seam</title>
 		<para>
-			This section details on integration of the eID IdP in the JBoss
-			Seam
-			Framework.
+			Esta sección detalla la integración del IdP con el framework JBoss
+			Seam.
 		</para>
 		<section>
 			<title>SAML v2.0</title>
 			<para>
-				It is possible to not use the SAML Authentication
-				Request/Response Servlets provided by the Java SDK.
-				Following
-				explains how.
+				Es posible utilizar los servlets de autenticación SAML para solicitud/respuesta
+				provistos por el Java SDK.
+				A continuación se explica como lograrlo.
 			</para>
 			<section>
-				<title>Authentication Request</title>
+				<title>Solicitud de Autenticación</title>
 				<para>
-					To send out a SAML v2.0 Authentication Request to the eID
-					IdP, one
-					can use the
+					Para enviar una solicitud de autenticación SAML v2.0  al IdP, se puede utilizar la clase 
 					<code>
 						be.fedict.eid.idp.sp.protocol.saml2.AuthenticationRequestUtil
 					</code>
-					class. Calling the
+					. Llamando el método 
 					<code>sendRequest</code>
-					will construct a SAML v2.0 Authentication Request given the
-					specified input and send it to the eID IdP using a HTTP
-					Browser
-					POST. It returns the Authentication Request as the
-					request's ID is
-					needed for later validation of the returned
-					Authentication Response.
+					se construirá una solicitud de autenticación SAML v2.0. 
 				</para>
 			</section>
 			<section>
-				<title>Authentication Response</title>
+				<title>Respuesta de Autenticación</title>
 				<para>
-					Depending on which eID IdP Protocol Entry point the request
-					was sent
-					to, the SAML v2.0 Authentication Response will be
-					returned using
-					either the HTTP-POST or HTTP-Artifact
-					binding. For both bindings it
-					is possible to not use the
-					servlet but directly use a binding
-					specific
+					Dependiendo del punto de entrada del protocolo al que la solicitud se ha enviado, 
+                                    la respuesta SAML v2.0 sera retornada ya sea utilizando HTTP-POST o HTTP-Artifact
+					binding. 
+                                    En ambos casos es posible no utilizar el servlet, pero en su lugar utilizar directamente la clase:
 					<code>AuthenticationResponseProcessor</code>
 					.
 				</para>
 				<para>
-					For the SAML v2.0 HTTP-POST binding, use
+					Para el enlace SAML v2.0 HTTP-POST, utilice 
 					<code>
 						be.fedict.eid.idp.sp.protocol.saml2.post.AuthenticationResponseProcessor
 					</code>
-					.
-					Instantiating this response processor takes an optional
+					. Instanciando este procesador de respuesta, se necesita un argumento opcional
 					<code>AuthenticationResponseService</code>
-					argument.
-					If specified, the instance of this service will be used
-					for
-					validation of the certificate chain attached to the
-					(optional)
-					XML Signature on both the SAML Response as on the
-					Assertion,
-					specifying a maximum time offset on the validity
-					of the assertion
-					and specifying optionally the needed
-					symmetric/assymetric keys if
-					encryption was configured for
-					certain attributes. Simply pass the
-					HTTP ServletRequest,
-					request ID, recipient and optional relaystate
-					to process the
-					eID IdP response which will return an instance of
-					<code>AuthenticationResponse</code>
-					containing all available info on the authenticated subject.
 				</para>
 				<para>
-					Processing the response for the SAML v2.0 HTTP-Artifact
-					binding is
-					similar with the exception that an instance of
-					the
+					EL procesamiento de la respuesta SAML v2.0 HTTP-Artifact
+					binding es 
+					similar, con la excepción que una instancia de 
 					<code>ArtifactAuthenticationResponseService</code>
-					is
-					required when instantiating the
+					es requerida cuando se instancia la clase 
 					<code>
 						be.fedict.eid.idp.sp.protocol.saml2.artifact.AuthenticationResponseProcessor
 					</code>
-					. This as it is required for the processor to know
-					the location of
-					the eID IdP Artifact Resolution Web Service.
-					This service also
-					allows for proxy configuration, optionally
-					signing the
-					ArtifactResolve request sent to the eID IdP,
-					logging, ... .
-					In the
+					. Este es debido a que es requerido por el procesador el conocer la ubicacion del web service
+                                        de resolución de artefacos del IdP. 
+                                        Este servicio también permite la configuración del proxy, etc.
+					De la misma manera, una instancia de 
 					same way as with HTTP-POST, an instance of
 					<code>AuthenticationResponse</code>
-					will be returned when successful.
+					sera retornada en el caso exitoso.
 				</para>
 			</section>
 		</section>
 	</section>
 	<section>
-		<title>Character Encodings</title>
+		<title>Codificación de caracteres</title>
 		<para>
-			The eID IdP will post/redirect all data UTF8 encoded. Beware
-			that for example when using OpenID, the request parameter parsing,
-			depending on your environment, must be processed using UTF8 encoding.
-			JBoss 6's tomcat for example will default to ISO-8859-1 encoding
-			by
-			default, which will break the OpenID signature as non-ascii
-			characters will be badly translated. On your tomcat connectors you
-			need to explicitly specify
+                    El IdP manejará toda la información condificada en UTF8. 
+                    Es importante considerar que cuando se utiliza OpenID, el parseo de parámetros
+                    dependiendo del entorno, debe ser procesado utiliando condificación UTF8.
+lo cual romperá la firma de OpenID. En los conectores tomcat, se tiene que especificar explícitamente 
 			<code>URIEncoding="UTF-8"</code>
-			to
-			resolve this.
+			para solucionar esto.
 		</para>
 	</section>
 	<section>
 		<title>SAML v2.0 mod_mellon</title>
 		<para>
-			Following is a brief explanation on how to setup a Service Provider
-			using the mod_mellon module.
+			En el siguiente link se tienen una explicación de como configurar un Proveedor de Servicio
+                    utiliando el módulo mod_mellon.
 			<ulink url="http://code.google.com/p/modmellon/">mod_mellon</ulink>
 		</para>
 		<para>
 			<code>mod_mellon</code>
-			is an authentication module for apache. It authenticates
-			the user
-			against a SAML 2.0 IdP, and and grants access to
-			directories depending
-			on attributes received from the IdP.
-			For installation, please refer to
-			the mod_mellon
-			<ulink url="http://modmellon.googlecode.com/svn/trunk/mod_mellon2/README">
-				README
-			</ulink>
-			. Testing was done against version 0.4.0-1.
+			Es un modulo de autenticación para apache. Este autentica al usuario contra un IdP 
+			SAML 2.0, y permite el acceso a sus directorios dependiendo de los atributos recibidos desde el IdP.
 		</para>
 		<para>
-			Be sure to have Liblasso3 version 3.9.3 or higer installed.
-			Segmentation faults were encountered in version 3.7.1.
-			You can find
-			the latest release @
+			Asegurese de tener instalada la librería Liblasso3 version 3.9.3 o superior.
+			Se puede descargar de
 			<ulink url="http://lasso.entrouvert.org/download/">Lasso</ulink>
 		</para>
+		
 		<para>
-			mod_mellon requires you to provide the SAML v2.0 Metadata file
-			for
-			the eID IdP SAML v2.0 Protocol entry point you wish to use. It
-			seems
-			that using the entry points using the SAML v2.0 HTTP-POST
-			binding is
-			not supported. The metadata files can be downloaded at the
-			eid-idp webapp start page.
-		</para>
-		<para>
-			mod_mellon requires you to specify a SAML v2.0 Metadata file for
-			your
-			Service Provider. Following is an example of such metadata:
+			mod_mellon requiere que se especifique un archivo de metadatos SAML v2.0 para el 
+                    proveedor de servicios. El siguiente es un ejemplo de tal archivo:
 			<programlisting language="XML"><![CDATA[<EntityDescriptor
     entityID="TestSP"
     xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
@@ -1539,58 +1255,11 @@ wreply=http://localhost:49267/EidIdpTest/]]></programlisting>
         Location="http://your-host/secret/endpoint/postResponse" />
   </SPSSODescriptor>
 </EntityDescriptor>]]></programlisting>
-			Note that the
-			<code>entityID</code>
-			corresponds to the SAML v2.0
-			Authentication Request Issuer, which will
-			be used by the eID IdP to
-			identify the Relying Party. This is crucial
-			as the authentication
-			request will not contain the optional SAML
-			<code>AssertionConsumerServiceURL</code>
-			field which can be used by the eID IdP to resolve the location to
-			post its SAML v2.0 Authentication Response to. To resolve this, the
-			eID IdP Admin Portal can specify a
-			<code>TargetURL</code>
-			for each Relying Party it configures, which will be used for this.
 		</para>
 		<para>
-			Besides the SP metadata, you also need to provide your SP's
-			private
-			key in the mod_mellon configuration for signing outgoing SAML
-			v2.0
-			authentication requests.
+			A parte de los metadatos, se tiee que proveer de la clave privada del proveedor de servicio, para la firma de 
+                    solicitudes de autenticaciones SAML salientes.
 		</para>
-		<para>
-			An additional check for a successful login in mod_mellon is to add a
-			<code>MellonRequire</code>
-			directive in mellon.conf.
-			Something like:
-			<programlisting language="XML"><![CDATA[MellonRequire "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname" "Wim"]]></programlisting>
-			If successfully authenticated, mod_mellon will match these directives
-			against the SAML attributes in the authentication response.
-		</para>
-		<section>
-			<title>mod_mellon issues</title>
-			<para>
-				By default, an eID IdP Relying Party configuration will by
-				default
-				return all available eID Attributes. mod_mellon has an
-				issue right
-				now with handling large SAML v2.0 Attribute when
-				trying to cache them
-				on the HTTP Session. Therefor you cannot
-				include the eID Photo
-				attribute as it will fail on this.
-				You can follow progress on this
-				issue @
-				<ulink url="http://code.google.com/p/modmellon/issues/detail?id=9">
-					mod_mellon caching issue.
-				</ulink>
-				<programlisting language="XML"><![CDATA[[Fri Feb 18 11:36:42 2011] [error] Unable to store session data because it is to big.
-    Name = "be:fedict:eid:idp:photo"; Value = "..."]]></programlisting>
-			</para>
-		</section>
 	</section>
 	<appendix>
 		<title>eID Identity Provider Developer's Guide License</title>
@@ -1714,6 +1383,11 @@ wreply=http://localhost:49267/EidIdpTest/]]></programlisting>
 						<entry>17 Sep 2013</entry>
 						<entry>Frank Cornelis</entry>
 						<entry>Removed FedICT branding.</entry>
+					</row>
+                                        <row>
+						<entry>7 Aug 2014</entry>
+						<entry>Rolosa HyJ S.A.</entry>
+						<entry>Spanish translation.</entry>
 					</row>
 				</tbody>
 			</tgroup>
