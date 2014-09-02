@@ -90,7 +90,8 @@ public abstract class AbstractOOXMLSignatureService extends
         super(digestAlgo);
 		ConstantLocalClock clock = new ConstantLocalClock();
 		addSignatureFacet(new OOXMLSignatureFacet(this, clock, digestAlgo));
-		addSignatureFacet(new KeyInfoSignatureFacet(true, false, false));
+		//addSignatureFacet(new KeyInfoSignatureFacet(true, false, false));
+        addSignatureFacet(new KeyInfoSignatureFacet(false, false, false));
 
 		this.xadesSignatureFacet = new XAdESSignatureFacet(clock, digestAlgo);
 		this.xadesSignatureFacet.setXadesNamespacePrefix("xd");
