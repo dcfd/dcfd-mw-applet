@@ -7,8 +7,8 @@
 	<ui:composition template="/WEB-INF/template.xhtml">
 		<ui:param name="activeMenu" value="main" />
 		<ui:define name="body">
-			<h2>#{messages.welcome}</h2>
-			<p>#{messages.welcomeMsg}</p>
+
+			<h2>#{messages.welcomeMsg}</h2>
             <p>#{messages.downloadDriverlLink}
                 <ol>
                     <li>#{messages.getDriver}
@@ -40,6 +40,12 @@
 			<p>
 				<s:formattedText value="#{ts_localization.info}" />
 			</p>
+        <div class="clear"> </div>
+        <div class="notify info">
+            <div class="notifyWrap1">
+                <div class="notifyWrap2"><div class="notifyWrap3">
+                    <div class="notifyWrap4">
+                        <div class="message">
 			<h:form id="form">
 				<p>
 					<h:commandLink
@@ -47,6 +53,12 @@
 						value="#{messages.clickToValidate}" />
 				</p>
 			</h:form>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
 
 		</ui:define>
 	</ui:composition>
