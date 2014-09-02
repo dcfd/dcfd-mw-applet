@@ -13,7 +13,7 @@
 <meta http-equiv="expires" content="0" />
 <meta http-equiv="cache-control" content="no-cache, no-store" />
 <meta http-equiv="pragma" content="no-cache" />
-<title>eID Digital Signature Service Admin Portal</title>
+<title>Digital Signature Service Admin Portal</title>
 <link rel="stylesheet" type="text/css"
 	href="#{facesContext.externalContext.requestContextPath}/style.css" />
 </head>
@@ -22,10 +22,10 @@
 
 	<div id="header">
 		<div id="logo">
-			<h:graphicImage id="logo" alt="Fedict Logo" height="45"
+			<h:graphicImage id="logo" alt="Logo" height="45"
 				url="/images/fedict.png" />
 		</div>
-		<h1>eID Digital Signature Service Admin Portal</h1>
+		<h1>Digital Signature Service Admin Portal</h1>
 	</div>
 
 	<f:view contentType="text/html">
@@ -36,11 +36,11 @@
 					<rich:panelMenu value="#{dssMenuController.selectedChild}">
 						<rich:panelMenuItem label="Inicio" action="/main.xhtml"
 							rendered="#{!identity.isLoggedIn()}" />
-						<rich:panelMenuItem label="Inicio de Sesion" action="/admin/main.xhtml"
+                                                <rich:panelMenuItem label="Inicio de Sesion" action="/admin/main.xhtml"
 							rendered="#{!identity.isLoggedIn()}" />
 						<rich:panelMenuItem label="Inicio" action="/admin/main.xhtml"
 							rendered="#{identity.isLoggedIn()}" />
-						<rich:panelMenuItem label="Configuracion"
+                                                <rich:panelMenuItem label="Configuracion"
 							action="/admin/config.xhtml" rendered="#{s:hasRole('admin')}" />
 						<rich:panelMenuItem label="Identidad del Servicio"
 							action="/admin/identity.xhtml" rendered="#{s:hasRole('admin')}" />

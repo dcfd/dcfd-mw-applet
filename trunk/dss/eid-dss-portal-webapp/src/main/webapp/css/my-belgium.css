@@ -230,8 +230,8 @@ a.call .callWrap3 {background:url("../img/call-lb.gif") left bottom no-repeat; o
 
 /* site label ............................................................... */
 .siteLabel {background:url("../img/header-bottom-left.gif") left bottom no-repeat; font-size:100%;}
-.siteLabel .siteLogo {display:block; background:url("../img/header-bottom-right.gif") right bottom no-repeat; padding-bottom:23px;}
-.siteLabel .siteLogo a {display:block; width:502px; height:90px; margin-left:1.5em; margin-top:1em;}
+.siteLabel .siteLogo {display:block; background:url("../img/logoMicitt.png") right bottom no-repeat; padding-bottom:13px;}
+.siteLabel .siteLogo a {display:block;height:90px; margin-left:1.5em; margin-top:1em;}
 
 /* copyright ................................................................ */
 .copyright {text-align:center; font-weight:700; margin-bottom:2.5em; font-size:93%;}

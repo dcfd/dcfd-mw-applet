@@ -46,7 +46,7 @@
         <div id="blgm_belgiumHeader">
             <div class="blgm_wrapper">
                 <div id="blgm_beLogo">
-                    <img alt="Logo van de Belgische overheid" src="img/blgm_beLogo.gif" />
+                    
                 </div>
 
                 <ul id="blgm_languageSwitch">
@@ -54,66 +54,62 @@
 
                                 <!-- Spanish -->
                                 <s:span rendered="#{not dssLanguageSelector.spanishActive}">
-                                    <li>
+                                    <li style="visibility: hidden;">
                                         <h:commandLink value="es" action="#{dssLanguageSelector.spanish}" lang="es" class="blgm_lSwitch" />
                                     </li>
                                 </s:span>
                                 <s:span rendered="#{dssLanguageSelector.spanishActive}">
-                                    <li class="blgm_active">
+                                    <li class="blgm_active" style="visibility: hidden;">
                                         <h:commandLink value="es" action="#{dssLanguageSelector.spanish}" lang="es" class="blgm_lSwitch" />
                                     </li>
                                 </s:span>
 
-                                <!-- English -->
                                 <s:span rendered="#{not dssLanguageSelector.englishActive}">
-                                    <li>
+                                    <li style="visibility: hidden;">
                                         <h:commandLink value="en" action="#{dssLanguageSelector.english}" lang="en" class="blgm_lSwitch" />
                                     </li>
                                 </s:span>
                                 <s:span rendered="#{dssLanguageSelector.englishActive}">
-                                    <li class="blgm_active">
+                                    <li class="blgm_active" style="visibility: hidden;">
                                         <h:commandLink value="en" action="#{dssLanguageSelector.english}" lang="en" class="blgm_lSwitch" />
                                     </li>
                                 </s:span>
-                        <!-- Dutch -->
                                 <s:span rendered="#{not dssLanguageSelector.dutchActive}">
-                                <li>
+                                <li style="visibility: hidden;">
                                     <h:commandLink value="nl" action="#{dssLanguageSelector.dutch}" lang="nl" class="blgm_lSwitch" />
                                 </li>
                                 </s:span>
                                 <s:span rendered="#{dssLanguageSelector.dutchActive}">
-                                <li class="blgm_active">
+                                <li class="blgm_active" style="visibility: hidden;">
                                     <h:commandLink value="nl" action="#{dssLanguageSelector.dutch}" lang="nl" class="blgm_lSwitch" />
                                 </li>
                                 </s:span>
 
-                                <!-- French -->
                                 <s:span rendered="#{not dssLanguageSelector.frenchActive}">
-                                    <li>
+                                    <li style="visibility: hidden;">
                                         <h:commandLink value="fr" action="#{dssLanguageSelector.french}" lang="fr" class="blgm_lSwitch" />
                                     </li>
                                 </s:span>
                                 <s:span rendered="#{dssLanguageSelector.frenchActive}">
-                                    <li class="blgm_active">
+                                    <li class="blgm_active" style="visibility: hidden;">
                                         <h:commandLink value="fr" action="#{dssLanguageSelector.french}" lang="fr" class="blgm_lSwitch" />
                                     </li>
                                 </s:span>
 
-                                <!-- German -->
                                 <s:span rendered="#{not dssLanguageSelector.germanActive}">
-                                    <li>
+                                    <li style="visibility: hidden;">
                                         <h:commandLink value="de" action="#{dssLanguageSelector.german}" lang="de" class="blgm_lSwitch" />
                                     </li>
                                 </s:span>
                                 <s:span rendered="#{dssLanguageSelector.germanActive}">
-                                    <li class="blgm_active">
+                                    <li class="blgm_active" style="visibility: hidden;">
                                         <h:commandLink value="de" action="#{dssLanguageSelector.german}" lang="de" class="blgm_lSwitch" />
                                     </li>
                                 </s:span>
                             </h:form>
                         </ul>
                         <div id="blgm_beLink">
-                            #{messages.otherServices}<a title="http://www.belgium.be/nl/" class="blgm_loglink" href="http://www.belgium.be">www.belgium.be</a>
+                            #{messages.otherServices}<a title="http://www.firmadigital.go.cr/" class="blgm_loglink" href="http://www.firmadigital.go.cr/">www.firmadigital.go.cr/</a>
                         </div>
                     </div>
                 </div>
@@ -121,7 +117,7 @@
                 <h1 class="siteLabel">
                         <span class="siteLogo">
                             <a href="#{facesContext.externalContext.requestContextPath}/main">
-                                <img alt="my.belgium.be" src="img/logo_fedict_text.jpg"/>
+                                <img alt="DNCD" src="img/logo_firmadigital.png" height="75px" style="margin-right: 20px;"/>
                                 <span class="siteName"><span>#{messages.title}</span></span>
                                 <span class="siteTag">#{messages.sitetag}<span></span></span>
                             </a>
@@ -142,6 +138,11 @@
             <div id="footerWrap">
                 <div id="footerWrap2">
                     <div class="copyright"><p>#{messages.copyright}</p>
+                    </div>
+                    <div class="rolosa-logo">
+                        <a href="http://www.rolosa.com" target="_blank" title="www.rolosa.com">Rolosa S.A.
+<!--                            <img alt="www.rolosa.com" src="img/rolosa.png" height="40px"/>-->
+                        </a>
                     </div>
                 </div>
             </div>

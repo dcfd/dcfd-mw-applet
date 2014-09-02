@@ -4,9 +4,9 @@ h3 { margin: 5px 0; }
 p { line-height: 1.35em; font-size: 1.2em; }
 strong { font-weight: bold; }
 
-/* header */
+/* header 
 #header .siteLabel .siteLogo .siteName span { color: #F6994C; }
-
+*/
 
 /* content */
 #content #contentWrap {
@@ -83,7 +83,7 @@ strong { font-weight: bold; }
     color: white;
     line-height: 30px;
 }
-#content .steps .step p span.active { background-color: #F6994C; }
+#content .steps .step p span.active { background-color: #c0cd29; }
 #content .steps div.arrow { width: 5%; float: left;}
 #content .steps div.arrow p { 
     display: inline-block;
@@ -158,4 +158,14 @@ form li input {
     font-weight: normal;
 }
 
+.copyright {
+    float: left;
+    padding-left: 300px;
+}
 
+
+.rolosa-logo{
+    float: right;
+    padding-top: 15px;
+    padding-right: 10px;
+}
