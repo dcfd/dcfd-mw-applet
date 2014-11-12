@@ -49,6 +49,7 @@ import org.apache.commons.logging.LogFactory;
 import be.fedict.eid.applet.service.Address;
 import be.fedict.eid.applet.service.EIdCertsData;
 import be.fedict.eid.applet.service.EIdData;
+import be.fedict.eid.applet.service.Gender;
 import be.fedict.eid.applet.service.Identity;
 import be.fedict.eid.applet.service.impl.RequestContext;
 import be.fedict.eid.applet.service.impl.ServiceLocator;
