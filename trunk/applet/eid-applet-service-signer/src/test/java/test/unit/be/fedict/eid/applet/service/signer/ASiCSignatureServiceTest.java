@@ -141,6 +141,10 @@ public class ASiCSignatureServiceTest {
 					throws Exception {
 				return "encoded time-stamp token".getBytes();
 			}
+
+                        public String getTimeStampServiceURL() {
+                            return "";
+                        }
 		};
 
 		ASiCSignatureService testedInstance = new ASiCSignatureService(

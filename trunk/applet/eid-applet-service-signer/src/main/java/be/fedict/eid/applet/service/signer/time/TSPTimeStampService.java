@@ -111,6 +111,11 @@ public class TSPTimeStampService implements TimeStampService {
 		this(tspServiceUrl, validator, null, null);
 	}
 
+        @Override
+        public String  getTimeStampServiceURL(){
+            return tspServiceUrl;
+        }
+
 	/**
 	 * Main constructor.
 	 * 
@@ -146,7 +151,7 @@ public class TSPTimeStampService implements TimeStampService {
 		}
 
 		this.digestAlgo = "SHA-1";
-		this.digestAlgoOid = TSPAlgorithms.SHA1;
+                this.digestAlgoOid = "1.3.14.3.2.26";//org.bouncycastle.tsp.TSPAlgorithms.SHA1.toString();
 	}
 
 	/**
@@ -181,18 +186,20 @@ public class TSPTimeStampService implements TimeStampService {
 	/**
 	 * Sets the digest algorithm used for time-stamping data. Example value:
 	 * "SHA-1".
-	 * 
+	 *     SHA-256:    2.16.840.1.101.3.4.2.1
+         *     SHA-384:    2.16.840.1.101.3.4.2.2
+         *     SHA-512:    2.16.840.1.101.3.4.2.3
 	 * @param digestAlgo
 	 */
 	public void setDigestAlgo(String digestAlgo) {
 		if ("SHA-1".equals(digestAlgo)) {
-			this.digestAlgoOid = TSPAlgorithms.SHA1;
+                        this.digestAlgoOid = "1.3.14.3.2.26";//org.bouncycastle.tsp.TSPAlgorithms.SHA1.toString();
 		} else if ("SHA-256".equals(digestAlgo)) {
-			this.digestAlgoOid = TSPAlgorithms.SHA256;
+                        this.digestAlgoOid = "2.16.840.1.101.3.4.2.1";//org.bouncycastle.tsp.TSPAlgorithms.SHA256.toString();
 		} else if ("SHA-384".equals(digestAlgo)) {
-			this.digestAlgoOid = TSPAlgorithms.SHA384;
+                        this.digestAlgoOid = "2.16.840.1.101.3.4.2.2";//org.bouncycastle.tsp.TSPAlgorithms.SHA384.toString();
 		} else if ("SHA-512".equals(digestAlgo)) {
-			this.digestAlgoOid = TSPAlgorithms.SHA512;
+                        this.digestAlgoOid = "2.16.840.1.101.3.4.2.3";//org.bouncycastle.tsp.TSPAlgorithms.SHA512.toString();
 		} else {
 			throw new IllegalArgumentException("unsupported digest algo: "
 					+ digestAlgo);
@@ -302,7 +309,7 @@ public class TSPTimeStampService implements TimeStampService {
 		TimeStampToken timeStampToken = timeStampResponse.getTimeStampToken();
 		SignerId signerId = timeStampToken.getSID();
 		BigInteger signerCertSerialNumber = signerId.getSerialNumber();
-		X500Principal signerCertIssuer = signerId.getIssuer();
+		X500Principal signerCertIssuer = new X500Principal(signerId.getIssuer().getEncoded());
 		LOG.debug("signer cert serial number: " + signerCertSerialNumber);
 		LOG.debug("signer cert issuer: " + signerCertIssuer);
 
@@ -334,30 +341,19 @@ public class TSPTimeStampService implements TimeStampService {
 					"TSP response token has no signer certificate");
 		}
 		List<X509Certificate> tspCertificateChain = new LinkedList<X509Certificate>();
-		/*X509Certificate certificate = signerCert;
-		do {
-			LOG.debug("adding to certificate chain: "
-					+ certificate.getSubjectX500Principal());
-			tspCertificateChain.add(certificate);
-			if (certificate.getSubjectX500Principal().equals(
-					certificate.getIssuerX500Principal())) {
-				break;
-			}
-			String aki = Hex.encodeHexString(getAuthorityKeyId(certificate));
-			certificate = certificateMap.get(aki);
-		} while (null != certificate);*/
 
-        X509Certificate tsaIssuer = loadCertificate("be/fedict/eid/applet/service/CA POLITICA SELLADO DE TIEMPO - COSTA RICA.crt");
-        X509Certificate rootCA = loadCertificate("be/fedict/eid/applet/service/CA RAIZ NACIONAL COSTA RICA.cer");
-        LOG.debug("adding to certificate chain: "
-                        + signerCert.getSubjectX500Principal());
-        tspCertificateChain.add(signerCert);
-        LOG.debug("adding to certificate chain: "
-                        + tsaIssuer.getSubjectX500Principal());
-        tspCertificateChain.add(tsaIssuer);
-        LOG.debug("adding to certificate chain: "
-                        + rootCA.getSubjectX500Principal());
-        tspCertificateChain.add(rootCA);
+
+                X509Certificate tsaIssuer = loadCertificate("be/fedict/eid/applet/service/CA POLITICA SELLADO DE TIEMPO - COSTA RICA.crt");
+                X509Certificate rootCA = loadCertificate("be/fedict/eid/applet/service/CA RAIZ NACIONAL COSTA RICA.cer");
+                LOG.debug("adding to certificate chain: "
+                                + signerCert.getSubjectX500Principal());
+                tspCertificateChain.add(signerCert);
+                LOG.debug("adding to certificate chain: "
+                                + tsaIssuer.getSubjectX500Principal());
+                tspCertificateChain.add(tsaIssuer);
+                LOG.debug("adding to certificate chain: "
+                                + rootCA.getSubjectX500Principal());
+                tspCertificateChain.add(rootCA);
 
 		// verify TSP signer signature
 		timeStampToken.validate(tspCertificateChain.get(0),
@@ -418,9 +414,10 @@ public class TSPTimeStampService implements TimeStampService {
 		}
 		DEROctetString oct = (DEROctetString) (new ASN1InputStream(
 				new ByteArrayInputStream(extvalue)).readObject());
-		AuthorityKeyIdentifier keyId = new AuthorityKeyIdentifier(
+		/*AuthorityKeyIdentifier keyId = new AuthorityKeyIdentifier(
 				(ASN1Sequence) new ASN1InputStream(new ByteArrayInputStream(
-						oct.getOctets())).readObject());
+						oct.getOctets())).readObject());*/
+                AuthorityKeyIdentifier keyId = new AuthorityKeyIdentifier( oct.getOctets()  );
 		return keyId.getKeyIdentifier();
 	}
 }

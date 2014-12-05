@@ -199,8 +199,8 @@ public class PkiTestUtils {
 			GeneralName gn = new GeneralName(
 					GeneralName.uniformResourceIdentifier, new DERIA5String(
 							crlUri));
-			GeneralNames gns = new GeneralNames(new DERSequence(gn));
-			DistributionPointName dpn = new DistributionPointName(0, gns);
+			//GeneralNames gns = new GeneralNames(new DERSequence(gn));
+			DistributionPointName dpn = new DistributionPointName(0, gn);
 			DistributionPoint distp = new DistributionPoint(dpn, null, null);
 			certificateGenerator.addExtension(
 					X509Extensions.CRLDistributionPoints, false,

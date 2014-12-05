@@ -48,6 +48,8 @@ import org.junit.Test;
 
 import be.fedict.eid.applet.service.signer.cms.AbstractCMSSignatureService;
 import be.fedict.eid.applet.service.spi.DigestInfo;
+import java.security.cert.X509CertSelector;
+import org.bouncycastle.cms.jcajce.JcaX509CertSelectorConverter;
 
 public class AbstractCMSSignatureServiceTest {
 

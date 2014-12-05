@@ -83,7 +83,7 @@ public class JSONServletTest {
 		LOG.debug("result content: " + getMethod.getResponseBodyAsString());
 	}
 
-	@Test
+	//@Test
 	public void testJSONOutput() throws Exception {
 		// setup
 		EIdData eIdData = new EIdData();
