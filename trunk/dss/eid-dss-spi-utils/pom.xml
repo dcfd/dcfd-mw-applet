@@ -31,6 +31,11 @@
 			<groupId>be.fedict.eid-applet</groupId>
 			<artifactId>eid-applet-service-signer</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.49</version> 
+		</dependency>
 
 		<!-- Test Dependencies -->
 		<dependency>

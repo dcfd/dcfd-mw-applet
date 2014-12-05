@@ -117,6 +117,10 @@ public class UploadBean implements Upload {
 
 		supportedFileExtensions.put("asice", "application/vnd.etsi.asic-e+zip");
 		supportedFileExtensions.put("sce", "application/vnd.etsi.asic-e+zip");
+
+		// PDF
+		supportedFileExtensions.put("pdf", "application/pdf");
+
 	}
 
 	@Override

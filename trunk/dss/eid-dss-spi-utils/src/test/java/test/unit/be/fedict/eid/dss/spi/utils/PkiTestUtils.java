@@ -189,8 +189,9 @@ public class PkiTestUtils {
 			GeneralName gn = new GeneralName(
 					GeneralName.uniformResourceIdentifier, new DERIA5String(
 							crlUri));
-			GeneralNames gns = new GeneralNames(new DERSequence(gn));
-			DistributionPointName dpn = new DistributionPointName(0, gns);
+			//GeneralNames gns = new GeneralNames(new DERSequence(gn));
+			//DistributionPointName dpn = new DistributionPointName(0, gns);
+                        DistributionPointName dpn = new DistributionPointName(0, gn);
 			DistributionPoint distp = new DistributionPoint(dpn, null, null);
 			certificateGenerator.addExtension(
 					X509Extensions.CRLDistributionPoints, false,
@@ -335,7 +336,7 @@ public class PkiTestUtils {
 
 		MessageDigest md;
 		try {
-			md = MessageDigest.getInstance(TSPAlgorithms.SHA1);
+			md = MessageDigest.getInstance(TSPAlgorithms.SHA1.toString());
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException(e);
 		}
