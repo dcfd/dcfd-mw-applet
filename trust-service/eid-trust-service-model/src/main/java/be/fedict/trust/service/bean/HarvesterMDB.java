@@ -68,6 +68,8 @@ import be.fedict.trust.service.entity.RevokedCertificateEntity;
 import be.fedict.trust.service.entity.Status;
 import be.fedict.trust.service.snmp.SNMP;
 import be.fedict.trust.service.snmp.SNMPInterceptor;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.X509Name;
 
 /**
  * Harvester Message Driven Bean.
@@ -265,8 +267,9 @@ public class HarvesterMDB implements MessageListener {
 
 				TBSCertList.CRLEntry entry = (TBSCertList.CRLEntry) revokedCertificatesEnum
 						.nextElement();
-				X509CRLEntryObject revokedCertificate = new X509CRLEntryObject(
-						entry, isIndirect, previousCertificateIssuer);
+                                X500Name x500name = new X500Name( previousCertificateIssuer.getName(X500Principal.RFC1779) );
+                                X509CRLEntryObject revokedCertificate = new X509CRLEntryObject(
+						entry, isIndirect, x500name);
 				previousCertificateIssuer = revokedCertificate
 						.getCertificateIssuer();
 
