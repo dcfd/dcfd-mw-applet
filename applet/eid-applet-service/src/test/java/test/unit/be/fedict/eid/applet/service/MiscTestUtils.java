@@ -118,7 +118,8 @@ public class MiscTestUtils {
 			GeneralName gn = new GeneralName(
 					GeneralName.uniformResourceIdentifier, new DERIA5String(
 							crlUri));
-			GeneralNames gns = new GeneralNames(new DERSequence(gn));
+
+            GeneralNames gns = new GeneralNames(gn);
 			DistributionPointName dpn = new DistributionPointName(0, gns);
 			DistributionPoint distp = new DistributionPoint(dpn, null, null);
 			certificateGenerator.addExtension(

@@ -50,10 +50,6 @@ public class DerTest {
 				+ new String(Hex.encodeHex(encodedDerSequence)));
 		LOG.debug("ASN.1 DER sequence: " + ASN1Dump.dumpAsString(derSequence));
 
-		DERInteger derInteger = new DERInteger(1234);
-		byte[] encodedDerInteger = derInteger.getDEREncoded();
-		LOG.debug("DER integer: "
-				+ new String(Hex.encodeHex(encodedDerInteger)));
 	}
 
 	@Test

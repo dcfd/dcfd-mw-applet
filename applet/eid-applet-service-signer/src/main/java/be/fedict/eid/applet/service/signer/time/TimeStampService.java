@@ -44,4 +44,6 @@ public interface TimeStampService {
 	 */
 	byte[] timeStamp(byte[] data, RevocationData revocationData)
 			throws Exception;
+
+        public String  getTimeStampServiceURL();
 }

@@ -15,7 +15,6 @@
  * License along with this software; if not, see 
  * http://www.gnu.org/licenses/.
  */
-
 package be.fedict.eid.applet.service.signer;
 
 import javax.xml.crypto.dsig.DigestMethod;
@@ -27,7 +26,6 @@ public enum DigestAlgo {
     SHA512("SHA-512", DigestMethod.SHA512);
 //    SHA384("SHA-384");
 //    TODO: no support exists atm in java 6's XMLDSigRI provider nor in apache's xml-security head for RIPEMD160("RIPEMD160");
-
     private final String algoId;
     private final String xmlAlgoId;
 
@@ -52,5 +50,16 @@ public enum DigestAlgo {
     public String getXmlAlgoId() {
 
         return this.xmlAlgoId;
+    }
+
+    public String getPlainAlgo() {
+        if ("SHA-1".equals(this.algoId)) {
+            return "SHA1";
+        } else if ("SHA-256".equals(this.algoId)) {
+            return "SHA256";
+        } else if ("SHA-512".equals(this.algoId)) {
+            return "SHA512";
+        }
+        return null;
     }
 }
