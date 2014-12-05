@@ -94,6 +94,7 @@ import be.fedict.eid.applet.service.signer.jaxb.xades132.UnsignedSignatureProper
 import be.fedict.eid.applet.service.signer.jaxb.xades132.XAdESTimeStampType;
 import be.fedict.eid.applet.service.signer.jaxb.xmldsig.X509IssuerSerialType;
 import be.fedict.eid.dss.spi.utils.exception.XAdESValidationException;
+import org.bouncycastle.jce.X509Principal;
 
 /**
  * Some XAdES Utility methods.
@@ -180,7 +181,8 @@ public abstract class XAdESUtils {
 		try {
 			SignerId signerId = timeStampToken.getSID();
 			BigInteger signerCertSerialNumber = signerId.getSerialNumber();
-			X500Principal signerCertIssuer = signerId.getIssuer();
+			//X500Principal signerCertIssuer = signerId.getIssuer();
+                        X500Principal signerCertIssuer = new X500Principal(signerId.getIssuer().getEncoded());
 
 			CertStore certStore = timeStampToken.getCertificatesAndCRLs(
 					"Collection", BouncyCastleProvider.PROVIDER_NAME);
@@ -218,8 +220,7 @@ public abstract class XAdESUtils {
 				+ timeStampToken.getTimeStampInfo().getMessageImprintAlgOID());
 		MessageDigest md;
 		try {
-			md = MessageDigest.getInstance(timeStampToken.getTimeStampInfo()
-					.getMessageImprintAlgOID());
+            md = MessageDigest.getInstance(timeStampToken.getTimeStampInfo().getMessageImprintAlgOID().getId());
 		} catch (NoSuchAlgorithmException e) {
 			throw new XAdESValidationException(e);
 		}
@@ -686,10 +687,15 @@ public abstract class XAdESUtils {
 		}
 		X509Name issuerName;
 		try {
-			issuerName = new X509Name(
+			/*issuerName = new X509Name(
 					(ASN1Sequence) new ASN1InputStream(signingCertificate
 							.getIssuerX500Principal().getEncoded())
-							.readObject());
+							.readObject());*/
+                    X509Principal sprin = new X509Principal(signingCertificate.getIssuerX500Principal().getEncoded());
+
+                    //issuerName = new X509Name( signingCertificate.getIssuerX500Principal().getName(X500Principal.RFC1779) );
+                    issuerName = new X509Name( sprin.getName() );
+
 		} catch (IOException e) {
 			throw new XAdESValidationException(
 					"error parsing xades:SigningCertificate ds:X509IssuerName: "

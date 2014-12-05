@@ -26,6 +26,7 @@
 		<module>eid-dss-protocol-simple-client</module>
 		<module>eid-dss-document-xml</module>
 		<module>eid-dss-document-odf</module>
+		<module>eid-dss-document-pdf</module>
 		<module>eid-dss-document-ooxml</module>
 		<module>eid-dss-document-zip</module>
 		<module>eid-dss-document-asic</module>
@@ -215,8 +216,8 @@
 				<version>4.0.2.GA</version>
 			</dependency>
 			<dependency>
-				<groupId>be.fedict.jtrust</groupId>
-				<artifactId>jtrust-lib</artifactId>
+				<groupId>be.fedict</groupId>
+				<artifactId>jtrust</artifactId>
 				<version>${jtrust.version}</version>
 			</dependency>
 			<dependency>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DigitalSignatureServiceDocument xmlns="urn:be:fedict:eid:dss:spi:document">
+	<Name>PDF Document</Name>
+	<Description>PDF Documents</Description>
+	<DocumentServiceClass>be.fedict.eid.dss.document.pdf.PDFDSSDocumentService</DocumentServiceClass>
+	<ContentType>application/pdf</ContentType>
+</DigitalSignatureServiceDocument>

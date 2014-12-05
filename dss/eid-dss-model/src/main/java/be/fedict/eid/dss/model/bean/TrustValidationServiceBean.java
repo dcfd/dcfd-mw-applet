@@ -69,6 +69,7 @@ import be.fedict.trust.client.XKMS2Client;
 import be.fedict.trust.client.exception.RevocationDataNotFoundException;
 import be.fedict.trust.client.exception.TrustDomainNotFoundException;
 import be.fedict.trust.client.exception.ValidationFailedException;
+import org.bouncycastle.asn1.x500.X500Name;
 
 @Stateless
 public class TrustValidationServiceBean implements TrustValidationService {
@@ -158,58 +159,43 @@ public class TrustValidationServiceBean implements TrustValidationService {
 		 * 
 		 */
 
-        SignerId signerId = timeStampToken.getSID();
-        BigInteger signerCertSerialNumber = signerId.getSerialNumber();
-        X500Principal signerCertIssuer = signerId.getIssuer();
-        LOG.debug("signer cert serial number: " + signerCertSerialNumber);
-        LOG.debug("signer cert issuer: " + signerCertIssuer);
+                SignerId signerId = timeStampToken.getSID();
+                BigInteger signerCertSerialNumber = signerId.getSerialNumber();
+                //X500Principal signerCertIssuer = signerId.getIssuer();
 
-        // TSP signer certificates retrieval
-        CertStore certStore = timeStampToken.getCertificatesAndCRLs(
-                        "Collection", BouncyCastleProvider.PROVIDER_NAME);
-        Collection<? extends Certificate> certificates = certStore
-                        .getCertificates(null);
-        X509Certificate signerCert = null;
-        Map<String, X509Certificate> certificateMap = new HashMap<String, X509Certificate>();
-        for (Certificate certificate : certificates) {
-                X509Certificate x509Certificate = (X509Certificate) certificate;
-                if (signerCertIssuer.equals(x509Certificate
-                                .getIssuerX500Principal())
-                                && signerCertSerialNumber.equals(x509Certificate
-                                                .getSerialNumber())) {
-                        signerCert = x509Certificate;
-                }
-                String ski = Hex.encodeHexString(getSubjectKeyId(x509Certificate));
-                certificateMap.put(ski, x509Certificate);
-                LOG.debug("embedded certificate: "
-                                + x509Certificate.getSubjectX500Principal() + "; SKI="
-                                + ski);
-        }
+                X500Principal signerCertIssuer = new X500Principal(signerId.getIssuer().getEncoded());
 
-        // TSP signer cert path building
-        if (null == signerCert) {
-                throw new RuntimeException(
-                                "TSP response token has no signer certificate");
-        }
-        List<X509Certificate> tspCertificateChain = new LinkedList<X509Certificate>();
-        /*X509Certificate certificate = signerCert;
-        do {
-                LOG.debug("adding to certificate chain: "
-                                + certificate.getSubjectX500Principal());
-                tspCertificateChain.add(certificate);
-                if (certificate.getSubjectX500Principal().equals(
-                                certificate.getIssuerX500Principal())) {
-                        break;
+                LOG.debug("signer cert serial number: " + signerCertSerialNumber);
+                LOG.debug("signer cert issuer: " + signerCertIssuer);
+
+                // TSP signer certificates retrieval
+                CertStore certStore = timeStampToken.getCertificatesAndCRLs(
+                                "Collection", BouncyCastleProvider.PROVIDER_NAME);
+                Collection<? extends Certificate> certificates = certStore
+                                .getCertificates(null);
+                X509Certificate signerCert = null;
+                Map<String, X509Certificate> certificateMap = new HashMap<String, X509Certificate>();
+                for (Certificate certificate : certificates) {
+                        X509Certificate x509Certificate = (X509Certificate) certificate;
+                        if (signerCertIssuer.equals(x509Certificate
+                                        .getIssuerX500Principal())
+                                        && signerCertSerialNumber.equals(x509Certificate
+                                                        .getSerialNumber())) {
+                                signerCert = x509Certificate;
+                        }
+                        String ski = Hex.encodeHexString(getSubjectKeyId(x509Certificate));
+                        certificateMap.put(ski, x509Certificate);
+                        LOG.debug("embedded certificate: "
+                                        + x509Certificate.getSubjectX500Principal() + "; SKI="
+                                        + ski);
                 }
-                String aki = Hex.encodeHexString(getAuthorityKeyId(certificate));
-                certificate = certificateMap.get(aki);
-        } while (null != certificate);
-		     
-        if (false == signerCert.equals(tspCertificateChain.get(0))) {
-                throw new SecurityException("TST signing certificate mismatch");
-        }*/
-        
-        
+
+                // TSP signer cert path building
+                if (null == signerCert) {
+                        throw new RuntimeException(
+                                        "TSP response token has no signer certificate");
+                }
+                List<X509Certificate> tspCertificateChain = new LinkedList<X509Certificate>();
 
                 X509Certificate tsaIssuer = loadCertificate("be/fedict/eid/dss/CA POLITICA SELLADO DE TIEMPO - COSTA RICA.crt");
                 X509Certificate rootCA = loadCertificate("be/fedict/eid/dss/CA RAIZ NACIONAL COSTA RICA.cer");
@@ -274,9 +260,11 @@ public class TrustValidationServiceBean implements TrustValidationService {
         }
         DEROctetString oct = (DEROctetString) (new ASN1InputStream(
                         new ByteArrayInputStream(extvalue)).readObject());
-        AuthorityKeyIdentifier keyId = new AuthorityKeyIdentifier(
+        /*AuthorityKeyIdentifier keyId = new AuthorityKeyIdentifier(
                         (ASN1Sequence) new ASN1InputStream(new ByteArrayInputStream(
-                                        oct.getOctets())).readObject());
+                                        oct.getOctets())).readObject());*/
+        AuthorityKeyIdentifier keyId = new AuthorityKeyIdentifier( oct.getOctets() );
+
         return keyId.getKeyIdentifier();
 	}
 }

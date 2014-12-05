@@ -484,6 +484,11 @@ public class XAdESValidationTest {
 
 			return timeStampToken.getEncoded();
 		}
+
+                @Override
+                public String getTimeStampServiceURL() {
+                    return "";
+                }
 	}
 
 }
