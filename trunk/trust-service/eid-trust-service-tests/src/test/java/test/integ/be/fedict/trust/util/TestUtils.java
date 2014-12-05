@@ -241,8 +241,8 @@ public class TestUtils {
 
 		if (timeStampingPurpose) {
 			certificateGenerator.addExtension(X509Extensions.ExtendedKeyUsage,
-					true, new ExtendedKeyUsage(new DERSequence(
-							KeyPurposeId.id_kp_timeStamping)));
+					true, new ExtendedKeyUsage(
+							KeyPurposeId.id_kp_timeStamping));
 		}
 
 		if (null != ocspUri) {
@@ -259,7 +259,7 @@ public class TestUtils {
 			GeneralName gn = new GeneralName(
 					GeneralName.uniformResourceIdentifier, new DERIA5String(
 							crlUri));
-			GeneralNames gns = new GeneralNames(new DERSequence(gn));
+			GeneralNames gns = new GeneralNames(gn);
 			DistributionPointName dpn = new DistributionPointName(0, gns);
 			DistributionPoint distp = new DistributionPoint(dpn, null, null);
 			certificateGenerator.addExtension(
@@ -643,7 +643,7 @@ public class TestUtils {
 				new DERIA5String(uri));
 		ASN1EncodableVector vec = new ASN1EncodableVector();
 		vec.add(gn);
-		GeneralNames gns = new GeneralNames(new DERSequence(vec));
+		GeneralNames gns = new GeneralNames(gn);
 		DistributionPointName dpn = new DistributionPointName(0, gns);
 		return new DistributionPoint(dpn, null, null);
 	}

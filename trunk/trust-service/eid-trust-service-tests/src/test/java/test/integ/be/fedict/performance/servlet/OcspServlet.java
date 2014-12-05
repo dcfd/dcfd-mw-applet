@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.ocsp.RevokedInfo;
 import org.bouncycastle.ocsp.BasicOCSPResp;
@@ -102,7 +103,7 @@ public class OcspServlet extends HttpServlet {
 						.compareTo(maxRevokedSN)) {
 					LOG.debug("revoked");
 					ocspRespGen.addResponse(req.getCertID(), new RevokedStatus(
-							new RevokedInfo(new DERGeneralizedTime(new Date()),
+							new RevokedInfo(new ASN1GeneralizedTime(new Date()),
 									null)));
 				} else {
 					ocspRespGen.addResponse(req.getCertID(),
