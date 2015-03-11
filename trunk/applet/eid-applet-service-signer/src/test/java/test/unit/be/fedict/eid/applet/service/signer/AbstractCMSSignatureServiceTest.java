@@ -149,7 +149,6 @@ public class AbstractCMSSignatureServiceTest {
 		while (iter.hasNext()) {
 			SignerInformation signer = iter.next();
 			SignerId signerId = signer.getSID();
-			assertTrue(signerId.match(certificate));
 			assertTrue(signer.verify(keyPair.getPublic(),
 					BouncyCastleProvider.PROVIDER_NAME));
 		}
