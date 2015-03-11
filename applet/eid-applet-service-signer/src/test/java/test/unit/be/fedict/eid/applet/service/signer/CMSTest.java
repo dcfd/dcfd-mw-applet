@@ -354,7 +354,7 @@ public class CMSTest {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testRetrieveCMSDigestValue() throws Exception {
 		// setup
 		KeyPair keyPair = PkiTestUtils.generateKeyPair();

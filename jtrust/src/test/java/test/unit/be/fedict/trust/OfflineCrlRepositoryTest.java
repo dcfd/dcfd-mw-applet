@@ -18,6 +18,8 @@
 
 package test.unit.be.fedict.trust;
 
+import java.security.Security;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import be.fedict.trust.crl.OfflineCrlRepository;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -37,6 +39,11 @@ public class OfflineCrlRepositoryTest {
 
 	private Date validationDate;
 
+        static {
+                if (null == Security.getProvider(BouncyCastleProvider.PROVIDER_NAME)) {
+                        Security.addProvider(new BouncyCastleProvider());
+                }
+        }
 	@Before
 	public void setUp() throws Exception {
 		this.validationDate = new Date();

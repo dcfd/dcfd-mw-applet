@@ -202,7 +202,7 @@ public class PublicKeyTrustLinker implements TrustLinker {
 			return false;
 		}
 		ASN1Sequence basicConstraintsSequence = (ASN1Sequence) basicConstraintsDecoded;
-		BasicConstraints basicConstraints = new BasicConstraints(
+		BasicConstraints basicConstraints = BasicConstraints.getInstance(
 				basicConstraintsSequence);
 
 		return basicConstraints.isCA();
